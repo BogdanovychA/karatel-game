@@ -6,7 +6,7 @@ from settings import OUTPUT_MODE
 
 class OutputSpace(ABC):
     @abstractmethod
-    def write(self, text: str) -> None:
+    def write(self, *args, **kwargs) -> None:
         """Виводимо текст у "відкритий простір"""
         pass
 
