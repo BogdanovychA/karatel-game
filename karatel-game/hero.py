@@ -314,7 +314,13 @@ class EquipmentManager:
     def __init__(self, hero: Hero) -> None:
         self.hero = hero
 
-    def equip_item(self, hand_name: str, item, default_item, log=True) -> None:
+    def equip_item(
+        self,
+        hand_name: str,
+        item: Weapon | Shield,
+        default_item: Weapon | Shield,
+        log=True,
+    ) -> None:
         """Допоміжна функція для екіпірування предмета.
         Для забезпечення принципів DRY"""
 
