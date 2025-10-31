@@ -12,6 +12,7 @@ from items import (
 )
 from professions import PROFESSIONS, Profession, show_professions
 from settings import (
+    BASE_SKILL_LEVELS,
     DEBUG,
     EXPERIENCE_FOR_LEVEL,
     FEMALE_NAMES,
@@ -287,15 +288,16 @@ class SkillSystem:
         Використовується при "докручуванні" до потрібного рівня"""
 
         match self.hero.level:
-            case 1:
+
+            case level if level == BASE_SKILL_LEVELS[0]:
                 self.learn_skill(SKILLS["self_heal_small"], log=log)
-            case 6:
+            case level if level == BASE_SKILL_LEVELS[1]:
                 self.forget_skill(SKILLS["self_heal_small"], log=log)
                 self.learn_skill(SKILLS["self_heal_medium"], log=log)
-            case 12:
+            case level if level == BASE_SKILL_LEVELS[2]:
                 self.forget_skill(SKILLS["self_heal_medium"], log=log)
                 self.learn_skill(SKILLS["self_heal_strong"], log=log)
-            case 19:
+            case level if level == BASE_SKILL_LEVELS[3]:
                 self.forget_skill(SKILLS["self_heal_strong"], log=log)
                 self.learn_skill(SKILLS["self_heal_ultimate"], log=log)
 
