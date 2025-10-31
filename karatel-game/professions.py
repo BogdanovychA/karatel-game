@@ -1,7 +1,9 @@
 # -*- coding: utf-8 -*-
 from dataclasses import dataclass
 
+from settings import LOG
 from translations import TRANSLATIONS
+from utils import log_print
 
 
 @dataclass
@@ -67,17 +69,13 @@ def show_professions(professions: str | list[str] | None = None) -> None:
 
     for profession in professions:
         prof = PROFESSIONS[profession]
-        print(
+        log_print(
             f"""
 ==============================
 {prof.name.upper()}. {prof.description}
 Основні бонуси: {', '.join(TRANSLATIONS.get(bonus, bonus) for bonus in prof.main_bonuses)}
 Вторинні бонуси: {', '.join(TRANSLATIONS.get(bonus, bonus) for bonus in prof.secondary_bonuses)}
 Штрафи: {', '.join(TRANSLATIONS.get(bonus, bonus) for bonus in prof.penalties)}
-"""
+""",
+            log=LOG,
         )
-
-
-if __name__ == "__main__":
-    for item in PROFESSIONS:
-        print(PROFESSIONS[item])

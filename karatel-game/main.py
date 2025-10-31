@@ -6,8 +6,8 @@ from professions import PROFESSIONS
 from skills import SKILLS, SkillTiming
 
 # hero_a = Hero()
-hero_a = HeroFactory.generate(5)
-# hero_a = HeroFactory.create()
+# hero_a = HeroFactory.generate(5)
+hero_a = HeroFactory.create()
 # hero_a.skill_manager.forget_skill(SKILLS["self_heal_small"])
 hero_a.display.show()
 # hero_a.hp=1
@@ -30,7 +30,7 @@ hero_b = HeroFactory.generate(5)
 hero_b.display.show()
 #
 fight(hero_a, hero_b)
-fight(hero_a, hero_b)
+# fight(hero_a, hero_b)
 
 hero_a.display.show()
 hero_b.display.show()

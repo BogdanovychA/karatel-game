@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
-import time
+
+from ui import ui
 
 
 def get_modifier(stat_value: int) -> int:
@@ -15,5 +16,4 @@ def clamp_value(value, min_value, max_value):
 def log_print(*args, log=True, **kwargs):
     """Для виводу тексту в залежності від log"""
     if log:
-        time.sleep(1)
-        print(*args, **kwargs)
+        ui.write(*args, **kwargs)

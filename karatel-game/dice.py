@@ -1,6 +1,9 @@
 # -*- coding: utf-8 -*-
 import random
 
+from settings import DEBUG
+from utils import log_print
+
 
 class Dice:
     """
@@ -27,11 +30,21 @@ class Dice:
         # Беремо строку, розділювач "+", додаємо "0", якщо в функцію
         # не передали модифікатор, вибираємо тільки два перші елементи
         num_sides, modifier = (dice_expression.split("+") + [0])[:2]
-        # print(f"Кубиків: {num_dice}, Граней: {num_sides}, Модифікатор: {modifier}")
+        log_print(
+            f"Кубиків: {num_dice}, Граней: {num_sides}, Модифікатор: {modifier}",
+            log=DEBUG,
+        )
 
         total = 0
         for _ in range(int(num_dice)):
             value = random.randint(1, int(num_sides))
             total += value
 
-        return total + int(modifier)
+        result = total + int(modifier)
+        log_print(
+            f"Загальний результат: {result} це сума кидків: {total} "
+            + f"плюс модифікатор: {modifier}\n",
+            log=DEBUG,
+        )
+
+        return result

@@ -9,7 +9,7 @@ from dice import Dice
 if TYPE_CHECKING:
     from hero import Hero
 
-from utils import clamp_value, log_print
+from utils import log_print
 
 
 class SkillTiming(Enum):
@@ -108,8 +108,3 @@ SKILLS = {
         skill_timing=SkillTiming.POST_BATTLE,
     ),
 }
-
-
-if __name__ == "__main__":
-    for item in SKILLS:
-        print(SKILLS[item])

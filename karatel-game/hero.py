@@ -16,6 +16,7 @@ from settings import (
     DEBUG,
     EXPERIENCE_FOR_LEVEL,
     FEMALE_NAMES,
+    LOG,
     MALE_NAMES,
     MAX_LEVEL,
     MIN_LEVEL,
@@ -133,17 +134,20 @@ class HeroDisplay:
     def show(self) -> None:
         """Виводить повну інформацію про героя."""
         if self.hero.alive:
-            print(self.hero, end="\n")
+            log_print(self.hero, end="\n", log=LOG)
             self.level()
             self.stats()
             self.skills()
             self.inventory()
         else:
-            print(f"{self.hero.name} - мертвий\n\n")
+            log_print(f"{self.hero.name} - мертвий\n\n", log=LOG)
 
     def level(self) -> None:
         """Виводить рівень та досвід."""
-        print(f"Рівень: [{self.hero.level}]. " + f"Досвід: [{self.hero.experience}]")
+        log_print(
+            f"Рівень: [{self.hero.level}]. " + f"Досвід: [{self.hero.experience}]",
+            log=LOG,
+        )
 
     def stats(self) -> None:
         """Виводить характеристики героя."""
@@ -151,40 +155,41 @@ class HeroDisplay:
             f"{TRANSLATIONS.get(stat, stat)}: {self.hero.stats[stat]}"
             for stat in self.hero.stats
         ]
-        print(f"Характеристики: [{', '.join(stats_list)}]")
-        print(
+        log_print(f"Характеристики: [{', '.join(stats_list)}]", log=LOG)
+        log_print(
             f"Здоров'я: [{self.hero.hp} з {self.hero.max_hp}]. "
             + f"Клас броні: [{self.hero.ac}]. "
             + f"Модифікатор ініціативи: [{self.hero.initiative}]. "
-            + f"Модифікатор атаки: [{self.hero.attack_modifier}]."
+            + f"Модифікатор атаки: [{self.hero.attack_modifier}].",
+            log=LOG,
         )
 
     def skills(self) -> None:
         """Виводить навички героя."""
 
         if self.hero.skills is None or self.hero.skills == []:
-            print("Навички: [відсутні]")
+            log_print("Навички: [відсутні]", log=LOG)
         else:
-            print("Навички: ")
+            log_print("Навички: ", log=LOG)
             for item in self.hero.skills:
-                print(f"* {item}")
+                log_print(f"* {item}", log=LOG)
 
     def inventory(self) -> None:
         """Виводить екіпірування та інвентар."""
 
-        print("Права рука: ", end="")
-        print(self.hero.right_hand)
-        print("Ліва рука: ", end="")
-        print(self.hero.left_hand)
+        log_print("Права рука: ", end="", log=LOG)
+        log_print(self.hero.right_hand, log=LOG)
+        log_print("Ліва рука: ", end="", log=LOG)
+        log_print(self.hero.left_hand, log=LOG)
 
         if self.hero.inventory is None or self.hero.inventory == []:
-            print("Інвентар: [пусто]")
+            log_print("Інвентар: [пусто]", log=LOG)
         else:
-            print("Інвентар: ")
+            log_print("Інвентар: ", log=LOG)
             for item in self.hero.inventory:
-                print(f"* {item}")
+                log_print(f"* {item}", log=LOG)
 
-        print(f"Гроші: {self.hero.money} грн", end="\n\n")
+        log_print(f"Гроші: {self.hero.money} грн", end="\n\n", log=LOG)
 
 
 class LevelSystem:
@@ -246,7 +251,7 @@ class LevelSystem:
         ):
             self.hero.level += 1
             self.level_up(log=log)
-            log_print(f"Рівень {self.hero.name} підвищено:", self.hero.level, log=log)
+            log_print(f"Рівень {self.hero.name} підвищено: {self.hero.level}", log=log)
 
         if self.hero.level < MAX_LEVEL:
             log_print(
@@ -380,17 +385,17 @@ class HeroFactory:
     """Клас управління героєм"""
 
     @staticmethod
-    def create() -> Hero:
+    def create(log=LOG) -> Hero:
         """Для створення героя гравцем"""
         name = input("Введіть ім'я вашого персонажа: ")
         professions = list(PROFESSIONS.keys())
         menu = {}
         while True:
-            print("Обери одну з професій:")
+            log_print("Обери одну з професій:", log=LOG)
             for i in range(len(PROFESSIONS)):
-                print(i + 1, "-", PROFESSIONS[professions[i]].name)
+                log_print(i + 1, "-", PROFESSIONS[professions[i]].name, log=LOG)
                 menu[str(i + 1)] = professions[i]
-            print("L - Переглянути опис професій")
+            log_print("L - Переглянути опис професій", log=LOG)
             choice = input("Зроби свій вибір: ").upper()
             if choice == "L" or choice == "Д":
                 show_professions()
@@ -398,8 +403,11 @@ class HeroFactory:
                 profession = PROFESSIONS[menu[choice]]
                 break
             else:
-                print("\nЗробіть правильний вибір!")
-        print(f"Створюємо персонажа з ім'ям {name} та " f"професією {profession.name}")
+                log_print("\nЗробіть правильний вибір!", log=LOG)
+        log_print(
+            f"Створюємо персонажа з ім'ям {name} та " f"професією {profession.name}",
+            log=LOG,
+        )
         return Hero(name, profession)
 
     @staticmethod

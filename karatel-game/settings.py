@@ -5,6 +5,10 @@ DEBUG = False
 
 XP_MULTIPLIER = 50
 
+OUTPUT_MODE = "console"
+# OUTPUT_MODE = "gui"
+# OUTPUT_MODE = "test"
+
 EXPERIENCE_FOR_LEVEL = (
     0,
     300,

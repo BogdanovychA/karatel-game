@@ -348,13 +348,3 @@ def select_shield(level: int = 1) -> Shield:
 UNARMED_STRIKE = STRENGTH_WEAPONS[0]
 # Створюємо дефолтний щит
 JUST_HAND = SHIELDS[0]
-
-if __name__ == "__main__":
-    for item in (
-        STRENGTH_WEAPONS
-        + DEXTERITY_WEAPONS
-        + INTELLIGENCE_WEAPONS
-        + CHARISMA_WEAPONS
-        + SHIELDS
-    ):
-        print(item)
