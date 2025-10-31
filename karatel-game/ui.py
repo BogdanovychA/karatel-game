@@ -18,16 +18,27 @@ class ConsoleOutput(OutputSpace):
         print(text, **kwargs)
 
 
-class WebOutput(OutputSpace):
+class BufferedOutput(OutputSpace):
+    """Вивід у буфер (для тестів або GUI)"""
+
+    def __init__(self):
+        self.buffer: list[str] = []
+
     def write(self, *args, **kwargs) -> None:
         text = " ".join(str(a) for a in args)
-        print(text, **kwargs)
+        self.buffer.append(text)
+
+    def get_buffer(self) -> list[str]:
+        """Отримати весь буфер"""
+        return self.buffer
+
+    def clear(self) -> None:
+        """Очистити буфер"""
+        self.buffer.clear()
 
 
 match OUTPUT_MODE:
     case "gui":
-        ui = WebOutput()
-    case "console":
-        ui = ConsoleOutput()
-    case _:
+        ui = BufferedOutput()
+    case "console" | _:
         ui = ConsoleOutput()
