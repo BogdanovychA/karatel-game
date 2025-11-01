@@ -12,10 +12,11 @@ class OutputSpace(ABC):
 
 
 class ConsoleOutput(OutputSpace):
-    def write(self, *args, **kwargs) -> None:
-        text = " ".join(str(a) for a in args)
-        time.sleep(1)
-        print(text, **kwargs)
+    def write(self, *args, log=True, **kwargs) -> None:
+        if log:
+            text = " ".join(str(a) for a in args)
+            time.sleep(0.5)
+            print(text, **kwargs)
 
 
 class BufferedOutput(OutputSpace):

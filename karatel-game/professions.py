@@ -3,7 +3,7 @@ from dataclasses import dataclass
 
 from settings import LOG
 from translations import TRANSLATIONS
-from utils import log_print
+from ui import ui
 
 
 @dataclass
@@ -69,7 +69,7 @@ def show_professions(professions: str | list[str] | None = None) -> None:
 
     for profession in professions:
         prof = PROFESSIONS[profession]
-        log_print(
+        ui.write(
             f"""
 ==============================
 {prof.name.upper()}. {prof.description}

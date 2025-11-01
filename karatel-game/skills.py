@@ -9,7 +9,7 @@ from dice import Dice
 if TYPE_CHECKING:
     from hero import Hero
 
-from utils import log_print
+from ui import ui
 
 
 class SkillTiming(Enum):
@@ -76,7 +76,7 @@ class HealSelfSkill(Skill):
                     power = self.power
             # Обмеження максимального здоров'я реалізовано через сеттер Hero.hp
             hero.hp += power
-            log_print(
+            ui.write(
                 f"{hero.name} Відновлює {power} здоров'я за допомогою {self.name}\n",
                 log=log,
             )

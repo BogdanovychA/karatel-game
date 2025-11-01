@@ -23,9 +23,8 @@ from settings import (
 )
 from skills import SKILLS, Skill, SkillTiming
 from translations import TRANSLATIONS
-from utils import clamp_value, get_modifier, log_print
-
-# from ui import ui, OutputSpace
+from ui import OutputSpace, ui
+from utils import clamp_value, get_modifier
 
 
 class Hero:
@@ -39,11 +38,9 @@ class Hero:
         left_hand: Shield | None = None,
         inventory: list[Item] | None = None,
         money: int = 0,
-        # output: OutputSpace | None = None,
+        output: OutputSpace | None = None,
     ) -> None:
         self.name = name or HeroFactory.select_name()
-
-        log_print(f"Персонажа {self.name} створено", end="\n\n", log=DEBUG)
 
         self.profession = profession or PROFESSIONS["commando"]
 
@@ -61,11 +58,11 @@ class Hero:
             "Charisma": 10,
         }
         # Менеджери
-        # self.output = output if output is not None else ui
-        self.leveling = LevelSystem(self)
-        self.equipment = EquipmentManager(self)
-        self.display = HeroDisplay(self)
-        self.skill_manager = SkillSystem(self)
+        self.output = output if output is not None else ui
+        self.leveling = LevelSystem(self, output=self.output)
+        self.equipment = EquipmentManager(self, output=self.output)
+        self.display = HeroDisplay(self, output=self.output)
+        self.skill_manager = SkillSystem(self, output=self.output)
 
         self.skills = skills or []
 
@@ -95,6 +92,8 @@ class Hero:
             self.equipment.equip_weapon(right_hand, log=DEBUG)
 
         self.money: int = money
+
+        self.output.write(f"Персонажа {self.name} створено", end="\n\n", log=DEBUG)
 
     def __str__(self) -> str:
         """Повертає текстове представлення героя для print()."""
@@ -132,23 +131,24 @@ class Hero:
 class HeroDisplay:
     """Виведення інформації про героя"""
 
-    def __init__(self, hero: Hero) -> None:
+    def __init__(self, hero: Hero, output: OutputSpace) -> None:
         self.hero = hero
+        self.output = output
 
     def show(self) -> None:
         """Виводить повну інформацію про героя."""
         if self.hero.alive:
-            log_print(self.hero, end="\n", log=LOG)
+            self.output.write(self.hero, end="\n", log=LOG)
             self.level()
             self.stats()
             self.skills()
             self.inventory()
         else:
-            log_print(f"{self.hero.name} - мертвий\n\n", log=LOG)
+            self.output.write(f"{self.hero.name} - мертвий\n\n", log=LOG)
 
     def level(self) -> None:
         """Виводить рівень та досвід."""
-        log_print(
+        self.output.write(
             f"Рівень: [{self.hero.level}]. " + f"Досвід: [{self.hero.experience}]",
             log=LOG,
         )
@@ -159,8 +159,8 @@ class HeroDisplay:
             f"{TRANSLATIONS.get(stat, stat)}: {self.hero.stats[stat]}"
             for stat in self.hero.stats
         ]
-        log_print(f"Характеристики: [{', '.join(stats_list)}]", log=LOG)
-        log_print(
+        self.output.write(f"Характеристики: [{', '.join(stats_list)}]", log=LOG)
+        self.output.write(
             f"Здоров'я: [{self.hero.hp} з {self.hero.max_hp}]. "
             + f"Клас броні: [{self.hero.ac}]. "
             + f"Модифікатор ініціативи: [{self.hero.initiative}]. "
@@ -172,35 +172,36 @@ class HeroDisplay:
         """Виводить навички героя."""
 
         if self.hero.skills is None or self.hero.skills == []:
-            log_print("Навички: [відсутні]", log=LOG)
+            self.output.write("Навички: [відсутні]", log=LOG)
         else:
-            log_print("Навички: ", log=LOG)
+            self.output.write("Навички: ", log=LOG)
             for item in self.hero.skills:
-                log_print(f"* {item}", log=LOG)
+                self.output.write(f"* {item}", log=LOG)
 
     def inventory(self) -> None:
         """Виводить екіпірування та інвентар."""
 
-        log_print("Права рука: ", end="", log=LOG)
-        log_print(self.hero.right_hand, log=LOG)
-        log_print("Ліва рука: ", end="", log=LOG)
-        log_print(self.hero.left_hand, log=LOG)
+        self.output.write("Права рука: ", end="", log=LOG)
+        self.output.write(self.hero.right_hand, log=LOG)
+        self.output.write("Ліва рука: ", end="", log=LOG)
+        self.output.write(self.hero.left_hand, log=LOG)
 
         if self.hero.inventory is None or self.hero.inventory == []:
-            log_print("Інвентар: [пусто]", log=LOG)
+            self.output.write("Інвентар: [пусто]", log=LOG)
         else:
-            log_print("Інвентар: ", log=LOG)
+            self.output.write("Інвентар: ", log=LOG)
             for item in self.hero.inventory:
-                log_print(f"* {item}", log=LOG)
+                self.output.write(f"* {item}", log=LOG)
 
-        log_print(f"Гроші: {self.hero.money} грн", end="\n\n", log=LOG)
+        self.output.write(f"Гроші: {self.hero.money} грн", end="\n\n", log=LOG)
 
 
 class LevelSystem:
     """Управління рівнями та досвідом"""
 
-    def __init__(self, hero: Hero) -> None:
+    def __init__(self, hero: Hero, output: OutputSpace) -> None:
         self.hero = hero
+        self.output = output
 
     def set_hp(self) -> None:
         """Встановлює HP на основі Constitution."""
@@ -230,7 +231,7 @@ class LevelSystem:
 
         if self.hero.level >= MAX_LEVEL:
             self.hero.level = MAX_LEVEL
-            log_print(
+            self.output.write(
                 f"{self.hero.name} отримав максимальний рівень: "
                 + f"{self.hero.level}",
                 log=log,
@@ -240,10 +241,12 @@ class LevelSystem:
         if amount is not None:
             self.hero.experience += amount
             if self.hero.experience < EXPERIENCE_FOR_LEVEL[-1]:
-                log_print(f"{self.hero.name} отримує {amount} досвіду\n", log=log)
+                self.output.write(
+                    f"{self.hero.name} отримує {amount} досвіду\n", log=log
+                )
             else:
                 self.hero.experience = EXPERIENCE_FOR_LEVEL[-1]
-                log_print(
+                self.output.write(
                     f"{self.hero.name} Досяг максимального рівня досвіду: "
                     + f"{EXPERIENCE_FOR_LEVEL[-1]}\n",
                     log=log,
@@ -255,10 +258,12 @@ class LevelSystem:
         ):
             self.hero.level += 1
             self.level_up(log=log)
-            log_print(f"Рівень {self.hero.name} підвищено: {self.hero.level}", log=log)
+            self.output.write(
+                f"Рівень {self.hero.name} підвищено: {self.hero.level}", log=log
+            )
 
         if self.hero.level < MAX_LEVEL:
-            log_print(
+            self.output.write(
                 (
                     f"У {self.hero.name} досвіду: {self.hero.experience}. "
                     f"До наступного рівня: "
@@ -271,29 +276,38 @@ class LevelSystem:
 class SkillSystem:
     """Управління скілами"""
 
-    def __init__(self, hero: Hero) -> None:
+    def __init__(self, hero: Hero, output: OutputSpace) -> None:
         self.hero = hero
+        self.output = output
 
     def learn_skill(self, skill: Skill, log: bool = True) -> None:
         """Вивчення будь-якої навички"""
 
         if skill not in self.hero.skills:
             self.hero.skills.append(skill)
-            log_print(f"{self.hero.name} отримує навичку {skill.name}\n", log=log)
+            self.output.write(
+                f"{self.hero.name} отримує навичку {skill.name}\n", log=log
+            )
         else:
-            log_print(f"{self.hero.name} вже має навичку {skill.name}\n", log=log)
+            self.output.write(
+                f"{self.hero.name} вже має навичку {skill.name}\n", log=log
+            )
 
     def forget_skill(self, skill: Skill, log: bool = True) -> None:
         """Забування будь-якої навички"""
 
         if skill in self.hero.skills:
             self.hero.skills.remove(skill)
-            log_print(f"{self.hero.name} забуває навичку {skill.name}\n", log=log)
+            self.output.write(
+                f"{self.hero.name} забуває навичку {skill.name}\n", log=log
+            )
         else:
-            log_print(f"{self.hero.name} не має навички {skill.name}\n", log=log)
+            self.output.write(
+                f"{self.hero.name} не має навички {skill.name}\n", log=log
+            )
 
     def can_learn_skill(self, log: bool = True) -> None:
-        """Видавання базових навичок в залежності від рівня персонажа
+        """Видавання базових навичок залежно від рівня персонажа
         Використовується при "докручуванні" до потрібного рівня"""
 
         match self.hero.level:
@@ -322,8 +336,9 @@ class SkillSystem:
 class EquipmentManager:
     """Управління екіпіровкою"""
 
-    def __init__(self, hero: Hero) -> None:
+    def __init__(self, hero: Hero, output: OutputSpace) -> None:
         self.hero = hero
+        self.output = output
 
     def equip_item(
         self,
@@ -341,7 +356,7 @@ class EquipmentManager:
         if item in self.hero.inventory:
             self.hero.inventory.remove(item)
         setattr(self.hero, hand_name, item)
-        log_print(f"Екіпіруємо {item.name}\n", log=log)
+        self.output.write(f"Екіпіруємо {item.name}\n", log=log)
 
     def equip_weapon(self, weapon: Weapon | None = None, log: bool = True) -> None:
         """Екіпірує зброю."""
@@ -354,15 +369,15 @@ class EquipmentManager:
             if weapon.two_handed:
                 if self.hero.left_hand != JUST_HAND:
                     self.hero.inventory.append(self.hero.left_hand)
-                    log_print(f"{weapon.name} потребує обох рук!", log=log)
-                    log_print(
+                    self.output.write(f"{weapon.name} потребує обох рук!", log=log)
+                    self.output.write(
                         f"{self.hero.left_hand.name} автоматично знято",
                         end="\n\n",
                         log=log,
                     )
                 self.hero.left_hand = JUST_HAND
         else:
-            log_print(f"{weapon.name} не є зброєю", log=log)
+            self.output.write(f"{weapon.name} не є зброєю", log=log)
 
     def equip_shield(self, shield: Shield | None = None, log: bool = True) -> None:
         """Екіпірує щит."""
@@ -374,15 +389,17 @@ class EquipmentManager:
             self.equip_item("left_hand", shield, JUST_HAND, log=log)
             if self.hero.right_hand.two_handed:
                 self.hero.inventory.append(self.hero.right_hand)
-                log_print(f"{self.hero.right_hand.name} потребує обох рук!", log=log)
-                log_print(
+                self.output.write(
+                    f"{self.hero.right_hand.name} потребує обох рук!", log=log
+                )
+                self.output.write(
                     f"{self.hero.right_hand.name} автоматично знято",
                     end="\n\n",
                     log=log,
                 )
                 self.hero.right_hand = UNARMED_STRIKE
         else:
-            log_print(f"{shield.name} не є щитом", log=log)
+            self.output.write(f"{shield.name} не є щитом", log=log)
 
 
 class HeroFactory:
@@ -395,11 +412,11 @@ class HeroFactory:
         professions = list(PROFESSIONS.keys())
         menu = {}
         while True:
-            log_print("Обери одну з професій:", log=LOG)
+            ui.write("Обери одну з професій:", log=LOG)
             for i in range(len(PROFESSIONS)):
-                log_print(i + 1, "-", PROFESSIONS[professions[i]].name, log=LOG)
+                ui.write(i + 1, "-", PROFESSIONS[professions[i]].name, log=LOG)
                 menu[str(i + 1)] = professions[i]
-            log_print("L - Переглянути опис професій", log=LOG)
+            ui.write("L - Переглянути опис професій", log=LOG)
             choice = input("Зроби свій вибір: ").upper()
             if choice == "L" or choice == "Д":
                 show_professions()
@@ -407,8 +424,8 @@ class HeroFactory:
                 profession = PROFESSIONS[menu[choice]]
                 break
             else:
-                log_print("\nЗробіть правильний вибір!", log=LOG)
-        log_print(
+                ui.write("\nЗробіть правильний вибір!", log=LOG)
+        ui.write(
             f"Створюємо персонажа з ім'ям {name} та " f"професією {profession.name}",
             log=LOG,
         )
