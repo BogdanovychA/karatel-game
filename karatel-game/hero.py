@@ -25,6 +25,8 @@ from skills import SKILLS, Skill, SkillTiming
 from translations import TRANSLATIONS
 from utils import clamp_value, get_modifier, log_print
 
+# from ui import ui, OutputSpace
+
 
 class Hero:
     def __init__(
@@ -37,6 +39,7 @@ class Hero:
         left_hand: Shield | None = None,
         inventory: list[Item] | None = None,
         money: int = 0,
+        # output: OutputSpace | None = None,
     ) -> None:
         self.name = name or HeroFactory.select_name()
 
@@ -58,6 +61,7 @@ class Hero:
             "Charisma": 10,
         }
         # Менеджери
+        # self.output = output if output is not None else ui
         self.leveling = LevelSystem(self)
         self.equipment = EquipmentManager(self)
         self.display = HeroDisplay(self)

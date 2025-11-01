@@ -36,4 +36,4 @@ fight(hero_a, hero_b)
 hero_a.display.show()
 hero_b.display.show()
 
-print(ui.get_buffer())
+# print(ui.get_buffer())

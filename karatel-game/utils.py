@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from ui import ui
+from ui import OutputSpace, ui
 
 
 def get_modifier(stat_value: int) -> int:
@@ -13,7 +13,7 @@ def clamp_value(value, min_value, max_value):
     return min(max(value, min_value), max_value)
 
 
-def log_print(*args, log=True, **kwargs):
-    """Для виводу тексту в залежності від log"""
+def log_print(*args, output: OutputSpace | None = None, log=True, **kwargs):
     if log:
-        ui.write(*args, **kwargs)
+        out = output if output is not None else ui
+        out.write(*args, **kwargs)
