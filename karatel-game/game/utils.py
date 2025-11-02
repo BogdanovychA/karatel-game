@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from ui import OutputSpace, ui
+from .ui import OutputSpace, ui
 
 
 def get_modifier(stat_value: int) -> int:

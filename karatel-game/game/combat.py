@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
-from dice import Dice
-from hero import Hero
-from settings import LOG, XP_MULTIPLIER
-from skills import SkillTiming
-from ui import ui
+from .dice import Dice
+from .hero import Hero
+from .settings import LOG, XP_MULTIPLIER
+from .skills import SkillTiming
+from .ui import ui
 
 
 def attack(attacker: Hero, defender: Hero) -> bool:

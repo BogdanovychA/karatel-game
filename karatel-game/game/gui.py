@@ -1,10 +1,25 @@
 import streamlit as st
-from combat import fight
-from hero import Hero, HeroFactory
-from professions import PROFESSIONS
-from ui import ui
 
-TITLE = "Karatel Game"
+from .combat import fight
+from .hero import Hero, HeroFactory
+from .professions import PROFESSIONS
+from .ui import ui
+
+TITLE = "КАРАТЄЛЬ"
+
+
+def check_game_state() -> None:
+    match st.session_state.game_state:
+        case None:
+            hello()
+        case "menu":
+            menu()
+        case "hero":
+            hero()
+        case "fast":
+            fast()
+        case _:
+            st.title("Відсутній пункт меню")
 
 
 def read_buffer() -> str:
@@ -33,9 +48,10 @@ def back() -> None:
 
 
 def hello() -> None:
-    st.title(TITLE)
+    # st.title(TITLE)
+    st.image("./images/logo.png")
     st.header(
-        "Karatel Game — консольна рольова гра, де ти створюєш персонажа, "
+        "КАРАТЄЛЬ — консольна рольова гра, де ти створюєш персонажа, "
         + "обираєш професію і пробуєш вижити у тактичних боях. "
         + "Гра використовує спрощену систему D&D 5e з унікальними українськими "
         + "професіями"

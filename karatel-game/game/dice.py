@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 import random
 
-from settings import DEBUG
-from ui import ui
+from .settings import DEBUG
+from .ui import ui
 
 
 class Dice:
