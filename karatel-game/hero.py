@@ -61,7 +61,7 @@ class Hero:
         self.output = output if output is not None else ui
         self.leveling = LevelSystem(self, output=self.output)
         self.equipment = EquipmentManager(self, output=self.output)
-        self.display = HeroDisplay(self, output=self.output)
+        self.display = HeroDisplay(self)
         self.skill_manager = SkillSystem(self, output=self.output)
 
         self.skills = skills or []
@@ -131,9 +131,8 @@ class Hero:
 class HeroDisplay:
     """Виведення інформації про героя"""
 
-    def __init__(self, hero: Hero, output: OutputSpace) -> None:
+    def __init__(self, hero: Hero) -> None:
         self.hero = hero
-        # self.output = output
 
     def show(self) -> str:
         """Виводить повну інформацію про героя."""
@@ -448,7 +447,7 @@ class HeroFactory:
             else:
                 ui.write("\nЗробіть правильний вибір!", log=LOG)
         ui.write(
-            f"Створюємо персонажа з ім'ям {name} та " f"професією {profession.name}",
+            f"Створюємо персонажа з ім'ям {name} та професією {profession.name}",
             log=LOG,
         )
         return Hero(name, profession)
