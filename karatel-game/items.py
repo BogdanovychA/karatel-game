@@ -50,7 +50,7 @@ class Shield(Item):
         """Повертає текстове представлення героя для print()."""
         return (
             f"{self.name.upper()}. {self.description}. "
-            + f"Бонус захисту: {self.ac_bonus}"
+            + f"Бонус захисту: {self.ac_bonus}."
         )
 
 

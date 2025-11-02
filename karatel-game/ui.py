@@ -25,9 +25,10 @@ class BufferedOutput(OutputSpace):
     def __init__(self):
         self.buffer: list[str] = []
 
-    def write(self, *args, **kwargs) -> None:
-        text = " ".join(str(a) for a in args)
-        self.buffer.append(text)
+    def write(self, *args, log=True, **kwargs) -> None:
+        if log:
+            text = " ".join(str(a) for a in args)
+            self.buffer.append(text)
 
     def get_buffer(self) -> list[str]:
         """Отримати весь буфер"""

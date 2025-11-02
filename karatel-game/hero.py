@@ -98,9 +98,9 @@ class Hero:
     def __str__(self) -> str:
         """Повертає текстове представлення героя для print()."""
         return (
-            (f"Ім'я: [{self.name}]. " + f"Професія: [{self.profession.name}]")
+            (f"Ім'я: [{self.name}]. " + f"Професія: [{self.profession.name}].")
             if self.alive
-            else f"{self.name} - мертвий"
+            else f"{self.name} - мертвий."
         )
 
     @property
@@ -160,7 +160,7 @@ class HeroDisplay:
             + f"Досвід: [{self.hero.experience} з "
             + f"{EXPERIENCE_FOR_LEVEL[
                     clamp_value(self.hero.level, MIN_LEVEL, MAX_LEVEL-1)
-                 ]}]"
+                 ]}]."
         )
 
     def hp(self) -> str:
@@ -184,7 +184,7 @@ class HeroDisplay:
             f"{TRANSLATIONS.get(stat, stat)}: {self.hero.stats[stat]}"
             for stat in self.hero.stats
         ]
-        return f"Характеристики: [{', '.join(stats_list)}]"
+        return f"Характеристики: [{', '.join(stats_list)}]."
 
     def skills(self) -> str:
         """Виводить навички героя."""
@@ -205,13 +205,13 @@ class HeroDisplay:
             f"Ліва рука: {str(self.hero.left_hand)}",
         ]
         if self.hero.inventory is None or self.hero.inventory == []:
-            text.append("Інвентар: [пусто]")
+            text.append("Інвентар: [пусто].")
         else:
             text.append("Інвентар: ")
             for item in self.hero.inventory:
                 text.append(f"* {item}")
 
-        text.append(f"Гроші: {self.hero.money} грн")
+        text.append(f"Гроші: {self.hero.money} грн.")
 
         total = "\n".join(str(a) for a in text)
         return total
@@ -453,11 +453,16 @@ class HeroFactory:
         return Hero(name, profession)
 
     @staticmethod
-    def generate(level: int | None = None, name: str | None = None) -> Hero:
+    def generate(
+        level: int | None = None, profession: str | None = None, name: str | None = None
+    ) -> Hero:
         """Генерація рандомного героя"""
         if name is None:
             name = HeroFactory.select_name()
-        profession = random.choice(list(PROFESSIONS.values()))
+        if profession is None:
+            profession = random.choice(list(PROFESSIONS.values()))
+        else:
+            profession = PROFESSIONS[profession]
         if level is None:
             experience = random.choice(EXPERIENCE_FOR_LEVEL)
         else:
