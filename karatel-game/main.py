@@ -7,7 +7,7 @@ from skills import SKILLS, SkillTiming
 from ui import ui
 
 # hero_a = Hero()
-hero_a = HeroFactory.generate(5)
+hero_a = HeroFactory.generate(19)
 hero_a.skill_manager.learn_skill(SKILLS["self_heal_strong"])
 hero_a.skill_manager.learn_skill(SKILLS["self_heal_small"])
 print(hero_a.display.show())

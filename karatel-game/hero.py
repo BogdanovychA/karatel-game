@@ -140,8 +140,11 @@ class HeroDisplay:
         if self.hero.alive:
             text = [
                 str(self.hero),
+                self.hp(),
                 self.level(),
                 self.stats(),
+                self.ac(),
+                self.modifiers(),
                 self.skills(),
                 self.inventory(),
             ]
@@ -153,7 +156,28 @@ class HeroDisplay:
 
     def level(self) -> str:
         """Виводить рівень та досвід."""
-        return f"Рівень: [{self.hero.level}]. " f"Досвід: [{self.hero.experience}]"
+        return (
+            f"Рівень: [{self.hero.level}]. "
+            + f"Досвід: [{self.hero.experience} з "
+            + f"{EXPERIENCE_FOR_LEVEL[
+                    clamp_value(self.hero.level, MIN_LEVEL, MAX_LEVEL-1)
+                 ]}]"
+        )
+
+    def hp(self) -> str:
+        """Виводить здоров'я героя"""
+        return f"Здоров'я: [{self.hero.hp} з {self.hero.max_hp}]."
+
+    def ac(self) -> str:
+        """Виводить клас броні героя"""
+        return f"Клас броні: [{self.hero.ac}]."
+
+    def modifiers(self) -> str:
+        """Виводить клас броні героя"""
+        return (
+            f"Модифікатори: [Ініціатива: {self.hero.initiative}, "
+            f"Атака: {self.hero.attack_modifier}]."
+        )
 
     def stats(self) -> str:
         """Виводить характеристики героя."""
@@ -161,15 +185,7 @@ class HeroDisplay:
             f"{TRANSLATIONS.get(stat, stat)}: {self.hero.stats[stat]}"
             for stat in self.hero.stats
         ]
-        text = [
-            f"Характеристики: [{', '.join(stats_list)}]",
-            f"Здоров'я: [{self.hero.hp} з {self.hero.max_hp}]. "
-            f"Клас броні: [{self.hero.ac}]. ",
-            f"Модифікатор ініціативи: [{self.hero.initiative}]. "
-            f"Модифікатор атаки: [{self.hero.attack_modifier}].",
-        ]
-        total = "\n".join(str(a) for a in text)
-        return total
+        return f"Характеристики: [{', '.join(stats_list)}]"
 
     def skills(self) -> str:
         """Виводить навички героя."""
