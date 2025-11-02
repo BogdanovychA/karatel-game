@@ -133,67 +133,73 @@ class HeroDisplay:
 
     def __init__(self, hero: Hero, output: OutputSpace) -> None:
         self.hero = hero
-        self.output = output
+        # self.output = output
 
-    def show(self) -> None:
+    def show(self) -> str:
         """Виводить повну інформацію про героя."""
         if self.hero.alive:
-            self.output.write(self.hero, end="\n", log=LOG)
-            self.level()
-            self.stats()
-            self.skills()
-            self.inventory()
+            text = [
+                str(self.hero),
+                self.level(),
+                self.stats(),
+                self.skills(),
+                self.inventory(),
+            ]
+            total = "\n".join(str(a) for a in text)
+            return total
+
         else:
-            self.output.write(f"{self.hero.name} - мертвий\n\n", log=LOG)
+            return f"{self.hero.name} - мертвий\n\n"
 
-    def level(self) -> None:
+    def level(self) -> str:
         """Виводить рівень та досвід."""
-        self.output.write(
-            f"Рівень: [{self.hero.level}]. " + f"Досвід: [{self.hero.experience}]",
-            log=LOG,
-        )
+        return f"Рівень: [{self.hero.level}]. " f"Досвід: [{self.hero.experience}]"
 
-    def stats(self) -> None:
+    def stats(self) -> str:
         """Виводить характеристики героя."""
         stats_list = [
             f"{TRANSLATIONS.get(stat, stat)}: {self.hero.stats[stat]}"
             for stat in self.hero.stats
         ]
-        self.output.write(f"Характеристики: [{', '.join(stats_list)}]", log=LOG)
-        self.output.write(
+        text = [
+            f"Характеристики: [{', '.join(stats_list)}]",
             f"Здоров'я: [{self.hero.hp} з {self.hero.max_hp}]. "
-            + f"Клас броні: [{self.hero.ac}]. "
-            + f"Модифікатор ініціативи: [{self.hero.initiative}]. "
-            + f"Модифікатор атаки: [{self.hero.attack_modifier}].",
-            log=LOG,
-        )
+            f"Клас броні: [{self.hero.ac}]. ",
+            f"Модифікатор ініціативи: [{self.hero.initiative}]. "
+            f"Модифікатор атаки: [{self.hero.attack_modifier}].",
+        ]
+        total = "\n".join(str(a) for a in text)
+        return total
 
-    def skills(self) -> None:
+    def skills(self) -> str:
         """Виводить навички героя."""
-
         if self.hero.skills is None or self.hero.skills == []:
-            self.output.write("Навички: [відсутні]", log=LOG)
+            text = ["Навички: [відсутні]"]
         else:
-            self.output.write("Навички: ", log=LOG)
+            text = ["Навички: "]
             for item in self.hero.skills:
-                self.output.write(f"* {item}", log=LOG)
+                text.append(f"* {item}")
 
-    def inventory(self) -> None:
+        total = "\n".join(str(a) for a in text)
+        return total
+
+    def inventory(self) -> str:
         """Виводить екіпірування та інвентар."""
-
-        self.output.write("Права рука: ", end="", log=LOG)
-        self.output.write(self.hero.right_hand, log=LOG)
-        self.output.write("Ліва рука: ", end="", log=LOG)
-        self.output.write(self.hero.left_hand, log=LOG)
-
+        text = [
+            f"Права рука: {str(self.hero.right_hand)}",
+            f"Ліва рука: {str(self.hero.left_hand)}",
+        ]
         if self.hero.inventory is None or self.hero.inventory == []:
-            self.output.write("Інвентар: [пусто]", log=LOG)
+            text.append("Інвентар: [пусто]")
         else:
-            self.output.write("Інвентар: ", log=LOG)
+            text.append("Інвентар: ")
             for item in self.hero.inventory:
-                self.output.write(f"* {item}", log=LOG)
+                text.append(f"* {item}")
 
-        self.output.write(f"Гроші: {self.hero.money} грн", end="\n\n", log=LOG)
+        text.append(f"Гроші: {self.hero.money} грн")
+
+        total = "\n".join(str(a) for a in text)
+        return total
 
 
 class LevelSystem:
