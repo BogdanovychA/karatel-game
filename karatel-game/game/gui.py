@@ -16,6 +16,8 @@ def check_game_state() -> None:
             menu()
         case "hero":
             hero()
+        case "enemy":
+            enemy()
         case "fast":
             fast()
         case _:
@@ -56,7 +58,7 @@ def hello() -> None:
         + "Гра використовує спрощену систему D&D 5e з унікальними українськими "
         + "професіями"
     )
-    if st.button("Старт", type="primary"):
+    if st.button("СТАРТ", type="primary"):
         st.session_state.game_state = "menu"
         st.rerun()
 
@@ -66,6 +68,9 @@ def menu() -> None:
     st.header("Головне меню")
     if st.button("Персонаж", type="primary"):
         st.session_state.game_state = "hero"
+        st.rerun()
+    if st.button("Ворог", type="primary"):
+        st.session_state.game_state = "enemy"
         st.rerun()
     if st.button("Швидкий бій", type="secondary"):
         st.session_state.game_state = "fast"
@@ -89,7 +94,6 @@ def hero() -> None:
         level = st.slider("Рівень", 1, 20, 1)
 
         if st.button("Створити героя", type="secondary"):
-            # Створюємо героя та зберігаємо в session_state
             st.session_state.hero = HeroFactory.generate(
                 level=level, profession=profession, name=name
             )
@@ -100,8 +104,44 @@ def hero() -> None:
         st.success("Героя створено")
         st.text(st.session_state.hero.display.show())
 
-        if st.button("Видалити героя", type="secondary"):
+        if st.button("Видалити героя", type="primary"):
             st.session_state.hero = None
+            ui.clear()
+            st.rerun()
+    back()
+
+
+def enemy() -> None:
+    st.title(TITLE)
+    st.header("Ворог")
+
+    if st.session_state.enemy is None:
+
+        profession = st.selectbox(
+            "Професія",
+            options=list(PROFESSIONS.keys()),
+            format_func=lambda x: PROFESSIONS[x].name,
+        )
+        level = st.slider(
+            "Рівень",
+            1,
+            20,
+            1 if st.session_state.hero is None else st.session_state.hero.level,
+        )
+
+        if st.button("Створити ворога", type="secondary"):
+            st.session_state.enemy = HeroFactory.generate(
+                level=level, profession=profession, name=HeroFactory.select_name()
+            )
+            st.success(f"Ворога {st.session_state.enemy.name} створено!")
+            st.rerun()
+
+    else:
+        st.success("Ворога створено")
+        st.text(st.session_state.enemy.display.show())
+
+        if st.button("Видалити ворога", type="primary"):
+            st.session_state.enemy = None
             ui.clear()
             st.rerun()
     back()
@@ -113,20 +153,21 @@ def fast() -> None:
         st.header("Створіть персонажа, щоб почати бійку")
 
     if 'hero' in st.session_state and st.session_state.hero is not None:
-        if (
-            'enemy' in st.session_state
-            and st.session_state.enemy is None
-            or not st.session_state.enemy.alive
+        with st.expander("Ваш Герой:", expanded=True):
+            st.text(st.session_state.hero.display.show())
+
+        if 'enemy' in st.session_state and (
+            st.session_state.enemy is None or not st.session_state.enemy.alive
         ):
             st.session_state.enemy = HeroFactory.generate(
                 level=st.session_state.hero.level
             )
 
         if 'enemy' in st.session_state and st.session_state.enemy is not None:
-            st.header("Ваш ворог:")
-            st.text(st.session_state.enemy.display.show())
+            with st.expander("Ваш ворог:", expanded=True):
+                st.text(st.session_state.enemy.display.show())
             fight(st.session_state.hero, st.session_state.enemy)
-            st.header("Лог бою:")
-            st.text(read_buffer())
+            with st.expander("Лог бою:"):
+                st.text(read_buffer())
 
     back()
