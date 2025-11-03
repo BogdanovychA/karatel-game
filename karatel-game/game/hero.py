@@ -158,9 +158,7 @@ class HeroDisplay:
         return (
             f"Рівень: [{self.hero.level}]. "
             + f"Досвід: [{self.hero.experience} з "
-            + f"{EXPERIENCE_FOR_LEVEL[
-                    clamp_value(self.hero.level, MIN_LEVEL, MAX_LEVEL-1)
-                 ]}]."
+            + f"{EXPERIENCE_FOR_LEVEL[clamp_value(self.hero.level, MIN_LEVEL, MAX_LEVEL-1)]}]."
         )
 
     def hp(self) -> str:
