@@ -73,11 +73,11 @@ def menu() -> None:
     if st.button("Персонаж", type="primary"):
         st.session_state.game_state = "hero"
         st.rerun()
-    if st.button("Ворог", type="primary"):
-        st.session_state.game_state = "enemy"
-        st.rerun()
     if st.button("Підземелля", type="primary"):
         st.session_state.game_state = "on_map"
+        st.rerun()
+    if st.button("Ворог", type="secondary"):
+        st.session_state.game_state = "enemy"
         st.rerun()
     if st.button("Швидкий бій", type="secondary"):
         st.session_state.game_state = "fast"
