@@ -420,6 +420,13 @@ class EquipmentManager:
         else:
             self.output.write(f"{shield.name} не є щитом", log=log)
 
+    def add_item(self, item: Item, log: bool = True) -> None:
+        if item != UNARMED_STRIKE and item != JUST_HAND:
+            self.hero.inventory.append(item)
+            self.output.write(f"{self.hero.name} підбирає: {item}\n", log=log)
+        else:
+            self.output.write(f"Не можна підібрати {item.name}", log=log)
+
 
 class HeroFactory:
     """Клас управління героєм"""
@@ -431,11 +438,11 @@ class HeroFactory:
         professions = list(PROFESSIONS.keys())
         menu = {}
         while True:
-            ui.write("Обери одну з професій:", log=LOG)
+            ui.write("Обери одну з професій:", log=log)
             for i in range(len(PROFESSIONS)):
-                ui.write(i + 1, "-", PROFESSIONS[professions[i]].name, log=LOG)
+                ui.write(i + 1, "-", PROFESSIONS[professions[i]].name, log=log)
                 menu[str(i + 1)] = professions[i]
-            ui.write("L - Переглянути опис професій", log=LOG)
+            ui.write("L - Переглянути опис професій", log=log)
             choice = input("Зроби свій вибір: ").upper()
             if choice == "L" or choice == "Д":
                 show_professions()
@@ -443,10 +450,10 @@ class HeroFactory:
                 profession = PROFESSIONS[menu[choice]]
                 break
             else:
-                ui.write("\nЗробіть правильний вибір!", log=LOG)
+                ui.write("\nЗробіть правильний вибір!", log=log)
         ui.write(
             f"Створюємо персонажа з ім'ям {name} та професією {profession.name}",
-            log=LOG,
+            log=log,
         )
         return Hero(name, profession)
 

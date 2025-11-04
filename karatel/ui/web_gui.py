@@ -151,7 +151,6 @@ def on_map():
                             if st.session_state.hero.alive:
                                 move_hero(1, 1, st.session_state.game_map)
                                 st.rerun()
-
     back()
 
 

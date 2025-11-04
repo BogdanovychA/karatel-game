@@ -8,8 +8,10 @@ from karatel.core.items import (
     CHARISMA_WEAPONS,
     DEXTERITY_WEAPONS,
     INTELLIGENCE_WEAPONS,
+    JUST_HAND,
     SHIELDS,
     STRENGTH_WEAPONS,
+    UNARMED_STRIKE,
     Item,
 )
 from karatel.ui.abstract import OutputSpace, ui
@@ -40,7 +42,7 @@ class MapSize(IntEnum):
     """Enum-клас для зберігання змінних, що
     відповідають за розмір мапи"""
 
-    X = 23
+    X = 19
     Y = 15
 
 
@@ -96,17 +98,16 @@ def select_obj() -> Cell:
             cell = Cell(CellType.ENEMY, HeroFactory.generate(), Emoji.ENEMY.value)
             return cell
         case CellType.ITEM:
-            cell = Cell(
-                CellType.ITEM,
-                random.choice(
-                    STRENGTH_WEAPONS
-                    + DEXTERITY_WEAPONS
-                    + INTELLIGENCE_WEAPONS
-                    + CHARISMA_WEAPONS
-                    + SHIELDS
-                ),
-                Emoji.ITEM.value,
+            all_items = list(
+                STRENGTH_WEAPONS
+                + SHIELDS
+                + DEXTERITY_WEAPONS
+                + INTELLIGENCE_WEAPONS
+                + CHARISMA_WEAPONS
             )
+            all_items.remove(UNARMED_STRIKE)
+            all_items.remove(JUST_HAND)
+            cell = Cell(CellType.ITEM, random.choice(all_items), Emoji.ITEM.value)
             return cell
         case CellType.EMPTY | _:
             return EMPTY_CELL
