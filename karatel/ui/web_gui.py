@@ -53,11 +53,15 @@ def hello() -> None:
     # st.title(TITLE)
     st.image("./karatel/images/logo.png")
     st.header(
-        "КАРАТЄЛЬ — консольна рольова гра, де ти створюєш персонажа, "
-        + "обираєш професію і пробуєш вижити у тактичних боях. "
-        + "Гра використовує спрощену систему D&D 5e з унікальними українськими "
-        + "професіями"
+        "КАРАТЄЛЬ — рольова гра, де ти створюєш персонажа, "
+        + "обираєш професію і намагаєшся вижити у тактичних боях. "
     )
+    st.subheader(
+        "Гра використовує спрощену систему D&D 5e з унікальними українськими "
+        + "професіями."
+    )
+    st.subheader("Гітхаб: https://github.com/BogdanovychA/karatel-game")
+    st.subheader("Автор: https://www.bogdanovych.org/")
     if st.button("СТАРТ", type="primary"):
         st.session_state.game_state = "menu"
         st.rerun()
