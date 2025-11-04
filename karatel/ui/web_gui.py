@@ -4,6 +4,7 @@ from karatel.core.hero import HeroFactory
 from karatel.core.map_model import generate_map, render_map
 from karatel.core.professions import PROFESSIONS
 from karatel.logic.combat import fight
+from karatel.logic.map_logic import move_hero
 from karatel.ui.abstract import ui
 
 TITLE = "КАРАТЄЛЬ"
@@ -99,6 +100,57 @@ def on_map():
                 with st.expander("Мапа", expanded=True):
                     render_map(st.session_state.game_map)
                     st.text(read_buffer())
+
+                    # Верхній ряд (3 кнопки)
+                    col1, col2, col3 = st.columns(3)
+                    with col1:
+                        if st.button("↖️"):
+                            if st.session_state.hero.alive:
+                                move_hero(-1, -1, st.session_state.game_map)
+                                st.rerun()
+                    with col2:
+                        if st.button("⬆️"):
+                            if st.session_state.hero.alive:
+                                move_hero(-1, 0, st.session_state.game_map)
+                                st.rerun()
+                    with col3:
+                        if st.button("↗️"):
+                            if st.session_state.hero.alive:
+                                move_hero(-1, 1, st.session_state.game_map)
+                                st.rerun()
+
+                    # Середній ряд (3 кнопки)
+                    col1, col2, col3 = st.columns(3)
+                    with col1:
+                        if st.button("⬅️"):
+                            if st.session_state.hero.alive:
+                                move_hero(0, -1, st.session_state.game_map)
+                                st.rerun()
+                    with col2:
+                        st.text(" ")
+                    with col3:
+                        if st.button("➡️"):
+                            if st.session_state.hero.alive:
+                                move_hero(0, 1, st.session_state.game_map)
+                                st.rerun()
+
+                    # Нижній ряд (3 кнопки)
+                    col1, col2, col3 = st.columns(3)
+                    with col1:
+                        if st.button("↙️"):
+                            if st.session_state.hero.alive:
+                                move_hero(1, -1, st.session_state.game_map)
+                                st.rerun()
+                    with col2:
+                        if st.button("⬇️"):
+                            if st.session_state.hero.alive:
+                                move_hero(1, 0, st.session_state.game_map)
+                                st.rerun()
+                    with col3:
+                        if st.button("↘️"):
+                            if st.session_state.hero.alive:
+                                move_hero(1, 1, st.session_state.game_map)
+                                st.rerun()
 
     back()
 
