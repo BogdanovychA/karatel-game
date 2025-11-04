@@ -40,16 +40,16 @@ class MapSize(IntEnum):
     """Enum-клас для зберігання змінних, що
     відповідають за розмір мапи"""
 
-    X = 10
-    Y = 10
+    X = 23
+    Y = 15
 
 
 class StartHeroPosition(IntEnum):
     """Enum-клас для зберігання змінних, що
     відповідають за стартову позицію героя"""
 
-    X = random.randint(0, 1)
-    Y = random.randint(0, 1)
+    X = random.randint(0, 4)
+    Y = random.randint(0, 4)
 
 
 class CellMultiplier(IntEnum):
