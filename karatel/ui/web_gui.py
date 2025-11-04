@@ -44,6 +44,12 @@ def init_session_state():
 
 
 def apply_styles():
+
+    st.set_page_config(
+        page_title="КАРАТЄЛЬ",
+        page_icon="./karatel/images/favicon.png",  # або emoji типу "⚔️"
+        # layout="wide"
+    )
     st.markdown(
         """
         <style>
