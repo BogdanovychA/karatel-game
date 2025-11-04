@@ -16,6 +16,8 @@ from .utils import clamp_value
 
 
 class Emoji(Enum):
+    """Enum-клас для зберігання емоджі"""
+
     EMPTY = " ⬜ "
     ENEMY = " 👹 "
     ITEM = " 💎 "
@@ -46,8 +48,8 @@ class StartHeroPosition(IntEnum):
     """Enum-клас для зберігання змінних, що
     відповідають за стартову позицію героя"""
 
-    x = 0
-    y = 0
+    X = random.randint(0, 2)
+    Y = random.randint(0, 2)
 
 
 class CellMultiplier(IntEnum):
@@ -67,6 +69,8 @@ TYPES_OF_CELL = (
 
 
 def set_empty_cell() -> Tuple[CellType, None, str]:
+    """Встановлює пусту клітинку мапи"""
+
     return CellType.EMPTY, None, Emoji.EMPTY.value
 
 
@@ -113,8 +117,8 @@ def generate_map(hero: Hero) -> list:
         line_x: list[Cell] = []
         for coordinate_x in range(0, MapSize.X):
             if (
-                coordinate_y == StartHeroPosition.y
-                and coordinate_x == StartHeroPosition.x
+                coordinate_y == StartHeroPosition.X
+                and coordinate_x == StartHeroPosition.Y
             ):
                 cell_type = CellType.HERO
                 obj = hero
@@ -170,17 +174,10 @@ if __name__ == "__main__":
     hero_a = HeroFactory.generate(1)
     my_map = generate_map(hero_a)
     render_map(my_map)
-    my_map = move_hero(1, 0, my_map)
-    print()
-    render_map(my_map)
-    my_map = move_hero(1, 0, my_map)
-    print()
-    render_map(my_map)
-    my_map = move_hero(0, 1, my_map)
-    print()
-    render_map(my_map)
-    my_map = move_hero(0, 1, my_map)
-    print()
-    render_map(my_map)
-    my_map = move_hero(1, 1, my_map)
-    print()
+
+    for _ in range(10):
+        step_x = random.randint(-1, 1)
+        step_y = random.randint(-1, 1)
+        my_map = move_hero(step_y, step_x, my_map)
+        print(step_x, step_y)
+        render_map(my_map)
