@@ -43,8 +43,36 @@ def init_session_state():
             st.session_state[key] = value
 
 
+def apply_styles():
+    st.markdown(
+        """
+        <style>
+        
+        /* Прибрати верхню сіру панель */
+        div[data-testid="stToolbar"] {
+            visibility: hidden;
+            height: 0;
+        }
+        
+        /* Мінімальний відступ зверху */
+        div.block-container {
+            padding-top: 3rem !important;
+        }
+        
+        /* Прибрати порожній простір під заголовком */
+        h1 {
+            margin-top: 0rem !important;
+            margin-bottom: 0.0rem !important;
+        }
+        
+        </style>
+        """,
+        unsafe_allow_html=True,
+    )
+
+
 def back() -> None:
-    if st.button("Назад", type="secondary"):
+    if st.button("Назад", type="secondary", width=130):
         st.session_state.game_state = "menu"
         st.rerun()
 
@@ -62,7 +90,7 @@ def hello() -> None:
     )
     st.subheader("Гітхаб: https://github.com/BogdanovychA/karatel-game")
     st.subheader("Автор: https://www.bogdanovych.org/")
-    if st.button("СТАРТ", type="primary"):
+    if st.button("СТАРТ", type="primary", width=130):
         st.session_state.game_state = "menu"
         st.rerun()
 
@@ -70,19 +98,19 @@ def hello() -> None:
 def menu() -> None:
     st.title(TITLE)
     st.header("Головне меню")
-    if st.button("Персонаж", type="primary"):
+    if st.button("Персонаж", type="primary", width=130):
         st.session_state.game_state = "hero"
         st.rerun()
-    if st.button("Підземелля", type="primary"):
+    if st.button("Підземелля", type="primary", width=130):
         st.session_state.game_state = "on_map"
         st.rerun()
-    if st.button("Ворог", type="secondary"):
+    if st.button("Ворог", type="secondary", width=130):
         st.session_state.game_state = "enemy"
         st.rerun()
-    if st.button("Швидкий бій", type="secondary"):
+    if st.button("Швидкий бій", type="secondary", width=130):
         st.session_state.game_state = "fast"
         st.rerun()
-    if st.button("Назад", type="secondary"):
+    if st.button("Назад", type="secondary", width=130):
         st.session_state.game_state = None
         st.rerun()
 
@@ -106,7 +134,7 @@ def on_map():
                     st.text(read_buffer())
 
                     # Верхній ряд (3 кнопки)
-                    col1, col2, col3 = st.columns(3)
+                    col1, col2, col3 = st.columns([1, 1, 1])
                     with col1:
                         if st.button("↖️"):
                             if st.session_state.hero.alive:
@@ -124,7 +152,7 @@ def on_map():
                                 st.rerun()
 
                     # Середній ряд (3 кнопки)
-                    col1, col2, col3 = st.columns(3)
+                    col1, col2, col3 = st.columns([1, 1, 1])
                     with col1:
                         if st.button("⬅️"):
                             if st.session_state.hero.alive:
@@ -139,7 +167,7 @@ def on_map():
                                 st.rerun()
 
                     # Нижній ряд (3 кнопки)
-                    col1, col2, col3 = st.columns(3)
+                    col1, col2, col3 = st.columns([1, 1, 1])
                     with col1:
                         if st.button("↙️"):
                             if st.session_state.hero.alive:
@@ -172,7 +200,7 @@ def hero() -> None:
             )
             level = st.slider("Рівень", 1, 20, 1)
 
-            if st.button("Створити героя", type="secondary"):
+            if st.button("Створити героя", type="secondary", width=150):
                 st.session_state.hero = HeroFactory.generate(
                     level=level, profession=profession, name=name
                 )
@@ -183,7 +211,7 @@ def hero() -> None:
             st.success("Героя створено")
             st.text(st.session_state.hero.display.show())
 
-            if st.button("Видалити героя", type="primary"):
+            if st.button("Видалити героя", type="primary", width=150):
                 st.session_state.hero = None
                 if 'game_map' in st.session_state and st.session_state.game_map:
                     st.session_state.game_map = None
@@ -210,7 +238,7 @@ def enemy() -> None:
                 1 if not st.session_state.hero else st.session_state.hero.level,
             )
 
-            if st.button("Створити ворога", type="secondary"):
+            if st.button("Створити ворога", type="secondary", width=150):
                 st.session_state.enemy = HeroFactory.generate(
                     level=level, profession=profession, name=HeroFactory.select_name()
                 )
@@ -221,7 +249,7 @@ def enemy() -> None:
             st.success("Ворога створено")
             st.text(st.session_state.enemy.display.show())
 
-            if st.button("Видалити ворога", type="primary"):
+            if st.button("Видалити ворога", type="primary", width=150):
                 st.session_state.enemy = None
                 ui.clear()
                 st.rerun()
@@ -247,7 +275,7 @@ def fast() -> None:
         if 'enemy' in st.session_state and st.session_state.enemy:
             with st.expander("Ваш ворог:", expanded=True):
                 st.text(st.session_state.enemy.display.show())
-            if st.button("Почати бій", type="primary"):
+            if st.button("Почати бій", type="primary", width=130):
                 fight(st.session_state.hero, st.session_state.enemy)
                 with st.expander("Лог бою:"):
                     st.text(read_buffer())
