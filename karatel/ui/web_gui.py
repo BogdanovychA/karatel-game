@@ -1,7 +1,7 @@
 import streamlit as st
 
 from karatel.core.hero import HeroFactory
-from karatel.core.map_model import generate_map, render_map
+from karatel.core.map_model import Emoji, generate_map, render_map
 from karatel.core.professions import PROFESSIONS
 from karatel.logic.combat import fight
 from karatel.logic.map_logic import move_hero
@@ -104,21 +104,30 @@ def hello() -> None:
 def menu() -> None:
     st.title(TITLE)
     st.header("Головне меню")
-    if st.button("Персонаж", type="primary", width=130):
-        st.session_state.game_state = "hero"
-        st.rerun()
-    if st.button("Підземелля", type="primary", width=130):
-        st.session_state.game_state = "on_map"
-        st.rerun()
-    if st.button("Ворог", type="secondary", width=130):
-        st.session_state.game_state = "enemy"
-        st.rerun()
-    if st.button("Швидкий бій", type="secondary", width=130):
-        st.session_state.game_state = "fast"
-        st.rerun()
-    if st.button("Назад", type="secondary", width=130):
-        st.session_state.game_state = None
-        st.rerun()
+
+    col1, col2 = st.columns([1, 3])
+    with col1:
+        if st.button("Персонаж", type="primary", width=130):
+            st.session_state.game_state = "hero"
+            st.rerun()
+        if st.button("Підземелля", type="primary", width=130):
+            st.session_state.game_state = "on_map"
+            st.rerun()
+        if st.button("Ворог", type="secondary", width=130):
+            st.session_state.game_state = "enemy"
+            st.rerun()
+        if st.button("Швидкий бій", type="secondary", width=130):
+            st.session_state.game_state = "fast"
+            st.rerun()
+        if st.button("Назад", type="secondary", width=130):
+            st.session_state.game_state = None
+            st.rerun()
+    with col2:
+        st.subheader(
+            "Створіть собі героя та вирушайте в захопливі пригоди у підземелля. "
+            + "Вбивайте ворогів, знаходьте зброю та засоби захисту. "
+            + "Знайдіть вихід -- дійдіть до дверей."
+        )
 
 
 def on_map():
@@ -140,7 +149,7 @@ def on_map():
                     st.text(read_buffer())
 
                     # Верхній ряд (3 кнопки)
-                    col1, col2, col3 = st.columns([1, 1, 1])
+                    col1, col2, col3, col4 = st.columns([1, 1, 1, 6])
                     with col1:
                         if st.button("↖️"):
                             if st.session_state.hero.alive:
@@ -156,9 +165,11 @@ def on_map():
                             if st.session_state.hero.alive:
                                 move_hero(-1, 1, st.session_state.game_map)
                                 st.rerun()
+                    with col4:
+                        st.subheader("Легенда:")
 
                     # Середній ряд (3 кнопки)
-                    col1, col2, col3 = st.columns([1, 1, 1])
+                    col1, col2, col3, col4 = st.columns([1, 1, 1, 6])
                     with col1:
                         if st.button("⬅️"):
                             if st.session_state.hero.alive:
@@ -171,9 +182,14 @@ def on_map():
                             if st.session_state.hero.alive:
                                 move_hero(0, 1, st.session_state.game_map)
                                 st.rerun()
+                    with col4:
+                        st.write(
+                            f"{Emoji.HERO.value} -- ви   {Emoji.ENEMY.value} -- вороги   "
+                            + f"{Emoji.ITEM.value} -- скарби"
+                        )
 
                     # Нижній ряд (3 кнопки)
-                    col1, col2, col3 = st.columns([1, 1, 1])
+                    col1, col2, col3, col4 = st.columns([1, 1, 1, 6])
                     with col1:
                         if st.button("↙️"):
                             if st.session_state.hero.alive:
