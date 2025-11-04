@@ -3,4 +3,4 @@
 venv*/
 **/__pycache__/
 **/*.pyc
-karatel-game/game/test.py
+karatel/tests/

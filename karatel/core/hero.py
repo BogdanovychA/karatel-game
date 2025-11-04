@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 import random
 
-from .items import (
+from karatel.core.items import (
     JUST_HAND,
     UNARMED_STRIKE,
     Item,
@@ -10,8 +10,10 @@ from .items import (
     select_shield,
     select_weapon,
 )
-from .professions import PROFESSIONS, Profession, show_professions
-from .settings import (
+from karatel.core.professions import PROFESSIONS, Profession, show_professions
+from karatel.core.skills import SKILLS, Skill, SkillTiming
+from karatel.ui.abstract import OutputSpace, ui
+from karatel.utils.settings import (
     BASE_SKILL_LEVELS,
     DEBUG,
     EXPERIENCE_FOR_LEVEL,
@@ -21,10 +23,8 @@ from .settings import (
     MAX_LEVEL,
     MIN_LEVEL,
 )
-from .skills import SKILLS, Skill, SkillTiming
-from .translations import TRANSLATIONS
-from .ui import OutputSpace, ui
-from .utils import clamp_value, get_modifier
+from karatel.utils.translate import TRANSLATIONS
+from karatel.utils.utils import clamp_value, get_modifier
 
 
 class Hero:

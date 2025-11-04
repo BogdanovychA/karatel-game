@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
-from .dice import Dice
-from .hero import Hero
-from .settings import LOG, XP_MULTIPLIER
-from .skills import SkillTiming
-from .ui import ui
+from karatel.core.hero import Hero
+from karatel.core.skills import SkillTiming
+from karatel.ui.abstract import ui
+from karatel.utils.dice import Dice
+from karatel.utils.settings import LOG, XP_MULTIPLIER
 
 
 def attack(attacker: Hero, defender: Hero) -> bool:

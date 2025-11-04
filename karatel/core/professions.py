@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 from dataclasses import dataclass
 
-from .settings import LOG
-from .translations import TRANSLATIONS
-from .ui import ui
+from karatel.ui.abstract import ui
+from karatel.utils.settings import LOG
+from karatel.utils.translate import TRANSLATIONS
 
 
 @dataclass

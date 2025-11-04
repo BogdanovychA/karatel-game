@@ -1,9 +1,9 @@
 import streamlit as st
 
-from .combat import fight
-from .hero import Hero, HeroFactory
-from .professions import PROFESSIONS
-from .ui import ui
+from karatel.core.hero import HeroFactory
+from karatel.core.professions import PROFESSIONS
+from karatel.logic.combat import fight
+from karatel.ui.abstract import ui
 
 TITLE = "КАРАТЄЛЬ"
 
@@ -51,7 +51,7 @@ def back() -> None:
 
 def hello() -> None:
     # st.title(TITLE)
-    st.image("./images/logo.png")
+    st.image("./karatel/images/logo.png")
     st.header(
         "КАРАТЄЛЬ — консольна рольова гра, де ти створюєш персонажа, "
         + "обираєш професію і пробуєш вижити у тактичних боях. "

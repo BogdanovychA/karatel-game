@@ -1,9 +1,10 @@
+# -*- coding: utf-8 -*-
+
 import random
 from enum import Enum, IntEnum
-from typing import Tuple
 
-from .hero import Hero, HeroFactory
-from .items import (
+from karatel.core.hero import Hero, HeroFactory
+from karatel.core.items import (
     CHARISMA_WEAPONS,
     DEXTERITY_WEAPONS,
     INTELLIGENCE_WEAPONS,
@@ -11,8 +12,7 @@ from .items import (
     STRENGTH_WEAPONS,
     Item,
 )
-from .ui import OutputSpace, ui
-from .utils import clamp_value
+from karatel.ui.abstract import OutputSpace, ui
 
 
 class Emoji(Enum):
@@ -133,45 +133,9 @@ def generate_map(hero: Hero) -> list[list[Cell]]:
 
 
 def render_map(the_map: list) -> None:
+    text = ""
     for y in the_map:
         for x in y:
-            print(x.emoji, end="")
-        print()
-
-
-def find_hero(the_map: list) -> Tuple[int | None, int | None]:
-    """Шукає героя на карті. Повертає координати Y та X"""
-    for y in range(len(the_map)):
-        for x in range(len(the_map[y])):
-            if the_map[y][x].type == CellType.HERO:
-                return y, x
-    return None, None
-
-
-def move_hero(step_y: int, step_x: int, the_map: list) -> list:
-    pos_y, pos_x = find_hero(the_map)
-    if pos_y is None or pos_x is None:
-        return the_map
-    else:
-        new_y = clamp_value((pos_y + step_y), 0, MapSize.Y - 1)
-        new_x = clamp_value((pos_x + step_x), 0, MapSize.X - 1)
-
-        the_map[new_y][new_x] = the_map[pos_y][pos_x]
-
-        if new_y != pos_y or new_x != pos_x:
-            the_map[pos_y][pos_x] = EMPTY_CELL
-
-        return the_map
-
-
-if __name__ == "__main__":
-    hero_a = HeroFactory.generate(1)
-    my_map = generate_map(hero_a)
-    render_map(my_map)
-
-    for _ in range(10):
-        move_x = random.randint(-1, 1)
-        move_y = random.randint(-1, 1)
-        my_map = move_hero(move_y, move_x, my_map)
-        print(move_y, move_x)
-        render_map(my_map)
+            text += x.emoji
+        text += "\n"
+    ui.write(text)

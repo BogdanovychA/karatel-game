@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
-from .settings import MAX_LEVEL, MIN_LEVEL
-from .translations import TRANSLATIONS
-from .utils import clamp_value
+from karatel.utils.settings import MAX_LEVEL, MIN_LEVEL
+from karatel.utils.translate import TRANSLATIONS
+from karatel.utils.utils import clamp_value
 
 
 class Item:

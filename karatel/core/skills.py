@@ -4,12 +4,12 @@ from __future__ import annotations
 from enum import Enum
 from typing import TYPE_CHECKING
 
-from .dice import Dice
+from karatel.utils.dice import Dice
 
 if TYPE_CHECKING:
-    from hero import Hero
+    from karatel.core.hero import Hero
 
-from .ui import ui
+from karatel.ui.abstract import ui
 
 
 class SkillTiming(Enum):

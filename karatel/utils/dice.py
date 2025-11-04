@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 import random
 
-from .settings import DEBUG
-from .ui import ui
+from karatel.ui.abstract import ui
+from karatel.utils.settings import DEBUG
 
 
 class Dice:

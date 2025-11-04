@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from .ui import OutputSpace, ui
+from karatel.ui.abstract import OutputSpace, ui
 
 
 def get_modifier(stat_value: int) -> int:

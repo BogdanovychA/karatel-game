@@ -1,7 +1,7 @@
 import time
 from abc import ABC, abstractmethod
 
-from .settings import OUTPUT_MODE
+from karatel.utils.settings import OUTPUT_MODE
 
 
 class OutputSpace(ABC):
