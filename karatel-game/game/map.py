@@ -48,8 +48,8 @@ class StartHeroPosition(IntEnum):
     """Enum-клас для зберігання змінних, що
     відповідають за стартову позицію героя"""
 
-    X = random.randint(0, 2)
-    Y = random.randint(0, 2)
+    X = random.randint(0, 1)
+    Y = random.randint(0, 1)
 
 
 class CellMultiplier(IntEnum):
@@ -68,34 +68,9 @@ TYPES_OF_CELL = (
 )
 
 
-def set_empty_cell() -> Tuple[CellType, None, str]:
-    """Встановлює пусту клітинку мапи"""
-
-    return CellType.EMPTY, None, Emoji.EMPTY.value
-
-
-def select_obj() -> Tuple[CellType, Hero | Item | None, str]:
-    cell = random.choice(TYPES_OF_CELL)
-    match cell:
-        case CellType.ENEMY:
-            return CellType.ENEMY, HeroFactory.generate(), Emoji.ENEMY.value
-        case CellType.ITEM:
-            return (
-                CellType.ITEM,
-                random.choice(
-                    STRENGTH_WEAPONS
-                    + DEXTERITY_WEAPONS
-                    + INTELLIGENCE_WEAPONS
-                    + CHARISMA_WEAPONS
-                    + SHIELDS
-                ),
-                Emoji.ITEM.value,
-            )
-        case CellType.EMPTY | _:
-            return set_empty_cell()
-
-
 class Cell:
+    """Клас, що описує клітинку мапи"""
+
     def __init__(
         self,
         cell_type: CellType,
@@ -111,7 +86,33 @@ class Cell:
         self.output = output if output is not None else ui
 
 
-def generate_map(hero: Hero) -> list:
+EMPTY_CELL = Cell(CellType.EMPTY, None, Emoji.EMPTY.value)
+
+
+def select_obj() -> Cell:
+    cell = random.choice(TYPES_OF_CELL)
+    match cell:
+        case CellType.ENEMY:
+            cell = Cell(CellType.ENEMY, HeroFactory.generate(), Emoji.ENEMY.value)
+            return cell
+        case CellType.ITEM:
+            cell = Cell(
+                CellType.ITEM,
+                random.choice(
+                    STRENGTH_WEAPONS
+                    + DEXTERITY_WEAPONS
+                    + INTELLIGENCE_WEAPONS
+                    + CHARISMA_WEAPONS
+                    + SHIELDS
+                ),
+                Emoji.ITEM.value,
+            )
+            return cell
+        case CellType.EMPTY | _:
+            return EMPTY_CELL
+
+
+def generate_map(hero: Hero) -> list[list[Cell]]:
     line_y: list[list] = []
     for coordinate_y in range(MapSize.Y):
         line_x: list[Cell] = []
@@ -120,17 +121,13 @@ def generate_map(hero: Hero) -> list:
                 coordinate_y == StartHeroPosition.X
                 and coordinate_x == StartHeroPosition.Y
             ):
-                cell_type = CellType.HERO
-                obj = hero
-                emoji = Emoji.HERO.value
+                cell = Cell(CellType.HERO, hero, Emoji.HERO.value)
             elif coordinate_y == MapSize.Y - 1 and coordinate_x == MapSize.X - 1:
-                cell_type = CellType.EXIT
-                obj = None
-                emoji = Emoji.EXIT.value
+                cell = Cell(CellType.EXIT, None, Emoji.EXIT.value)
             else:
-                cell_type, obj, emoji = select_obj()
+                cell = select_obj()
 
-            line_x.append(Cell(cell_type, obj, emoji))
+            line_x.append(cell)
         line_y.append(line_x)
     return line_y
 
@@ -156,16 +153,13 @@ def move_hero(step_y: int, step_x: int, the_map: list) -> list:
     if pos_y is None or pos_x is None:
         return the_map
     else:
-        cell_type, obj, emoji = set_empty_cell()
-        empty_cell = Cell(cell_type, obj, emoji)
-
         new_y = clamp_value((pos_y + step_y), 0, MapSize.Y - 1)
         new_x = clamp_value((pos_x + step_x), 0, MapSize.X - 1)
 
         the_map[new_y][new_x] = the_map[pos_y][pos_x]
 
         if new_y != pos_y or new_x != pos_x:
-            the_map[pos_y][pos_x] = empty_cell
+            the_map[pos_y][pos_x] = EMPTY_CELL
 
         return the_map
 
@@ -176,8 +170,8 @@ if __name__ == "__main__":
     render_map(my_map)
 
     for _ in range(10):
-        step_x = random.randint(-1, 1)
-        step_y = random.randint(-1, 1)
-        my_map = move_hero(step_y, step_x, my_map)
-        print(step_x, step_y)
+        move_x = random.randint(-1, 1)
+        move_y = random.randint(-1, 1)
+        my_map = move_hero(move_y, move_x, my_map)
+        print(move_y, move_x)
         render_map(my_map)
