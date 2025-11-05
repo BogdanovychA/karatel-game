@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import random
+from typing import Type
 
 from karatel.core.items import (
     JUST_HAND,
@@ -416,6 +417,15 @@ class EquipmentManager:
             self.output.write(f"{self.hero.name} підбирає: {item}", log=log)
         else:
             self.output.write(f"Не можна підібрати {item.name}", log=log)
+
+    def select_item(self, item_class: Type | None = None) -> Item | None:
+        if self.hero.inventory is not None:
+            for item in self.hero.inventory:
+                if isinstance(item, item_class):
+                    return item
+            return None
+        else:
+            return None
 
 
 class HeroFactory:

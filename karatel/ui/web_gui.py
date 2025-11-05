@@ -1,6 +1,7 @@
 import streamlit as st
 
 from karatel.core.hero import HeroFactory
+from karatel.core.items import Shield, Weapon
 from karatel.core.map_model import Emoji, generate_map, render_map
 from karatel.core.professions import PROFESSIONS
 from karatel.logic.combat import fight
@@ -250,17 +251,25 @@ def hero() -> None:
             if st.session_state.hero.alive:
                 col1, col2, col3, col4 = st.columns([1, 1, 1, 1])
                 with col1:
-                    if st.button("Кнопка1", type="secondary", width=150):
-                        pass
+                    if st.button("Екіпірувати зброю", type="secondary", width=150):
+                        st.session_state.hero.equipment.equip_weapon(
+                            st.session_state.hero.equipment.select_item(Weapon)
+                        )
+                        st.rerun()
                 with col2:
-                    if st.button("Кнопка2", type="secondary", width=150):
-                        pass
+                    if st.button("Екіпірувати щит", type="secondary", width=150):
+                        st.session_state.hero.equipment.equip_shield(
+                            st.session_state.hero.equipment.select_item(Shield)
+                        )
+                        st.rerun()
                 with col3:
-                    if st.button("Кнопка3", type="secondary", width=150):
-                        pass
+                    if st.button("Зняти зброю", type="secondary", width=150):
+                        st.session_state.hero.equipment.equip_weapon()
+                        st.rerun()
                 with col4:
-                    if st.button("Кнопка4", type="secondary", width=150):
-                        pass
+                    if st.button("Зняти щит", type="secondary", width=150):
+                        st.session_state.hero.equipment.equip_shield()
+                        st.rerun()
 
             show_log()
 
