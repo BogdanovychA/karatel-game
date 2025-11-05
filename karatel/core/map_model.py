@@ -26,6 +26,7 @@ class Emoji(Enum):
     HERO = " 🧙 "
     EXIT = " 🚪 "
     TOMB = " 🪦 "
+    GOLD = " 🪙 "
 
 
 class CellType(Enum):
@@ -37,6 +38,7 @@ class CellType(Enum):
     ITEM = "item"
     HERO = "hero"
     EXIT = "exit"
+    GOLD = "gold"
 
 
 class MapSize(IntEnum):
@@ -45,6 +47,13 @@ class MapSize(IntEnum):
 
     X = 19
     Y = 15
+
+
+class GoldLimits(IntEnum):
+    """Ліміти грошай при генерації клітинок з золотом"""
+
+    MIN = 1
+    MAX = 10
 
 
 class StartHeroPosition(IntEnum):
@@ -62,12 +71,14 @@ class CellMultiplier(IntEnum):
     EMPTY = 10
     ENEMY = 5
     ITEM = 5
+    GOLD = 1
 
 
 TYPES_OF_CELL = (
     [CellType.EMPTY] * CellMultiplier.EMPTY
     + [CellType.ENEMY] * CellMultiplier.ENEMY
     + [CellType.ITEM] * CellMultiplier.ITEM
+    + [CellType.GOLD] * CellMultiplier.GOLD
 )
 
 
@@ -79,11 +90,13 @@ class Cell:
         cell_type: CellType,
         obj: Hero | Item | None = None,
         emoji: str | None = None,
+        gold: int = 0,
         output: OutputSpace | None = None,
     ) -> None:
         self.type = cell_type
         self.obj = obj
         self.emoji = emoji or Emoji.EMPTY.value
+        self.gold = gold
 
         # Менеджери
         self.output = output if output is not None else ui
@@ -110,6 +123,13 @@ def select_obj() -> Cell:
             all_items.remove(JUST_HAND)
             cell = Cell(CellType.ITEM, random.choice(all_items), Emoji.ITEM.value)
             return cell
+        case CellType.GOLD:
+            return Cell(
+                CellType.GOLD,
+                None,
+                Emoji.GOLD.value,
+                random.randint(GoldLimits.MIN, GoldLimits.MAX),
+            )
         case CellType.EMPTY | _:
             return EMPTY_CELL
 
