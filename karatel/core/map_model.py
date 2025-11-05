@@ -53,7 +53,8 @@ class GoldLimits(IntEnum):
     """Ліміти грошай при генерації клітинок з золотом"""
 
     MIN = 1
-    MAX = 10
+    MAX = 5
+    ENEMY = 10
 
 
 class StartHeroPosition(IntEnum):
@@ -109,7 +110,13 @@ def select_obj() -> Cell:
     cell = random.choice(TYPES_OF_CELL)
     match cell:
         case CellType.ENEMY:
-            cell = Cell(CellType.ENEMY, HeroFactory.generate(), Emoji.ENEMY.value)
+            enemy = HeroFactory.generate()
+            cell = Cell(
+                CellType.ENEMY,
+                enemy,
+                Emoji.ENEMY.value,
+                random.randint(GoldLimits.MIN, GoldLimits.ENEMY * enemy.level),
+            )
             return cell
         case CellType.ITEM:
             all_items = list(
