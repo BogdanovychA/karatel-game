@@ -106,39 +106,60 @@ class Cell:
 EMPTY_CELL = Cell(CellType.EMPTY, None, Emoji.EMPTY.value)
 
 
-def select_obj() -> Cell:
-    cell = random.choice(TYPES_OF_CELL)
-    match cell:
+def select_obj(cell_type: CellType | None = None) -> Cell:
+
+    def generate_enemy() -> Cell:
+        enemy = HeroFactory.generate()
+        enemy_cell = Cell(
+            CellType.ENEMY,
+            enemy,
+            Emoji.ENEMY.value,
+            random.randint(GoldLimits.MIN, GoldLimits.ENEMY * enemy.level),
+        )
+        return enemy_cell
+
+    def generate_item() -> Cell:
+        all_items = list(
+            STRENGTH_WEAPONS
+            + SHIELDS
+            + DEXTERITY_WEAPONS
+            + INTELLIGENCE_WEAPONS
+            + CHARISMA_WEAPONS
+        )
+        all_items.remove(UNARMED_STRIKE)
+        all_items.remove(JUST_HAND)
+        item_cell = Cell(CellType.ITEM, random.choice(all_items), Emoji.ITEM.value)
+        return item_cell
+
+    def generate_gold() -> Cell:
+        gold_cell = Cell(
+            CellType.GOLD,
+            None,
+            Emoji.GOLD.value,
+            random.randint(GoldLimits.MIN, GoldLimits.MAX),
+        )
+        return gold_cell
+
+    match cell_type:
         case CellType.ENEMY:
-            enemy = HeroFactory.generate()
-            cell = Cell(
-                CellType.ENEMY,
-                enemy,
-                Emoji.ENEMY.value,
-                random.randint(GoldLimits.MIN, GoldLimits.ENEMY * enemy.level),
-            )
-            return cell
+            return generate_enemy()
         case CellType.ITEM:
-            all_items = list(
-                STRENGTH_WEAPONS
-                + SHIELDS
-                + DEXTERITY_WEAPONS
-                + INTELLIGENCE_WEAPONS
-                + CHARISMA_WEAPONS
-            )
-            all_items.remove(UNARMED_STRIKE)
-            all_items.remove(JUST_HAND)
-            cell = Cell(CellType.ITEM, random.choice(all_items), Emoji.ITEM.value)
-            return cell
+            return generate_item()
         case CellType.GOLD:
-            return Cell(
-                CellType.GOLD,
-                None,
-                Emoji.GOLD.value,
-                random.randint(GoldLimits.MIN, GoldLimits.MAX),
-            )
-        case CellType.EMPTY | _:
+            return generate_gold()
+        case CellType.EMPTY:
             return EMPTY_CELL
+        case None | _:
+            cell = random.choice(TYPES_OF_CELL)
+            match cell:
+                case CellType.ENEMY:
+                    return generate_enemy()
+                case CellType.ITEM:
+                    return generate_item()
+                case CellType.GOLD:
+                    return generate_gold()
+                case CellType.EMPTY | _:
+                    return EMPTY_CELL
 
 
 def generate_map(hero: Hero) -> list[list[Cell]]:
@@ -151,6 +172,33 @@ def generate_map(hero: Hero) -> list[list[Cell]]:
                 and coordinate_x == StartHeroPosition.Y
             ):
                 cell = Cell(CellType.HERO, hero, Emoji.HERO.value)
+            elif (
+                (coordinate_y == MapSize.Y - 1 and coordinate_x == MapSize.X - 2)
+                or (coordinate_y == MapSize.Y - 1 and coordinate_x == MapSize.X - 3)
+                or (coordinate_y == MapSize.Y - 1 and coordinate_x == MapSize.X - 4)
+                or (coordinate_y == MapSize.Y - 1 and coordinate_x == MapSize.X - 5)
+                or (coordinate_y == MapSize.Y - 2 and coordinate_x == MapSize.X - 1)
+                or (coordinate_y == MapSize.Y - 2 and coordinate_x == MapSize.X - 2)
+                or (coordinate_y == MapSize.Y - 2 and coordinate_x == MapSize.X - 3)
+                or (coordinate_y == MapSize.Y - 2 and coordinate_x == MapSize.X - 4)
+                or (coordinate_y == MapSize.Y - 2 and coordinate_x == MapSize.X - 5)
+                or (coordinate_y == MapSize.Y - 3 and coordinate_x == MapSize.X - 1)
+                or (coordinate_y == MapSize.Y - 3 and coordinate_x == MapSize.X - 2)
+                or (coordinate_y == MapSize.Y - 3 and coordinate_x == MapSize.X - 3)
+                or (coordinate_y == MapSize.Y - 3 and coordinate_x == MapSize.X - 4)
+                or (coordinate_y == MapSize.Y - 3 and coordinate_x == MapSize.X - 5)
+                or (coordinate_y == MapSize.Y - 4 and coordinate_x == MapSize.X - 1)
+                or (coordinate_y == MapSize.Y - 4 and coordinate_x == MapSize.X - 2)
+                or (coordinate_y == MapSize.Y - 4 and coordinate_x == MapSize.X - 3)
+                or (coordinate_y == MapSize.Y - 4 and coordinate_x == MapSize.X - 4)
+                or (coordinate_y == MapSize.Y - 4 and coordinate_x == MapSize.X - 5)
+                or (coordinate_y == MapSize.Y - 5 and coordinate_x == MapSize.X - 1)
+                or (coordinate_y == MapSize.Y - 5 and coordinate_x == MapSize.X - 2)
+                or (coordinate_y == MapSize.Y - 5 and coordinate_x == MapSize.X - 3)
+                or (coordinate_y == MapSize.Y - 5 and coordinate_x == MapSize.X - 4)
+                or (coordinate_y == MapSize.Y - 5 and coordinate_x == MapSize.X - 5)
+            ):
+                cell = select_obj(CellType.ENEMY)
             elif coordinate_y == MapSize.Y - 1 and coordinate_x == MapSize.X - 1:
                 cell = Cell(CellType.EXIT, None, Emoji.EXIT.value)
             else:
