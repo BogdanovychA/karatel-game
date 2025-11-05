@@ -77,7 +77,7 @@ class HealSelfSkill(Skill):
             # Обмеження максимального здоров'я реалізовано через сеттер Hero.hp
             hero.hp += power
             ui.write(
-                f"{hero.name} Відновлює {power} здоров'я за допомогою {self.name}\n",
+                f"{hero.name} Відновлює {power} здоров'я за допомогою {self.name}",
                 log=log,
             )
 

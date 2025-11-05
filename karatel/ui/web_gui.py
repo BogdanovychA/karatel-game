@@ -83,6 +83,23 @@ def back() -> None:
         st.rerun()
 
 
+def show_log() -> None:
+    with st.expander("Лог:"):
+        st.text(read_buffer())
+
+
+def show_hero() -> None:
+    st.text(st.session_state.hero)
+    if st.session_state.hero.alive:
+        st.write(st.session_state.hero.display.hp())
+        st.write(st.session_state.hero.display.level())
+        st.write(st.session_state.hero.display.stats())
+        st.write(st.session_state.hero.display.ac())
+        st.write(st.session_state.hero.display.modifiers())
+        st.write(st.session_state.hero.display.skills())
+        st.write(st.session_state.hero.display.inventory())
+
+
 def hello() -> None:
     # st.title(TITLE)
     st.image("./karatel/images/logo.png")
@@ -139,7 +156,7 @@ def on_map():
 
     if 'hero' in st.session_state and st.session_state.hero:
         with st.expander("Ваш Герой:", expanded=False):
-            st.text(st.session_state.hero.display.show())
+            show_hero()
         if 'game_map' in st.session_state:
             if not st.session_state.game_map:
                 st.session_state.game_map = generate_map(st.session_state.hero)
@@ -148,63 +165,62 @@ def on_map():
                     render_map(st.session_state.game_map)
                     st.text(read_buffer())
 
-                    # Верхній ряд (3 кнопки)
-                    col1, col2, col3, col4 = st.columns([1, 1, 1, 6])
-                    with col1:
-                        if st.button("↖️"):
-                            if st.session_state.hero.alive:
+                    if st.session_state.hero.alive:
+                        # Верхній ряд (3 кнопки)
+                        col1, col2, col3, col4 = st.columns([1, 1, 1, 6])
+                        with col1:
+                            if st.button("↖️"):
                                 move_hero(-1, -1, st.session_state.game_map)
                                 st.rerun()
-                    with col2:
-                        if st.button("⬆️"):
-                            if st.session_state.hero.alive:
+                        with col2:
+                            if st.button("⬆️"):
                                 move_hero(-1, 0, st.session_state.game_map)
                                 st.rerun()
-                    with col3:
-                        if st.button("↗️"):
-                            if st.session_state.hero.alive:
+                        with col3:
+                            if st.button("↗️"):
                                 move_hero(-1, 1, st.session_state.game_map)
                                 st.rerun()
-                    with col4:
-                        st.subheader("Легенда:")
+                        with col4:
+                            st.subheader("Легенда:")
 
-                    # Середній ряд (3 кнопки)
-                    col1, col2, col3, col4 = st.columns([1, 1, 1, 6])
-                    with col1:
-                        if st.button("⬅️"):
-                            if st.session_state.hero.alive:
+                        # Середній ряд (3 кнопки)
+                        col1, col2, col3, col4 = st.columns([1, 1, 1, 6])
+                        with col1:
+                            if st.button("⬅️"):
                                 move_hero(0, -1, st.session_state.game_map)
                                 st.rerun()
-                    with col2:
-                        st.text(" ")
-                    with col3:
-                        if st.button("➡️"):
-                            if st.session_state.hero.alive:
+                        with col2:
+                            st.text(" ")
+                        with col3:
+                            if st.button("➡️"):
                                 move_hero(0, 1, st.session_state.game_map)
                                 st.rerun()
-                    with col4:
-                        st.write(
-                            f"{Emoji.HERO.value} -- ви   {Emoji.ENEMY.value} -- вороги   "
-                            + f"{Emoji.ITEM.value} -- скарби"
-                        )
+                        with col4:
+                            st.write(
+                                f"{Emoji.HERO.value} -- ви | {Emoji.ENEMY.value} -- вороги | "
+                                + f"{Emoji.ITEM.value} -- скарби"
+                            )
 
-                    # Нижній ряд (3 кнопки)
-                    col1, col2, col3, col4 = st.columns([1, 1, 1, 6])
-                    with col1:
-                        if st.button("↙️"):
-                            if st.session_state.hero.alive:
+                        # Нижній ряд (3 кнопки)
+                        col1, col2, col3, col4 = st.columns([1, 1, 1, 6])
+                        with col1:
+                            if st.button("↙️"):
                                 move_hero(1, -1, st.session_state.game_map)
                                 st.rerun()
-                    with col2:
-                        if st.button("⬇️"):
-                            if st.session_state.hero.alive:
+                        with col2:
+                            if st.button("⬇️"):
                                 move_hero(1, 0, st.session_state.game_map)
                                 st.rerun()
-                    with col3:
-                        if st.button("↘️"):
-                            if st.session_state.hero.alive:
+                        with col3:
+                            if st.button("↘️"):
                                 move_hero(1, 1, st.session_state.game_map)
                                 st.rerun()
+                        with col4:
+                            st.write(
+                                f"{Emoji.EMPTY.value} -- нічого | {Emoji.EXIT.value} -- вихід"
+                            )
+                    else:
+                        st.write(f"{Emoji.TOMB.value} {st.session_state.hero}")
     back()
 
 
@@ -226,12 +242,27 @@ def hero() -> None:
                 st.session_state.hero = HeroFactory.generate(
                     level=level, profession=profession, name=name
                 )
-                st.success(f"Героя {name} створено!")
                 st.rerun()
 
         else:
-            st.success("Героя створено")
-            st.text(st.session_state.hero.display.show())
+            show_hero()
+
+            if st.session_state.hero.alive:
+                col1, col2, col3, col4 = st.columns([1, 1, 1, 1])
+                with col1:
+                    if st.button("Кнопка1", type="secondary", width=150):
+                        pass
+                with col2:
+                    if st.button("Кнопка2", type="secondary", width=150):
+                        pass
+                with col3:
+                    if st.button("Кнопка3", type="secondary", width=150):
+                        pass
+                with col4:
+                    if st.button("Кнопка4", type="secondary", width=150):
+                        pass
+
+            show_log()
 
             if st.button("Видалити героя", type="primary", width=150):
                 st.session_state.hero = None
@@ -299,7 +330,6 @@ def fast() -> None:
                 st.text(st.session_state.enemy.display.show())
             if st.button("Почати бій", type="primary", width=130):
                 fight(st.session_state.hero, st.session_state.enemy)
-                with st.expander("Лог бою:"):
-                    st.text(read_buffer())
+                show_log()
 
     back()

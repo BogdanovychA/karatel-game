@@ -25,6 +25,7 @@ class Emoji(Enum):
     ITEM = " 💎 "
     HERO = " 🧙 "
     EXIT = " 🚪 "
+    TOMB = " 🪦 "
 
 
 class CellType(Enum):

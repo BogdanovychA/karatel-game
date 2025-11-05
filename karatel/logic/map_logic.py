@@ -2,7 +2,7 @@
 
 from typing import Tuple
 
-from karatel.core.map_model import EMPTY_CELL, CellType, MapSize
+from karatel.core.map_model import EMPTY_CELL, CellType, Emoji, MapSize
 from karatel.logic.combat import fight
 from karatel.utils.settings import LOG
 from karatel.utils.utils import clamp_value
@@ -44,5 +44,7 @@ def move_hero(step_y: int, step_x: int, the_map: list) -> list:
             fight(the_map[pos_y][pos_x].obj, the_map[new_y][new_x].obj)
             if the_map[pos_y][pos_x].obj.alive:
                 step()
+            else:
+                the_map[pos_y][pos_x].emoji = Emoji.TOMB.value
 
         return the_map

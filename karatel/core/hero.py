@@ -93,7 +93,7 @@ class Hero:
 
         self.money: int = money
 
-        self.output.write(f"Персонажа {self.name} створено", end="\n\n", log=DEBUG)
+        self.output.write(f"Персонажа {self.name} створено", log=DEBUG)
 
     def __str__(self) -> str:
         """Повертає текстове представлення героя для print()."""
@@ -151,7 +151,7 @@ class HeroDisplay:
             return total
 
         else:
-            return f"{self.hero.name} - мертвий\n\n"
+            return f"{self.hero.name} - мертвий"
 
     def level(self) -> str:
         """Виводить рівень та досвід."""
@@ -199,16 +199,16 @@ class HeroDisplay:
     def inventory(self) -> str:
         """Виводить екіпірування та інвентар."""
         text = [
-            f"Права рука: {str(self.hero.right_hand)}",
-            f"Ліва рука: {str(self.hero.left_hand)}",
+            f"Права рука:\n\n{str(self.hero.right_hand)}\n",
+            f"Ліва рука:\n\n{str(self.hero.left_hand)}\n",
         ]
         if self.hero.inventory is None or self.hero.inventory == []:
-            text.append("Інвентар: [пусто].")
+            text.append("Інвентар: [пусто].\n")
         else:
             text.append("Інвентар: ")
             for item in self.hero.inventory:
                 text.append(f"* {item}")
-
+            text.append("\n")
         text.append(f"Гроші: {self.hero.money} грн.")
 
         total = "\n".join(str(a) for a in text)
@@ -260,14 +260,12 @@ class LevelSystem:
         if amount is not None:
             self.hero.experience += amount
             if self.hero.experience < EXPERIENCE_FOR_LEVEL[-1]:
-                self.output.write(
-                    f"{self.hero.name} отримує {amount} досвіду\n", log=log
-                )
+                self.output.write(f"{self.hero.name} отримує {amount} досвіду", log=log)
             else:
                 self.hero.experience = EXPERIENCE_FOR_LEVEL[-1]
                 self.output.write(
                     f"{self.hero.name} Досяг максимального рівня досвіду: "
-                    + f"{EXPERIENCE_FOR_LEVEL[-1]}\n",
+                    + f"{EXPERIENCE_FOR_LEVEL[-1]}",
                     log=log,
                 )
 
@@ -286,7 +284,7 @@ class LevelSystem:
                 (
                     f"У {self.hero.name} досвіду: {self.hero.experience}. "
                     f"До наступного рівня: "
-                    f"{EXPERIENCE_FOR_LEVEL[self.hero.level] - self.hero.experience}.\n"
+                    f"{EXPERIENCE_FOR_LEVEL[self.hero.level] - self.hero.experience}."
                 ),
                 log=log,
             )
@@ -304,26 +302,18 @@ class SkillSystem:
 
         if skill not in self.hero.skills:
             self.hero.skills.append(skill)
-            self.output.write(
-                f"{self.hero.name} отримує навичку {skill.name}\n", log=log
-            )
+            self.output.write(f"{self.hero.name} отримує навичку {skill.name}", log=log)
         else:
-            self.output.write(
-                f"{self.hero.name} вже має навичку {skill.name}\n", log=log
-            )
+            self.output.write(f"{self.hero.name} вже має навичку {skill.name}", log=log)
 
     def forget_skill(self, skill: Skill, log: bool = True) -> None:
         """Забування будь-якої навички"""
 
         if skill in self.hero.skills:
             self.hero.skills.remove(skill)
-            self.output.write(
-                f"{self.hero.name} забуває навичку {skill.name}\n", log=log
-            )
+            self.output.write(f"{self.hero.name} забуває навичку {skill.name}", log=log)
         else:
-            self.output.write(
-                f"{self.hero.name} не має навички {skill.name}\n", log=log
-            )
+            self.output.write(f"{self.hero.name} не має навички {skill.name}", log=log)
 
     def can_learn_skill(self, log: bool = True) -> None:
         """Видавання базових навичок залежно від рівня персонажа
@@ -375,7 +365,7 @@ class EquipmentManager:
         if item in self.hero.inventory:
             self.hero.inventory.remove(item)
         setattr(self.hero, hand_name, item)
-        self.output.write(f"Екіпіруємо {item.name}\n", log=log)
+        self.output.write(f"Екіпіруємо {item.name}", log=log)
 
     def equip_weapon(self, weapon: Weapon | None = None, log: bool = True) -> None:
         """Екіпірує зброю."""
@@ -391,7 +381,7 @@ class EquipmentManager:
                     self.output.write(f"{weapon.name} потребує обох рук!", log=log)
                     self.output.write(
                         f"{self.hero.left_hand.name} автоматично знято",
-                        end="\n\n",
+                        # end="\n\n",
                         log=log,
                     )
                 self.hero.left_hand = JUST_HAND
@@ -413,7 +403,7 @@ class EquipmentManager:
                 )
                 self.output.write(
                     f"{self.hero.right_hand.name} автоматично знято",
-                    end="\n\n",
+                    # end="\n\n",
                     log=log,
                 )
                 self.hero.right_hand = UNARMED_STRIKE
@@ -423,7 +413,7 @@ class EquipmentManager:
     def add_item(self, item: Item, log: bool = True) -> None:
         if item != UNARMED_STRIKE and item != JUST_HAND:
             self.hero.inventory.append(item)
-            self.output.write(f"{self.hero.name} підбирає: {item}\n", log=log)
+            self.output.write(f"{self.hero.name} підбирає: {item}", log=log)
         else:
             self.output.write(f"Не можна підібрати {item.name}", log=log)
 
@@ -450,7 +440,7 @@ class HeroFactory:
                 profession = PROFESSIONS[menu[choice]]
                 break
             else:
-                ui.write("\nЗробіть правильний вибір!", log=log)
+                ui.write("Зробіть правильний вибір!", log=log)
         ui.write(
             f"Створюємо персонажа з ім'ям {name} та професією {profession.name}",
             log=log,
