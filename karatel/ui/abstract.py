@@ -23,20 +23,21 @@ class BufferedOutput(OutputSpace):
     """Вивід у буфер (для тестів або GUI)"""
 
     def __init__(self):
-        self.buffer: list[str] = []
+        self._buffer: list[str] = []
 
     def write(self, *args, log=True, **kwargs) -> None:
         if log:
             text = " ".join(str(a) for a in args)
-            self.buffer.append(text)
+            self._buffer.append(text)
 
-    def get_buffer(self) -> list[str]:
+    @property
+    def buffer(self) -> list[str]:
         """Отримати весь буфер"""
-        return self.buffer
+        return self._buffer
 
     def clear(self) -> None:
         """Очистити буфер"""
-        self.buffer.clear()
+        self._buffer.clear()
 
 
 match OUTPUT_MODE:

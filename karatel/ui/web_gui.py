@@ -29,7 +29,7 @@ def check_game_state() -> None:
 
 
 def read_buffer() -> str:
-    text = "\n".join(str(a) for a in ui.get_buffer())
+    text = "\n".join(str(a) for a in ui.buffer)
     ui.clear()
     return text
 
