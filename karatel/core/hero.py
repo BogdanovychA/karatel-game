@@ -211,8 +211,8 @@ class HeroDisplay:
     def inventory(self) -> str:
         """Виводить екіпірування та інвентар."""
         text = [
-            f"Права рука:\n\n{str(self.hero.right_hand)}\n",
-            f"Ліва рука:\n\n{str(self.hero.left_hand)}\n",
+            f"Права рука (зброя):\n\n{str(self.hero.right_hand)}\n",
+            f"Ліва рука (щит):\n\n{str(self.hero.left_hand)}\n",
         ]
         if self.hero.inventory is None or self.hero.inventory == []:
             text.append("Інвентар: [пусто].\n")
@@ -371,19 +371,24 @@ class EquipmentManager:
         Для забезпечення принципів DRY"""
 
         current_hand = getattr(self.hero, hand_name)
-        if current_hand != default_item:
-            self.hero.inventory.append(current_hand)
         if item in self.hero.inventory:
             self.hero.inventory.remove(item)
         setattr(self.hero, hand_name, item)
-        self.output.write(f"Екіпіруємо {item.name}", log=log)
+        if current_hand != default_item:
+            self.hero.inventory.append(current_hand)
+        if item != default_item:
+            self.output.write(f"Екіпіруємо {item.name}", log=log)
+        else:
+            if current_hand != default_item:
+                self.output.write(f"{current_hand.name} Знято!", log=log)
+            else:
+                self.output.write(f"В руках пусто!", log=log)
 
     def equip_weapon(self, weapon: Weapon | None = None, log: bool = True) -> None:
         """Екіпірує зброю."""
 
         if weapon is None:
             weapon = UNARMED_STRIKE
-
         if isinstance(weapon, Weapon):
             self.equip_item("right_hand", weapon, UNARMED_STRIKE, log=log)
             if weapon.two_handed:
@@ -391,9 +396,7 @@ class EquipmentManager:
                     self.hero.inventory.append(self.hero.left_hand)
                     self.output.write(f"{weapon.name} потребує обох рук!", log=log)
                     self.output.write(
-                        f"{self.hero.left_hand.name} автоматично знято",
-                        # end="\n\n",
-                        log=log,
+                        f"{self.hero.left_hand.name} автоматично знято", log=log
                     )
                 self.hero.left_hand = JUST_HAND
         else:
@@ -407,17 +410,16 @@ class EquipmentManager:
 
         if isinstance(shield, Shield):
             self.equip_item("left_hand", shield, JUST_HAND, log=log)
-            if self.hero.right_hand.two_handed:
-                self.hero.inventory.append(self.hero.right_hand)
-                self.output.write(
-                    f"{self.hero.right_hand.name} потребує обох рук!", log=log
-                )
-                self.output.write(
-                    f"{self.hero.right_hand.name} автоматично знято",
-                    # end="\n\n",
-                    log=log,
-                )
-                self.hero.right_hand = UNARMED_STRIKE
+            if shield != JUST_HAND:
+                if self.hero.right_hand.two_handed:
+                    self.hero.inventory.append(self.hero.right_hand)
+                    self.output.write(
+                        f"{self.hero.right_hand.name} потребує обох рук!", log=log
+                    )
+                    self.output.write(
+                        f"{self.hero.right_hand.name} автоматично знято", log=log
+                    )
+                    self.hero.right_hand = UNARMED_STRIKE
         else:
             self.output.write(f"{shield.name} не є щитом", log=log)
 
