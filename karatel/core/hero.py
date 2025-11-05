@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import math
 import random
 from typing import Type
 
@@ -50,6 +51,8 @@ class Hero:
         # Ініціалізуємо HP до будь-яких викликів
         self._hp = 0
         self.max_hp = 0
+
+        self._money = 0
 
         self.stats = {
             "Strength": 10,
@@ -110,7 +113,7 @@ class Hero:
 
     @hp.setter
     def hp(self, value: int) -> None:
-        self._hp = clamp_value(value, 0, self.max_hp)
+        self._hp = math.floor(clamp_value(value, 0, self.max_hp))
 
     @property
     def ac(self) -> int:
@@ -127,6 +130,14 @@ class Hero:
     @property
     def alive(self) -> bool:
         return True if self.hp > 0 else False
+
+    @property
+    def money(self) -> int:
+        return self._money
+
+    @money.setter
+    def money(self, value: int) -> None:
+        self._money = math.floor(clamp_value(value, 0, None))
 
 
 class HeroDisplay:
@@ -211,7 +222,6 @@ class HeroDisplay:
                 text.append(f"* {item}")
             text.append("\n")
         text.append(f"Гроші: {self.hero.money} грн.")
-
         total = "\n".join(str(a) for a in text)
         return total
 
