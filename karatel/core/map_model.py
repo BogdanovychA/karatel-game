@@ -177,30 +177,23 @@ def select_obj(
         )
         return book_cell
 
-    match cell_type:
-        case CellType.ENEMY:
-            return generate_enemy(enemy_level)
-        case CellType.ITEM:
-            return generate_item()
-        case CellType.GOLD:
-            return generate_gold()
-        case CellType.BOOK:
-            return generate_book()
-        case CellType.EMPTY:
-            return EMPTY_CELL
-        case None | _:
-            cell = random.choice(TYPES_OF_CELL)
-            match cell:
-                case CellType.ENEMY:
-                    return generate_enemy(enemy_level)
-                case CellType.ITEM:
-                    return generate_item()
-                case CellType.GOLD:
-                    return generate_gold()
-                case CellType.BOOK:
-                    return generate_book()
-                case CellType.EMPTY | _:
-                    return EMPTY_CELL
+    def create() -> Cell:
+        match cell_type:
+            case CellType.ENEMY:
+                return generate_enemy(enemy_level)
+            case CellType.ITEM:
+                return generate_item()
+            case CellType.GOLD:
+                return generate_gold()
+            case CellType.BOOK:
+                return generate_book()
+            case CellType.EMPTY | _:
+                return EMPTY_CELL
+
+    if cell_type is None:
+        cell_type = random.choice(TYPES_OF_CELL)
+
+    return create()
 
 
 def generate_map(hero: Hero) -> list[list[Cell]]:
