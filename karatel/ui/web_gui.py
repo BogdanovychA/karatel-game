@@ -220,7 +220,8 @@ def on_map():
                                 st.rerun()
                         with col4:
                             st.write(
-                                f"{Emoji.EMPTY.value} -- нічого | {Emoji.EXIT.value} -- вихід"
+                                f"{Emoji.BOOK.value} -- досвід | {Emoji.EMPTY.value} -- нічого | "
+                                + f"{Emoji.EXIT.value} -- вихід"
                             )
                     else:
                         st.write(f"{Emoji.TOMB.value} {st.session_state.hero}")
