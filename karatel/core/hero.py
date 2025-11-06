@@ -71,7 +71,7 @@ class Hero:
         self.skills = skills or []
 
         # Ініціалізація героя
-        self.leveling.level_up(add_const=False, log=DEBUG)
+        self.leveling.level_up(add_constitution=False, log=DEBUG)
         self.leveling.set_penalties()
 
         # "Докручування" героя до потрібного рівня
@@ -153,7 +153,7 @@ class Hero:
 
     @level.setter
     def level(self, value: int) -> None:
-        self._level = math.floor(clamp_value(value, 0, None))
+        self._level = math.floor(clamp_value(value, 0, MAX_LEVEL))
 
 
 class HeroDisplay:
@@ -254,13 +254,13 @@ class LevelSystem:
         self.hero.max_hp = 10 + get_modifier(self.hero.stats["Constitution"])
         self.hero._hp = self.hero.max_hp
 
-    def level_up(self, add_const: bool = True, log: bool = True) -> None:
+    def level_up(self, add_constitution: bool = True, log: bool = True) -> None:
         """Підвищує характеристики при новому рівні."""
         for main_bonuses in self.hero.profession.main_bonuses:
             self.hero.stats[main_bonuses] += 2
         for secondary_bonuses in self.hero.profession.secondary_bonuses:
             self.hero.stats[secondary_bonuses] += 1
-        if add_const:
+        if add_constitution:
             self.hero.stats["Constitution"] += 1
         self.set_hp()
         self.hero.skill_manager.can_learn_skill(log=log)
@@ -273,27 +273,23 @@ class LevelSystem:
         self.set_hp()
 
     def add_experience(self, amount: int | None = None, log: bool = True) -> None:
-        """Перевіряє чи герой отримав новий рівень."""
+        """Перевіряє чи отримав герой новий рівень."""
 
         if amount is not None and amount != 0:
             self.hero.experience += amount
-            if self.hero.experience < EXPERIENCE_FOR_LEVEL[-1]:
-                self.output.write(f"{self.hero.name} отримує {amount} досвіду", log=log)
-            else:
-                self.hero.experience = EXPERIENCE_FOR_LEVEL[-1]
+            self.output.write(f"{self.hero.name} отримує {amount} досвіду", log=log)
+            if self.hero.experience == EXPERIENCE_FOR_LEVEL[-1]:
                 self.output.write(
-                    f"{self.hero.name} Досяг максимального рівня досвіду: "
+                    f"{self.hero.name} досяг максимального досвіду: "
                     + f"{EXPERIENCE_FOR_LEVEL[-1]}",
                     log=log,
                 )
         else:
             return
 
-        if self.hero.level >= MAX_LEVEL:
-            self.hero.level = MAX_LEVEL
+        if self.hero.level == MAX_LEVEL:
             self.output.write(
-                f"{self.hero.name} вже досяг максимального рівня: "
-                + f"{self.hero.level}",
+                f"{self.hero.name} досяг максимального рівня: " + f"{self.hero.level}",
                 log=log,
             )
             return

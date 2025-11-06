@@ -7,6 +7,7 @@ from karatel.core.professions import PROFESSIONS
 from karatel.logic.combat import fight
 from karatel.logic.map_logic import move_hero
 from karatel.ui.abstract import ui
+from karatel.utils.settings import DEBUG, MAX_LEVEL, MIN_LEVEL
 
 TITLE = "КАРАТЄЛЬ"
 
@@ -131,12 +132,13 @@ def menu() -> None:
         if st.button("Підземелля", type="primary", width=130):
             st.session_state.game_state = "on_map"
             st.rerun()
-        # if st.button("Ворог", type="secondary", width=130):
-        #     st.session_state.game_state = "enemy"
-        #     st.rerun()
-        # if st.button("Швидкий бій", type="secondary", width=130):
-        #     st.session_state.game_state = "fast"
-        #     st.rerun()
+        if DEBUG:
+            if st.button("Ворог", type="secondary", width=130):
+                st.session_state.game_state = "enemy"
+                st.rerun()
+            if st.button("Швидкий бій", type="secondary", width=130):
+                st.session_state.game_state = "fast"
+                st.rerun()
         if st.button("Назад", type="secondary", width=130):
             st.session_state.game_state = None
             st.rerun()
@@ -237,7 +239,7 @@ def hero() -> None:
                 options=list(PROFESSIONS.keys()),
                 format_func=lambda x: PROFESSIONS[x].name,
             )
-            level = st.slider("Рівень", 1, 20, 1)
+            level = st.slider("Рівень", MIN_LEVEL, MAX_LEVEL, MIN_LEVEL)
 
             if st.button("Створити героя", type="secondary", width=150):
                 st.session_state.hero = HeroFactory.generate(
@@ -295,9 +297,9 @@ def enemy() -> None:
             )
             level = st.slider(
                 "Рівень",
-                1,
-                20,
-                1 if not st.session_state.hero else st.session_state.hero.level,
+                MIN_LEVEL,
+                MAX_LEVEL,
+                MIN_LEVEL if not st.session_state.hero else st.session_state.hero.level,
             )
 
             if st.button("Створити ворога", type="secondary", width=150):
@@ -315,6 +317,7 @@ def enemy() -> None:
                 st.session_state.enemy = None
                 ui.clear()
                 st.rerun()
+            show_log()
     back()
 
 

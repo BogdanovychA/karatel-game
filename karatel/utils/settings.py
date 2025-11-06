@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 LOG = True
+
 DEBUG = False
 
 XP_MULTIPLIER = 50
