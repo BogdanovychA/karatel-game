@@ -7,7 +7,7 @@ from karatel.core.professions import PROFESSIONS, Profession, show_professions
 from karatel.logic.combat import fight
 from karatel.logic.map_logic import move_hero
 from karatel.ui.abstract import ui
-from karatel.utils.settings import DEBUG, MAX_LEVEL, MIN_LEVEL
+from karatel.utils.settings import DEBUG, LOG, MAX_LEVEL, MIN_LEVEL
 
 TITLE = "КАРАТЄЛЬ"
 
@@ -173,15 +173,15 @@ def on_map():
                         col1, col2, col3, col4 = st.columns([1, 1, 1, 6])
                         with col1:
                             if st.button("↖️"):
-                                move_hero(-1, -1, st.session_state.game_map)
+                                move_hero(-1, -1, st.session_state.game_map, log=LOG)
                                 st.rerun()
                         with col2:
                             if st.button("⬆️"):
-                                move_hero(-1, 0, st.session_state.game_map)
+                                move_hero(-1, 0, st.session_state.game_map, log=LOG)
                                 st.rerun()
                         with col3:
                             if st.button("↗️"):
-                                move_hero(-1, 1, st.session_state.game_map)
+                                move_hero(-1, 1, st.session_state.game_map, log=LOG)
                                 st.rerun()
                         with col4:
                             st.subheader("Легенда:")
@@ -190,13 +190,13 @@ def on_map():
                         col1, col2, col3, col4 = st.columns([1, 1, 1, 6])
                         with col1:
                             if st.button("⬅️"):
-                                move_hero(0, -1, st.session_state.game_map)
+                                move_hero(0, -1, st.session_state.game_map, log=LOG)
                                 st.rerun()
                         with col2:
                             st.text(" ")
                         with col3:
                             if st.button("➡️"):
-                                move_hero(0, 1, st.session_state.game_map)
+                                move_hero(0, 1, st.session_state.game_map, log=LOG)
                                 st.rerun()
                         with col4:
                             st.write(
@@ -208,15 +208,15 @@ def on_map():
                         col1, col2, col3, col4 = st.columns([1, 1, 1, 6])
                         with col1:
                             if st.button("↙️"):
-                                move_hero(1, -1, st.session_state.game_map)
+                                move_hero(1, -1, st.session_state.game_map, log=LOG)
                                 st.rerun()
                         with col2:
                             if st.button("⬇️"):
-                                move_hero(1, 0, st.session_state.game_map)
+                                move_hero(1, 0, st.session_state.game_map, log=LOG)
                                 st.rerun()
                         with col3:
                             if st.button("↘️"):
-                                move_hero(1, 1, st.session_state.game_map)
+                                move_hero(1, 1, st.session_state.game_map, log=LOG)
                                 st.rerun()
                         with col4:
                             st.write(
