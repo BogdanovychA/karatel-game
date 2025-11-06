@@ -65,6 +65,13 @@ class StartHeroPosition(IntEnum):
     Y = random.randint(0, 4)
 
 
+class EnemyLine(IntEnum):
+    """Кількість рядів монстрів перед виходом"""
+
+    X = 3
+    Y = 3
+
+
 class CellMultiplier(IntEnum):
     """Enum-клас для зберігання змінних, що
     відповідають за мультиплікатор типів клітинок"""
@@ -173,31 +180,9 @@ def generate_map(hero: Hero) -> list[list[Cell]]:
             ):
                 cell = Cell(CellType.HERO, hero, Emoji.HERO.value)
             elif (
-                (coordinate_y == MapSize.Y - 1 and coordinate_x == MapSize.X - 2)
-                or (coordinate_y == MapSize.Y - 1 and coordinate_x == MapSize.X - 3)
-                or (coordinate_y == MapSize.Y - 1 and coordinate_x == MapSize.X - 4)
-                or (coordinate_y == MapSize.Y - 1 and coordinate_x == MapSize.X - 5)
-                or (coordinate_y == MapSize.Y - 2 and coordinate_x == MapSize.X - 1)
-                or (coordinate_y == MapSize.Y - 2 and coordinate_x == MapSize.X - 2)
-                or (coordinate_y == MapSize.Y - 2 and coordinate_x == MapSize.X - 3)
-                or (coordinate_y == MapSize.Y - 2 and coordinate_x == MapSize.X - 4)
-                or (coordinate_y == MapSize.Y - 2 and coordinate_x == MapSize.X - 5)
-                or (coordinate_y == MapSize.Y - 3 and coordinate_x == MapSize.X - 1)
-                or (coordinate_y == MapSize.Y - 3 and coordinate_x == MapSize.X - 2)
-                or (coordinate_y == MapSize.Y - 3 and coordinate_x == MapSize.X - 3)
-                or (coordinate_y == MapSize.Y - 3 and coordinate_x == MapSize.X - 4)
-                or (coordinate_y == MapSize.Y - 3 and coordinate_x == MapSize.X - 5)
-                or (coordinate_y == MapSize.Y - 4 and coordinate_x == MapSize.X - 1)
-                or (coordinate_y == MapSize.Y - 4 and coordinate_x == MapSize.X - 2)
-                or (coordinate_y == MapSize.Y - 4 and coordinate_x == MapSize.X - 3)
-                or (coordinate_y == MapSize.Y - 4 and coordinate_x == MapSize.X - 4)
-                or (coordinate_y == MapSize.Y - 4 and coordinate_x == MapSize.X - 5)
-                or (coordinate_y == MapSize.Y - 5 and coordinate_x == MapSize.X - 1)
-                or (coordinate_y == MapSize.Y - 5 and coordinate_x == MapSize.X - 2)
-                or (coordinate_y == MapSize.Y - 5 and coordinate_x == MapSize.X - 3)
-                or (coordinate_y == MapSize.Y - 5 and coordinate_x == MapSize.X - 4)
-                or (coordinate_y == MapSize.Y - 5 and coordinate_x == MapSize.X - 5)
-            ):
+                MapSize.Y - EnemyLine.Y <= coordinate_y <= MapSize.Y - 1
+                and MapSize.X - EnemyLine.X <= coordinate_x <= MapSize.X - 1
+            ) and (coordinate_y != MapSize.Y - 1 or coordinate_x != MapSize.X - 1):
                 cell = select_obj(CellType.ENEMY)
             elif coordinate_y == MapSize.Y - 1 and coordinate_x == MapSize.X - 1:
                 cell = Cell(CellType.EXIT, None, Emoji.EXIT.value)
