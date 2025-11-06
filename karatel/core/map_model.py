@@ -27,6 +27,7 @@ class Emoji(Enum):
     EXIT = " 🚪 "
     TOMB = " 🪦 "
     GOLD = " 🪙 "
+    BOOK = " 📖 "
 
 
 class CellType(Enum):
@@ -39,6 +40,7 @@ class CellType(Enum):
     HERO = "hero"
     EXIT = "exit"
     GOLD = "gold"
+    BOOK = "book"
 
 
 class MapSize(IntEnum):
@@ -55,6 +57,13 @@ class GoldLimits(IntEnum):
     MIN = 1
     MAX = 5
     ENEMY = 10
+
+
+class ExpLimits(IntEnum):
+    """Ліміти досвіду при генерації клітинок з книжками"""
+
+    MIN = 100
+    MAX = 500
 
 
 class StartHeroPosition(IntEnum):
@@ -80,6 +89,7 @@ class CellMultiplier(IntEnum):
     ENEMY = 5
     ITEM = 5
     GOLD = 1
+    BOOK = 1
 
 
 TYPES_OF_CELL = (
@@ -87,6 +97,7 @@ TYPES_OF_CELL = (
     + [CellType.ENEMY] * CellMultiplier.ENEMY
     + [CellType.ITEM] * CellMultiplier.ITEM
     + [CellType.GOLD] * CellMultiplier.GOLD
+    + [CellType.BOOK] * CellMultiplier.BOOK
 )
 
 
@@ -99,12 +110,14 @@ class Cell:
         obj: Hero | Item | None = None,
         emoji: str | None = None,
         gold: int = 0,
+        experience: int = 0,
         output: OutputSpace | None = None,
     ) -> None:
         self.type = cell_type
         self.obj = obj
         self.emoji = emoji or Emoji.EMPTY.value
         self.gold = gold
+        self.experience = experience
 
         # Менеджери
         self.output = output if output is not None else ui
@@ -118,10 +131,10 @@ def select_obj(cell_type: CellType | None = None) -> Cell:
     def generate_enemy() -> Cell:
         enemy = HeroFactory.generate()
         enemy_cell = Cell(
-            CellType.ENEMY,
-            enemy,
-            Emoji.ENEMY.value,
-            random.randint(GoldLimits.MIN, GoldLimits.ENEMY * enemy.level),
+            cell_type=CellType.ENEMY,
+            obj=enemy,
+            emoji=Emoji.ENEMY.value,
+            gold=random.randint(GoldLimits.MIN, GoldLimits.ENEMY * enemy.level),
         )
         return enemy_cell
 
@@ -135,17 +148,30 @@ def select_obj(cell_type: CellType | None = None) -> Cell:
         )
         all_items.remove(UNARMED_STRIKE)
         all_items.remove(JUST_HAND)
-        item_cell = Cell(CellType.ITEM, random.choice(all_items), Emoji.ITEM.value)
+        item_cell = Cell(
+            cell_type=CellType.ITEM,
+            obj=random.choice(all_items),
+            emoji=Emoji.ITEM.value,
+        )
         return item_cell
 
     def generate_gold() -> Cell:
         gold_cell = Cell(
-            CellType.GOLD,
-            None,
-            Emoji.GOLD.value,
-            random.randint(GoldLimits.MIN, GoldLimits.MAX),
+            cell_type=CellType.GOLD,
+            obj=None,
+            emoji=Emoji.GOLD.value,
+            gold=random.randint(GoldLimits.MIN, GoldLimits.MAX),
         )
         return gold_cell
+
+    def generate_book() -> Cell:
+        book_cell = Cell(
+            cell_type=CellType.BOOK,
+            obj=None,
+            emoji=Emoji.BOOK.value,
+            experience=random.randint(ExpLimits.MIN, ExpLimits.MAX),
+        )
+        return book_cell
 
     match cell_type:
         case CellType.ENEMY:
@@ -154,6 +180,8 @@ def select_obj(cell_type: CellType | None = None) -> Cell:
             return generate_item()
         case CellType.GOLD:
             return generate_gold()
+        case CellType.BOOK:
+            return generate_book()
         case CellType.EMPTY:
             return EMPTY_CELL
         case None | _:
@@ -165,6 +193,8 @@ def select_obj(cell_type: CellType | None = None) -> Cell:
                     return generate_item()
                 case CellType.GOLD:
                     return generate_gold()
+                case CellType.BOOK:
+                    return generate_book()
                 case CellType.EMPTY | _:
                     return EMPTY_CELL
 

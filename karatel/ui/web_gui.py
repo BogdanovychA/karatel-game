@@ -131,12 +131,12 @@ def menu() -> None:
         if st.button("Підземелля", type="primary", width=130):
             st.session_state.game_state = "on_map"
             st.rerun()
-        if st.button("Ворог", type="secondary", width=130):
-            st.session_state.game_state = "enemy"
-            st.rerun()
-        if st.button("Швидкий бій", type="secondary", width=130):
-            st.session_state.game_state = "fast"
-            st.rerun()
+        # if st.button("Ворог", type="secondary", width=130):
+        #     st.session_state.game_state = "enemy"
+        #     st.rerun()
+        # if st.button("Швидкий бій", type="secondary", width=130):
+        #     st.session_state.game_state = "fast"
+        #     st.rerun()
         if st.button("Назад", type="secondary", width=130):
             st.session_state.game_state = None
             st.rerun()

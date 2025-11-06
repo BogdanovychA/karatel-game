@@ -259,16 +259,7 @@ class LevelSystem:
     def add_experience(self, amount: int | None = None, log: bool = True) -> None:
         """Перевіряє чи герой отримав новий рівень."""
 
-        if self.hero.level >= MAX_LEVEL:
-            self.hero.level = MAX_LEVEL
-            self.output.write(
-                f"{self.hero.name} отримав максимальний рівень: "
-                + f"{self.hero.level}",
-                log=log,
-            )
-            return
-
-        if amount is not None:
+        if amount is not None and amount != 0:
             self.hero.experience += amount
             if self.hero.experience < EXPERIENCE_FOR_LEVEL[-1]:
                 self.output.write(f"{self.hero.name} отримує {amount} досвіду", log=log)
@@ -279,6 +270,17 @@ class LevelSystem:
                     + f"{EXPERIENCE_FOR_LEVEL[-1]}",
                     log=log,
                 )
+        else:
+            return
+
+        if self.hero.level >= MAX_LEVEL:
+            self.hero.level = MAX_LEVEL
+            self.output.write(
+                f"{self.hero.name} вже досяг максимального рівня: "
+                + f"{self.hero.level}",
+                log=log,
+            )
+            return
 
         while (
             self.hero.level < MAX_LEVEL

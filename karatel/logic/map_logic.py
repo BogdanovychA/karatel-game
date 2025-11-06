@@ -24,13 +24,26 @@ def find_hero(the_map: list) -> Tuple[int | None, int | None]:
 
 
 def add_money(hero: Hero, cell: Cell, log=LOG) -> None:
-    hero.money += cell.gold
-    ui.write(f"{hero.name} отримує {cell.gold} грн", log=log)
+    """Додавання грошей"""
+
+    if cell.gold > 0:
+        hero.money += cell.gold
+        ui.write(f"{hero.name} отримує {cell.gold} грн", log=log)
 
 
 def move_hero(step_y: int, step_x: int, the_map: list) -> list:
+    """Переміщення персонажа по мапі"""
 
     def step():
+        """Винесено в окрему функцію для забезпечення принципу DRY"""
+
+        # Додаємо гроші
+        add_money(the_map[pos_y][pos_x].obj, the_map[new_y][new_x], log=LOG)
+        # Додаємо досвід
+        the_map[pos_y][pos_x].obj.leveling.add_experience(
+            the_map[new_y][new_x].experience, log=LOG
+        )
+        # Переміщуємо об'єкт персонажа в новий Cell
         the_map[new_y][new_x] = the_map[pos_y][pos_x]
         if new_y != pos_y or new_x != pos_x:
             the_map[pos_y][pos_x] = EMPTY_CELL
@@ -43,25 +56,21 @@ def move_hero(step_y: int, step_x: int, the_map: list) -> list:
         new_x = clamp_value((pos_x + step_x), 0, MapSize.X - 1)
 
         match the_map[new_y][new_x].type:
-            case CellType.EMPTY:
+            case CellType.EMPTY | CellType.GOLD | CellType.BOOK:
                 step()
             case CellType.ITEM:
                 the_map[pos_y][pos_x].obj.equipment.add_item(
                     the_map[new_y][new_x].obj, log=LOG
                 )
                 step()
-            case CellType.GOLD:
-                add_money(the_map[pos_y][pos_x].obj, the_map[new_y][new_x], log=LOG)
-                step()
-            case CellType.EXIT:
-                ui.write(f"{the_map[pos_y][pos_x].obj.name} перемагає", log=LOG)
-                step()
             case CellType.ENEMY:
                 fight(the_map[pos_y][pos_x].obj, the_map[new_y][new_x].obj)
                 if the_map[pos_y][pos_x].obj.alive:
-                    add_money(the_map[pos_y][pos_x].obj, the_map[new_y][new_x], log=LOG)
                     step()
                 else:
                     the_map[pos_y][pos_x].emoji = Emoji.TOMB.value
+            case CellType.EXIT:
+                ui.write(f"{the_map[pos_y][pos_x].obj.name} перемагає", log=LOG)
+                step()
 
         return the_map
