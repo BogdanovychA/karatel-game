@@ -46,8 +46,8 @@ class Hero:
 
         self.profession = profession or PROFESSIONS["commando"]
 
-        self.level = MIN_LEVEL
-        self.experience = 0
+        self._level = MIN_LEVEL
+        self._experience = 0
         # Ініціалізуємо HP до будь-яких викликів
         self._hp = 0
         self.max_hp = 0
@@ -138,6 +138,22 @@ class Hero:
     @money.setter
     def money(self, value: int) -> None:
         self._money = math.floor(clamp_value(value, 0, None))
+
+    @property
+    def experience(self) -> int:
+        return self._experience
+
+    @experience.setter
+    def experience(self, value: int) -> None:
+        self._experience = math.floor(clamp_value(value, 0, EXPERIENCE_FOR_LEVEL[-1]))
+
+    @property
+    def level(self) -> int:
+        return self._level
+
+    @level.setter
+    def level(self, value: int) -> None:
+        self._level = math.floor(clamp_value(value, 0, None))
 
 
 class HeroDisplay:
