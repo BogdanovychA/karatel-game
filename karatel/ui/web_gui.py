@@ -3,7 +3,7 @@ import streamlit as st
 from karatel.core.hero import HeroFactory
 from karatel.core.items import Shield, Weapon
 from karatel.core.map_model import Emoji, generate_map, render_map
-from karatel.core.professions import PROFESSIONS
+from karatel.core.professions import PROFESSIONS, Profession, show_professions
 from karatel.logic.combat import fight
 from karatel.logic.map_logic import move_hero
 from karatel.ui.abstract import ui
@@ -234,13 +234,29 @@ def hero() -> None:
 
     if 'hero' in st.session_state:
         if not st.session_state.hero:
-            name = st.text_input("Ім'я", value="Іван")
+            name = st.text_input("Ім'я", value="ІВАН")
+
+            professions_plus_none = {
+                None: Profession(
+                    name="Оберіть професію",
+                    description="",
+                    main_bonuses=("",),
+                    secondary_bonuses=("",),
+                    penalties=("",),
+                ),
+                **PROFESSIONS,  # об'єднуємо із словником наявних професій
+            }
+
             profession = st.selectbox(
                 "Професія",
-                options=list(PROFESSIONS.keys()),
-                format_func=lambda x: PROFESSIONS[x].name,
+                options=list(professions_plus_none.keys()),
+                format_func=lambda x: professions_plus_none[x].name,
             )
             level = st.slider("Рівень", MIN_LEVEL, MAX_LEVEL, MIN_LEVEL)
+
+            with st.expander("Професії", expanded=False):
+                show_professions(profession)
+                st.text(read_buffer())
 
             if st.button("Створити героя", type="secondary", width=150):
                 st.session_state.hero = HeroFactory.generate(

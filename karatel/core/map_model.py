@@ -75,10 +75,12 @@ class StartHeroPosition(IntEnum):
 
 
 class EnemyLine(IntEnum):
-    """Кількість рядів монстрів перед виходом"""
+    """Кількість рядів монстрів перед виходом
+    та бонус до їх рівня"""
 
     X = 3
     Y = 3
+    MULTIPLIER = 5
 
 
 class CellMultiplier(IntEnum):
@@ -126,10 +128,12 @@ class Cell:
 EMPTY_CELL = Cell(CellType.EMPTY, None, Emoji.EMPTY.value)
 
 
-def select_obj(cell_type: CellType | None = None) -> Cell:
+def select_obj(
+    cell_type: CellType | None = None, enemy_level: int | None = None
+) -> Cell:
 
-    def generate_enemy() -> Cell:
-        enemy = HeroFactory.generate()
+    def generate_enemy(level: int | None = None) -> Cell:
+        enemy = HeroFactory.generate(level)
         enemy_cell = Cell(
             cell_type=CellType.ENEMY,
             obj=enemy,
@@ -175,7 +179,7 @@ def select_obj(cell_type: CellType | None = None) -> Cell:
 
     match cell_type:
         case CellType.ENEMY:
-            return generate_enemy()
+            return generate_enemy(enemy_level)
         case CellType.ITEM:
             return generate_item()
         case CellType.GOLD:
@@ -188,7 +192,7 @@ def select_obj(cell_type: CellType | None = None) -> Cell:
             cell = random.choice(TYPES_OF_CELL)
             match cell:
                 case CellType.ENEMY:
-                    return generate_enemy()
+                    return generate_enemy(enemy_level)
                 case CellType.ITEM:
                     return generate_item()
                 case CellType.GOLD:
@@ -213,11 +217,13 @@ def generate_map(hero: Hero) -> list[list[Cell]]:
                 MapSize.Y - EnemyLine.Y <= coordinate_y <= MapSize.Y - 1
                 and MapSize.X - EnemyLine.X <= coordinate_x <= MapSize.X - 1
             ) and (coordinate_y != MapSize.Y - 1 or coordinate_x != MapSize.X - 1):
-                cell = select_obj(CellType.ENEMY)
+                cell = select_obj(
+                    CellType.ENEMY, enemy_level=hero.level + EnemyLine.MULTIPLIER
+                )
             elif coordinate_y == MapSize.Y - 1 and coordinate_x == MapSize.X - 1:
                 cell = Cell(CellType.EXIT, None, Emoji.EXIT.value)
             else:
-                cell = select_obj()
+                cell = select_obj(enemy_level=hero.level)
 
             line_x.append(cell)
         line_y.append(line_x)

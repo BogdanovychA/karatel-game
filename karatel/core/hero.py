@@ -254,7 +254,7 @@ class LevelSystem:
         self.hero.max_hp = 10 + get_modifier(self.hero.stats["Constitution"])
         self.hero._hp = self.hero.max_hp
 
-    def level_up(self, add_constitution: bool = True, log: bool = True) -> None:
+    def level_up(self, add_constitution: bool = True, log: bool = LOG) -> None:
         """Підвищує характеристики при новому рівні."""
         for main_bonuses in self.hero.profession.main_bonuses:
             self.hero.stats[main_bonuses] += 2
@@ -272,7 +272,7 @@ class LevelSystem:
             self.hero.stats[penalty] -= 1
         self.set_hp()
 
-    def add_experience(self, amount: int | None = None, log: bool = True) -> None:
+    def add_experience(self, amount: int | None = None, log: bool = LOG) -> None:
         """Перевіряє чи отримав герой новий рівень."""
 
         if amount is not None and amount != 0:
@@ -322,7 +322,7 @@ class SkillSystem:
         self.hero = hero
         self.output = output
 
-    def learn_skill(self, skill: Skill, log: bool = True) -> None:
+    def learn_skill(self, skill: Skill, log: bool = LOG) -> None:
         """Вивчення будь-якої навички"""
 
         if skill not in self.hero.skills:
@@ -331,7 +331,7 @@ class SkillSystem:
         else:
             self.output.write(f"{self.hero.name} вже має навичку {skill.name}", log=log)
 
-    def forget_skill(self, skill: Skill, log: bool = True) -> None:
+    def forget_skill(self, skill: Skill, log: bool = LOG) -> None:
         """Забування будь-якої навички"""
 
         if skill in self.hero.skills:
@@ -340,7 +340,7 @@ class SkillSystem:
         else:
             self.output.write(f"{self.hero.name} не має навички {skill.name}", log=log)
 
-    def can_learn_skill(self, log: bool = True) -> None:
+    def can_learn_skill(self, log: bool = LOG) -> None:
         """Видавання базових навичок залежно від рівня персонажа
         Використовується при "докручуванні" до потрібного рівня"""
 
@@ -358,7 +358,7 @@ class SkillSystem:
                 self.forget_skill(SKILLS["self_heal_strong"], log=log)
                 self.learn_skill(SKILLS["self_heal_ultimate"], log=log)
 
-    def use_all_skills(self, timing: SkillTiming, log=True) -> None:
+    def use_all_skills(self, timing: SkillTiming, log=LOG) -> None:
         """Використати всі вивчені навички, які відповідають
         їх таймінгу застосування"""
 
@@ -398,7 +398,7 @@ class EquipmentManager:
             else:
                 self.output.write(f"В руках пусто!", log=log)
 
-    def equip_weapon(self, weapon: Weapon | None = None, log: bool = True) -> None:
+    def equip_weapon(self, weapon: Weapon | None = None, log: bool = LOG) -> None:
         """Екіпірує зброю."""
 
         if weapon is None:
@@ -416,7 +416,7 @@ class EquipmentManager:
         else:
             self.output.write(f"{weapon.name} не є зброєю", log=log)
 
-    def equip_shield(self, shield: Shield | None = None, log: bool = True) -> None:
+    def equip_shield(self, shield: Shield | None = None, log: bool = LOG) -> None:
         """Екіпірує щит."""
 
         if shield is None:
@@ -437,7 +437,7 @@ class EquipmentManager:
         else:
             self.output.write(f"{shield.name} не є щитом", log=log)
 
-    def add_item(self, item: Item, log: bool = True) -> None:
+    def add_item(self, item: Item, log: bool = LOG) -> None:
         if item != UNARMED_STRIKE and item != JUST_HAND:
             self.hero.inventory.append(item)
             self.output.write(f"{self.hero.name} підбирає: {item}", log=log)

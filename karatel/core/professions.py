@@ -56,7 +56,9 @@ PROFESSIONS = {
 }
 
 
-def show_professions(professions: str | list[str] | None = None) -> None:
+def show_professions(
+    professions: str | list[str] | None = None, log: bool = LOG
+) -> None:
     """Виводить одну або кілька професій. Якщо аргумент відсутній — виводить всі."""
 
     # Якщо передано одну професію як рядок — обертаємо у список
@@ -70,12 +72,11 @@ def show_professions(professions: str | list[str] | None = None) -> None:
     for profession in professions:
         prof = PROFESSIONS[profession]
         ui.write(
-            f"""
-==============================
-{prof.name.upper()}. {prof.description}
-Основні бонуси: {', '.join(TRANSLATIONS.get(bonus, bonus) for bonus in prof.main_bonuses)}
-Вторинні бонуси: {', '.join(TRANSLATIONS.get(bonus, bonus) for bonus in prof.secondary_bonuses)}
-Штрафи: {', '.join(TRANSLATIONS.get(bonus, bonus) for bonus in prof.penalties)}
-""",
-            log=LOG,
+            f"{prof.name.upper()}.\n{prof.description}\n"
+            + f"Основні бонуси: "
+            + f"{', '.join(TRANSLATIONS.get(bonus, bonus) for bonus in prof.main_bonuses)}. "
+            + f"Вторинні бонуси: "
+            + f"{', '.join(TRANSLATIONS.get(bonus, bonus) for bonus in prof.secondary_bonuses)}. "
+            + f"Штрафи: {', '.join(TRANSLATIONS.get(bonus, bonus) for bonus in prof.penalties)}.\n",
+            log=log,
         )
