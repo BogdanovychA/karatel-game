@@ -67,6 +67,22 @@ def back() -> None:
         st.rerun()
 
 
+def respawn() -> None:
+    if not st.session_state.hero.alive:
+        if st.session_state.hero.lives > 0:
+            if st.button("Відродитиcя", type="secondary", width=130):
+                st.session_state.hero.leveling.set_hp()
+                st.rerun()
+        else:
+            st.text("Ви програли!")
+    if st.button("Видалити героя", type="primary", width=150):
+        st.session_state.hero = None
+        if 'game_map' in st.session_state and st.session_state.game_map:
+            st.session_state.game_map = None
+        ui.clear()
+        st.rerun()
+
+
 def show_log() -> None:
     with st.expander("Лог:"):
         st.text(read_buffer())
@@ -226,12 +242,10 @@ def on_map():
                                 + f"{Emoji.EXIT.value} -- вихід"
                             )
                     else:
-                        st.write(f"{Emoji.TOMB.value} {st.session_state.hero}")
-
-                        if st.button("Відродити героя"):
-                            st.session_state.hero.leveling.set_hp()
-                            st.rerun()
-
+                        st.write(
+                            f"{Emoji.TOMB.value} {st.session_state.hero.display.show()}"
+                        )
+                        respawn()
     back()
 
 
@@ -299,12 +313,13 @@ def hero() -> None:
 
             show_log()
 
-            if st.button("Видалити героя", type="primary", width=150):
-                st.session_state.hero = None
-                if 'game_map' in st.session_state and st.session_state.game_map:
-                    st.session_state.game_map = None
-                ui.clear()
-                st.rerun()
+            respawn()
+            # if st.button("Видалити героя", type="primary", width=150):
+            #     st.session_state.hero = None
+            #     if 'game_map' in st.session_state and st.session_state.game_map:
+            #         st.session_state.game_map = None
+            #     ui.clear()
+            #     st.rerun()
     back()
 
 

@@ -102,11 +102,13 @@ class Hero:
 
     def __str__(self) -> str:
         """Повертає текстове представлення героя для print()."""
-        return (
-            (f"Ім'я: [{self.name}]. " + f"Професія: [{self.profession.name}].")
-            if self.alive
-            else f"{self.name} - мертвий."
-        )
+
+        if self.alive:
+            return f"Ім'я: [{self.name}]. Професія: [{self.profession.name}]."
+        elif self.lives > 0:
+            return f"{self.name} - мертвий. Залишилося життів: {self.lives}"
+        else:
+            return f"{self.name} помер остаточно."
 
     @property
     def hp(self) -> int:
@@ -192,9 +194,8 @@ class HeroDisplay:
             ]
             total = "\n".join(str(a) for a in text)
             return total
-
         else:
-            return f"{self.hero.name} - мертвий"
+            return str(self.hero)
 
     def level(self) -> str:
         """Виводить рівень та досвід."""
