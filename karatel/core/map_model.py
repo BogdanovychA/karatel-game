@@ -114,23 +114,20 @@ class Cell:
         self,
         cell_type: CellType,
         obj: Hero | Item | None = None,
-        emoji: str | None = None,
         gold: int = 0,
         experience: int = 0,
         output: OutputSpace | None = None,
     ) -> None:
         self.type = cell_type
         self.obj = obj
-        self.emoji = emoji or Emoji.EMPTY.value
         self.gold = gold
         self.experience = experience
-        self._emo: str | None = None
 
         # Менеджери
         self.output = output if output is not None else ui
 
     @property
-    def emo(self) -> str:
+    def emoji(self) -> str:
         match self.type:
             case CellType.ENEMY:
                 return Emoji.ENEMY.value
@@ -153,7 +150,7 @@ class Cell:
                     return Emoji.TOMB.value
 
 
-EMPTY_CELL = Cell(CellType.EMPTY, None, Emoji.EMPTY.value)
+EMPTY_CELL = Cell(CellType.EMPTY, None)
 
 
 def select_obj(
@@ -165,7 +162,6 @@ def select_obj(
         enemy_cell = Cell(
             cell_type=CellType.ENEMY,
             obj=enemy,
-            emoji=Emoji.ENEMY.value,
             gold=random.randint(GoldLimits.MIN, GoldLimits.ENEMY * enemy.level),
         )
         return enemy_cell
@@ -183,7 +179,6 @@ def select_obj(
         item_cell = Cell(
             cell_type=CellType.ITEM,
             obj=random.choice(all_items),
-            emoji=Emoji.ITEM.value,
         )
         return item_cell
 
@@ -191,7 +186,6 @@ def select_obj(
         gold_cell = Cell(
             cell_type=CellType.GOLD,
             obj=None,
-            emoji=Emoji.GOLD.value,
             gold=random.randint(GoldLimits.MIN, GoldLimits.MAX),
         )
         return gold_cell
@@ -200,7 +194,6 @@ def select_obj(
         book_cell = Cell(
             cell_type=CellType.BOOK,
             obj=None,
-            emoji=Emoji.BOOK.value,
             experience=random.randint(ExpLimits.MIN, ExpLimits.MAX),
         )
         return book_cell
@@ -209,7 +202,6 @@ def select_obj(
         heart_cell = Cell(
             cell_type=CellType.HEART,
             obj=None,
-            emoji=Emoji.HEART.value,
         )
         return heart_cell
 
@@ -243,7 +235,7 @@ def generate_map(hero: Hero) -> list[list[Cell]]:
                 coordinate_y == StartHeroPosition.X
                 and coordinate_x == StartHeroPosition.Y
             ):
-                cell = Cell(CellType.HERO, hero, Emoji.HERO.value)
+                cell = Cell(CellType.HERO, hero)
             elif (
                 MapSize.Y - EnemyLine.Y <= coordinate_y <= MapSize.Y - 1
                 and MapSize.X - EnemyLine.X <= coordinate_x <= MapSize.X - 1
@@ -252,7 +244,7 @@ def generate_map(hero: Hero) -> list[list[Cell]]:
                     CellType.ENEMY, enemy_level=hero.level + EnemyLine.MULTIPLIER
                 )
             elif coordinate_y == MapSize.Y - 1 and coordinate_x == MapSize.X - 1:
-                cell = Cell(CellType.EXIT, None, Emoji.EXIT.value)
+                cell = Cell(CellType.EXIT, None)
             else:
                 cell = select_obj(enemy_level=hero.level)
 
@@ -265,7 +257,6 @@ def render_map(the_map: list) -> None:
     text = ""
     for y in the_map:
         for x in y:
-            # text += x.emoji
-            text += x.emo
+            text += x.emoji
         text += "\n"
     ui.write(text)

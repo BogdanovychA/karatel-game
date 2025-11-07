@@ -3,7 +3,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Tuple
 
-from karatel.core.map_model import EMPTY_CELL, CellType, Emoji, MapSize
+from karatel.core.map_model import EMPTY_CELL, CellType, MapSize
 from karatel.logic.combat import fight
 from karatel.ui.abstract import ui
 from karatel.utils.settings import LOG
@@ -98,8 +98,6 @@ def move_hero(
                 fight(the_map[pos_y][pos_x].obj, the_map[new_y][new_x].obj)
                 if the_map[pos_y][pos_x].obj.alive:
                     step()
-                else:
-                    the_map[pos_y][pos_x].emoji = Emoji.TOMB.value
             case CellType.EXIT:
                 ui.write(
                     f"{the_map[pos_y][pos_x].obj.name} знаходить вихід з підземелля",
