@@ -124,9 +124,33 @@ class Cell:
         self.emoji = emoji or Emoji.EMPTY.value
         self.gold = gold
         self.experience = experience
+        self._emo: str | None = None
 
         # Менеджери
         self.output = output if output is not None else ui
+
+    @property
+    def emo(self) -> str:
+        match self.type:
+            case CellType.ENEMY:
+                return Emoji.ENEMY.value
+            case CellType.ITEM:
+                return Emoji.ITEM.value
+            case CellType.GOLD:
+                return Emoji.GOLD.value
+            case CellType.BOOK:
+                return Emoji.BOOK.value
+            case CellType.HEART:
+                return Emoji.HEART.value
+            case CellType.EMPTY:
+                return Emoji.EMPTY.value
+            case CellType.EXIT:
+                return Emoji.EXIT.value
+            case CellType.HERO:
+                if self.obj.alive:
+                    return Emoji.HERO.value
+                else:
+                    return Emoji.TOMB.value
 
 
 EMPTY_CELL = Cell(CellType.EMPTY, None, Emoji.EMPTY.value)
@@ -241,6 +265,7 @@ def render_map(the_map: list) -> None:
     text = ""
     for y in the_map:
         for x in y:
-            text += x.emoji
+            # text += x.emoji
+            text += x.emo
         text += "\n"
     ui.write(text)

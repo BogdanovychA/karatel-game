@@ -118,6 +118,8 @@ class Hero:
     @hp.setter
     def hp(self, value: int) -> None:
         self._hp = math.floor(clamp_value(value, 0, self.max_hp))
+        if self._hp == 0:
+            self.lives -= 1
 
     @property
     def ac(self) -> int:

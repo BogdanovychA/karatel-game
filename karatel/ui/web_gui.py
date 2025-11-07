@@ -227,6 +227,11 @@ def on_map():
                             )
                     else:
                         st.write(f"{Emoji.TOMB.value} {st.session_state.hero}")
+
+                        if st.button("Відродити героя"):
+                            st.session_state.hero.leveling.set_hp()
+                            st.rerun()
+
     back()
 
 
