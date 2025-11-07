@@ -50,6 +50,7 @@ class Hero:
         self._experience = 0
         # Ініціалізуємо HP до будь-яких викликів
         self._hp = 0
+        self._lives = 1
         self.max_hp = 0
 
         self._money = 0
@@ -109,7 +110,10 @@ class Hero:
 
     @property
     def hp(self) -> int:
-        return self._hp
+        if self.lives > 0:
+            return self._hp
+        else:
+            return 0
 
     @hp.setter
     def hp(self, value: int) -> None:
@@ -155,6 +159,14 @@ class Hero:
     def level(self, value: int) -> None:
         self._level = math.floor(clamp_value(value, 0, MAX_LEVEL))
 
+    @property
+    def lives(self) -> int:
+        return self._lives
+
+    @lives.setter
+    def lives(self, value: int) -> None:
+        self._lives = math.floor(clamp_value(value, 0, MAX_LEVEL))
+
 
 class HeroDisplay:
     """Виведення інформації про героя"""
@@ -167,6 +179,7 @@ class HeroDisplay:
         if self.hero.alive:
             text = [
                 str(self.hero),
+                self.lives(),
                 self.hp(),
                 self.level(),
                 self.stats(),
@@ -192,6 +205,10 @@ class HeroDisplay:
     def hp(self) -> str:
         """Виводить здоров'я героя"""
         return f"Здоров'я: [{self.hero.hp} з {self.hero.max_hp}]."
+
+    def lives(self) -> str:
+        """Виводить кількість життів героя"""
+        return f"Кількість життів: [{self.hero.lives}]."
 
     def ac(self) -> str:
         """Виводить клас броні героя"""

@@ -31,6 +31,19 @@ def add_money(hero: Hero, cell: Cell, log=LOG) -> None:
         ui.write(f"{hero.name} отримує {cell.gold} грн", log=log)
 
 
+def add_lives(hero: Hero, value: int | None, log=LOG) -> None:
+    """Додавання життів"""
+
+    if value != 0 and value is not None:
+        if value < 0 and abs(value) > hero.lives:
+            value = hero.lives * -1
+        hero.lives += value
+        if value > 0:
+            ui.write(f"{hero.name} отримує {value} життя", log=log)
+        elif value < 0:
+            ui.write(f"{hero.name} втрачає {abs(value)} життя", log=log)
+
+
 def move_hero(
     step_y: int,
     step_x: int,
@@ -68,6 +81,9 @@ def move_hero(
                     the_map[new_y][new_x].obj, log=log
                 )
                 step()
+            case CellType.HEART:
+                add_lives(the_map[pos_y][pos_x].obj, 1)
+                step()
             case CellType.ENEMY:
                 ui.write(
                     f"Ваш ворог:\n"
@@ -85,7 +101,11 @@ def move_hero(
                 else:
                     the_map[pos_y][pos_x].emoji = Emoji.TOMB.value
             case CellType.EXIT:
-                ui.write(f"{the_map[pos_y][pos_x].obj.name} перемагає", log=log)
+                ui.write(
+                    f"{the_map[pos_y][pos_x].obj.name} знаходить вихід з підземелля",
+                    log=log,
+                )
+                add_lives(the_map[pos_y][pos_x].obj, 1)
                 step()
 
         return the_map

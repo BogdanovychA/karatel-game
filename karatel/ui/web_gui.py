@@ -7,33 +7,9 @@ from karatel.core.professions import PROFESSIONS, Profession, show_professions
 from karatel.logic.combat import fight
 from karatel.logic.map_logic import move_hero
 from karatel.ui.abstract import ui
-from karatel.utils.settings import DEBUG, LOG, MAX_LEVEL, MIN_LEVEL
+from karatel.utils.settings import DEBUG, HERO_LIVES, LOG, MAX_LEVEL, MIN_LEVEL
 
 TITLE = "КАРАТЄЛЬ"
-
-
-def check_game_state() -> None:
-    match st.session_state.game_state:
-        case None:
-            hello()
-        case "menu":
-            menu()
-        case "hero":
-            hero()
-        case "enemy":
-            enemy()
-        case "on_map":
-            on_map()
-        case "fast":
-            fast()
-        case _:
-            st.title("Відсутній пункт меню")
-
-
-def read_buffer() -> str:
-    text = "\n".join(str(a) for a in ui.buffer)
-    ui.clear()
-    return text
 
 
 def init_session_state():
@@ -79,6 +55,12 @@ def apply_styles():
     )
 
 
+def read_buffer() -> str:
+    text = "\n".join(str(a) for a in ui.buffer)
+    ui.clear()
+    return text
+
+
 def back() -> None:
     if st.button("Назад", type="secondary", width=130):
         st.session_state.game_state = "menu"
@@ -93,6 +75,7 @@ def show_log() -> None:
 def show_hero() -> None:
     st.text(st.session_state.hero)
     if st.session_state.hero.alive:
+        st.write(st.session_state.hero.display.lives())
         st.write(st.session_state.hero.display.hp())
         st.write(st.session_state.hero.display.level())
         st.write(st.session_state.hero.display.stats())
@@ -100,6 +83,24 @@ def show_hero() -> None:
         st.write(st.session_state.hero.display.modifiers())
         st.write(st.session_state.hero.display.skills())
         st.write(st.session_state.hero.display.inventory())
+
+
+def check_game_state() -> None:
+    match st.session_state.game_state:
+        case None:
+            hello()
+        case "menu":
+            menu()
+        case "hero":
+            hero()
+        case "enemy":
+            enemy()
+        case "on_map":
+            on_map()
+        case "fast":
+            fast()
+        case _:
+            st.title("Відсутній пункт меню")
 
 
 def hello() -> None:
@@ -115,6 +116,7 @@ def hello() -> None:
     )
     st.subheader("Гітхаб: https://github.com/BogdanovychA/karatel-game")
     st.subheader("Автор: https://www.bogdanovych.org/")
+
     if st.button("СТАРТ", type="primary", width=130):
         st.session_state.game_state = "menu"
         st.rerun()
@@ -262,11 +264,11 @@ def hero() -> None:
                 st.session_state.hero = HeroFactory.generate(
                     level=level, profession=profession, name=name
                 )
+                st.session_state.hero.lives = HERO_LIVES
                 st.rerun()
 
         else:
             show_hero()
-
             if st.session_state.hero.alive:
                 col1, col2, col3, col4 = st.columns([1, 1, 1, 1])
                 with col1:

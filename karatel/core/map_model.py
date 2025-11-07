@@ -28,6 +28,7 @@ class Emoji(Enum):
     TOMB = " 🪦 "
     GOLD = " 🪙 "
     BOOK = " 📖 "
+    HEART = " ❤️ "
 
 
 class CellType(Enum):
@@ -41,6 +42,7 @@ class CellType(Enum):
     EXIT = "exit"
     GOLD = "gold"
     BOOK = "book"
+    HEART = "heart"
 
 
 class MapSize(IntEnum):
@@ -92,6 +94,7 @@ class CellMultiplier(IntEnum):
     ITEM = 5
     GOLD = 1
     BOOK = 1
+    HEART = 1
 
 
 TYPES_OF_CELL = (
@@ -100,6 +103,7 @@ TYPES_OF_CELL = (
     + [CellType.ITEM] * CellMultiplier.ITEM
     + [CellType.GOLD] * CellMultiplier.GOLD
     + [CellType.BOOK] * CellMultiplier.BOOK
+    + [CellType.HEART] * CellMultiplier.HEART
 )
 
 
@@ -177,6 +181,14 @@ def select_obj(
         )
         return book_cell
 
+    def generate_heart() -> Cell:
+        heart_cell = Cell(
+            cell_type=CellType.HEART,
+            obj=None,
+            emoji=Emoji.HEART.value,
+        )
+        return heart_cell
+
     def create() -> Cell:
         match cell_type:
             case CellType.ENEMY:
@@ -187,6 +199,8 @@ def select_obj(
                 return generate_gold()
             case CellType.BOOK:
                 return generate_book()
+            case CellType.HEART:
+                return generate_heart()
             case CellType.EMPTY | _:
                 return EMPTY_CELL
 

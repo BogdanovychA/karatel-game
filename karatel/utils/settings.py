@@ -4,6 +4,8 @@ LOG = True
 
 DEBUG = False
 
+HERO_LIVES = 3
+
 XP_MULTIPLIER = 50
 
 # OUTPUT_MODE = "console"
