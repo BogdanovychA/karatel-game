@@ -6,12 +6,16 @@ from karatel.utils.utils import read_buffer
 
 
 def back_button() -> None:
+    """Кнопка НАЗАД"""
+
     if st.button("Назад", type="secondary", width=150):
         st.session_state.game_state = None
         st.rerun()
 
 
 def dungeon_button() -> None:
+    """Кнопка підземелля"""
+
     if st.session_state.hero:
         if st.button("Підземелля", type="secondary", width=150):
             st.session_state.game_state = "on_map"
@@ -19,12 +23,16 @@ def dungeon_button() -> None:
 
 
 def hero_button() -> None:
+    """Кнопка екрану героя"""
+
     if st.button("Герой", type="secondary", width=150):
         st.session_state.game_state = "hero"
         st.rerun()
 
 
 def navigation() -> None:
+    """Блок кнопок навігації"""
+
     col1, col2, col3, col4 = st.columns([1, 1, 1, 1])
 
     with col1:
@@ -43,6 +51,7 @@ def navigation() -> None:
 
 
 def respawn() -> None:
+    """Блок кнопок відродження"""
 
     col1, col2, col3, col4 = st.columns([1, 1, 1, 1])
     with col1:
@@ -67,6 +76,8 @@ def respawn() -> None:
 
 
 def equipment() -> None:
+    """Блок кнопок керування екіпіруванням"""
+
     if st.session_state.hero.alive:
         col1, col2, col3, col4 = st.columns([1, 1, 1, 1])
         with col1:
@@ -92,11 +103,15 @@ def equipment() -> None:
 
 
 def show_log(expanded: bool = False) -> None:
+    """Експандер з логом гри"""
+
     with st.expander("Лог:", expanded=expanded):
         st.text(read_buffer())
 
 
 def show_hero() -> None:
+    """Перегляд характеристик героя"""
+
     st.text(st.session_state.hero)
     if st.session_state.hero.alive:
         st.write(st.session_state.hero.display.lives())
