@@ -30,6 +30,8 @@ from karatel.utils.utils import clamp_value, get_modifier
 
 
 class Hero:
+    """Клас героя"""
+
     def __init__(
         self,
         name: str | None = None,
@@ -112,6 +114,8 @@ class Hero:
 
     @property
     def hp(self) -> int:
+        """Повертає кількість здоров'я"""
+
         if self.lives > 0:
             return self._hp
         else:
@@ -119,56 +123,70 @@ class Hero:
 
     @hp.setter
     def hp(self, value: int) -> None:
+        """Сеттер здоров'я"""
+
         self._hp = math.floor(clamp_value(value, 0, self.max_hp))
         if self._hp == 0:
             self.lives -= 1
 
     @property
     def ac(self) -> int:
+        """Розраховує та повертає клас броні"""
         return (10 + get_modifier(self.stats["Dexterity"])) + self.left_hand.ac_bonus
 
     @property
     def attack_modifier(self) -> int:
+        """Розраховує та повертає модифікатор атаки"""
         return get_modifier(self.stats[self.right_hand.stat])
 
     @property
     def initiative(self) -> int:
+        """Розраховує та повертає модифікатор ініціативи"""
         return get_modifier(self.stats["Dexterity"])
 
     @property
     def alive(self) -> bool:
+        """Повертає статус чи живий герой"""
         return True if self.hp > 0 else False
 
     @property
     def money(self) -> int:
+        """Повертає кількість грошей"""
         return self._money
 
     @money.setter
     def money(self, value: int) -> None:
+        """Сеттер грошей"""
         self._money = math.floor(clamp_value(value, 0, None))
 
     @property
     def experience(self) -> int:
+        """Повертає досвід"""
         return self._experience
 
     @experience.setter
     def experience(self, value: int) -> None:
+        """Сеттер досвіду"""
         self._experience = math.floor(clamp_value(value, 0, EXPERIENCE_FOR_LEVEL[-1]))
 
     @property
     def level(self) -> int:
+        """Повертає рівень героя"""
         return self._level
 
     @level.setter
     def level(self, value: int) -> None:
+        """Сеттер рівня героя"""
         self._level = math.floor(clamp_value(value, 0, MAX_LEVEL))
 
     @property
     def lives(self) -> int:
+        """Повертає кількість життів героя"""
         return self._lives
 
     @lives.setter
     def lives(self, value: int) -> None:
+        """Сеттер життів героя"""
         self._lives = math.floor(clamp_value(value, 0, MAX_LEVEL))
 
 
