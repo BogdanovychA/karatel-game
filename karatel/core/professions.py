@@ -8,6 +8,8 @@ from karatel.utils.translate import TRANSLATIONS
 
 @dataclass
 class Profession:
+    """Клас професій"""
+
     name: str
     description: str
     main_bonuses: tuple[str, ...]

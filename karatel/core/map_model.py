@@ -272,7 +272,7 @@ def generate_map(hero: Hero) -> list[list[Cell]]:
 
 
 def render_map(the_map: list) -> None:
-    """Рендерінг мапи"""
+    """Рендеринг мапи"""
 
     text = ""
     for y in the_map:
