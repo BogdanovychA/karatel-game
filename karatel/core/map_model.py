@@ -128,6 +128,8 @@ class Cell:
 
     @property
     def emoji(self) -> str:
+        """Встановлює емодзі, яке відповідає типу клітинки"""
+
         match self.type:
             case CellType.ENEMY:
                 return Emoji.ENEMY.value
@@ -150,14 +152,17 @@ class Cell:
                     return Emoji.TOMB.value
 
 
-EMPTY_CELL = Cell(CellType.EMPTY, None)
+EMPTY_CELL = Cell(CellType.EMPTY, None)  # Пуста клітинка
 
 
 def select_obj(
     cell_type: CellType | None = None, enemy_level: int | None = None
 ) -> Cell:
+    """Вибір клітинки. Якщо не задано тип -- випадковий"""
 
     def generate_enemy(level: int | None = None) -> Cell:
+        """Створення клітинки з ворогом"""
+
         enemy = HeroFactory.generate(level)
         enemy_cell = Cell(
             cell_type=CellType.ENEMY,
@@ -167,6 +172,8 @@ def select_obj(
         return enemy_cell
 
     def generate_item() -> Cell:
+        """Створення клітинки з предметом"""
+
         all_items = list(
             STRENGTH_WEAPONS
             + SHIELDS
@@ -183,6 +190,8 @@ def select_obj(
         return item_cell
 
     def generate_gold() -> Cell:
+        """Створення клітинки з грошима"""
+
         gold_cell = Cell(
             cell_type=CellType.GOLD,
             obj=None,
@@ -191,6 +200,8 @@ def select_obj(
         return gold_cell
 
     def generate_book() -> Cell:
+        """Створення клітинки з досвідом"""
+
         book_cell = Cell(
             cell_type=CellType.BOOK,
             obj=None,
@@ -199,6 +210,8 @@ def select_obj(
         return book_cell
 
     def generate_heart() -> Cell:
+        """Створення клітинки з життям"""
+
         heart_cell = Cell(
             cell_type=CellType.HEART,
             obj=None,
@@ -206,6 +219,9 @@ def select_obj(
         return heart_cell
 
     def create() -> Cell:
+        """Допоміжна функція, для створення клітинки.
+        Для забезпечення принципу DRY"""
+
         match cell_type:
             case CellType.ENEMY:
                 return generate_enemy(enemy_level)
@@ -227,6 +243,8 @@ def select_obj(
 
 
 def generate_map(hero: Hero) -> list[list[Cell]]:
+    """Генерація мапи"""
+
     line_y: list[list] = []
     for coordinate_y in range(MapSize.Y):
         line_x: list[Cell] = []
@@ -254,6 +272,8 @@ def generate_map(hero: Hero) -> list[list[Cell]]:
 
 
 def render_map(the_map: list) -> None:
+    """Рендерінг мапи"""
+
     text = ""
     for y in the_map:
         for x in y:

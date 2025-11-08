@@ -13,6 +13,7 @@ TITLE = "КАРАТЄЛЬ"
 
 def init_session_state():
     """Ініціалізує всі змінні сесії"""
+
     defaults = {'hero': None, 'enemy': None, 'game_state': None, 'game_map': None}
 
     for key, value in defaults.items():
@@ -21,6 +22,9 @@ def init_session_state():
 
 
 def check_game_state() -> None:
+    """Перевіряє статус гри і направляє на відповідний екран
+    (викликає відповідну функцію)"""
+
     match st.session_state.game_state:
         case None:
             hello()
@@ -39,6 +43,8 @@ def check_game_state() -> None:
 
 
 def hello() -> None:
+    """Перший екран, який бачить користувач"""
+
     st.image("./karatel/images/logo.png")
     st.header(
         "КАРАТЄЛЬ — рольова гра, де ти створюєш героя, "
@@ -59,7 +65,56 @@ def hello() -> None:
     navigation()
 
 
+def hero() -> None:
+    """ "Екран з гравцем (героєм)"""
+
+    st.title(TITLE)
+    st.header("Герой")
+
+    if 'hero' in st.session_state:
+        if not st.session_state.hero:
+            name = st.text_input("Ім'я", value="КАРАТЄЛЬ")
+
+            professions_plus_none = {
+                None: Profession(
+                    name="Оберіть професію",
+                    description="",
+                    main_bonuses=("",),
+                    secondary_bonuses=("",),
+                    penalties=("",),
+                ),
+                **PROFESSIONS,  # об'єднуємо із словником наявних професій
+            }
+
+            profession = st.selectbox(
+                "Професія",
+                options=list(professions_plus_none.keys()),
+                format_func=lambda x: professions_plus_none[x].name,
+            )
+            level = st.slider("Рівень", MIN_LEVEL, MAX_LEVEL, MIN_LEVEL)
+
+            with st.expander("Професії", expanded=True):
+                show_professions(profession)
+                st.text(read_buffer())
+
+            if st.button("Створити героя", type="secondary", width=150):
+                st.session_state.hero = HeroFactory.generate(
+                    level=level, profession=profession, name=name
+                )
+                st.session_state.hero.lives = HERO_LIVES
+                st.rerun()
+
+        else:
+            show_hero()
+            equipment()
+            show_log(expanded=True)
+            respawn()
+    navigation()
+
+
 def on_map() -> None:
+    """Карта (підземелля)"""
+
     st.title(TITLE)
     st.header("Підземелля")
 
@@ -139,49 +194,4 @@ def on_map() -> None:
                             f"{Emoji.TOMB.value} {st.session_state.hero.display.show()}"
                         )
                         respawn()
-    navigation()
-
-
-def hero() -> None:
-    st.title(TITLE)
-    st.header("Герой")
-
-    if 'hero' in st.session_state:
-        if not st.session_state.hero:
-            name = st.text_input("Ім'я", value="КАРАТЄЛЬ")
-
-            professions_plus_none = {
-                None: Profession(
-                    name="Оберіть професію",
-                    description="",
-                    main_bonuses=("",),
-                    secondary_bonuses=("",),
-                    penalties=("",),
-                ),
-                **PROFESSIONS,  # об'єднуємо із словником наявних професій
-            }
-
-            profession = st.selectbox(
-                "Професія",
-                options=list(professions_plus_none.keys()),
-                format_func=lambda x: professions_plus_none[x].name,
-            )
-            level = st.slider("Рівень", MIN_LEVEL, MAX_LEVEL, MIN_LEVEL)
-
-            with st.expander("Професії", expanded=True):
-                show_professions(profession)
-                st.text(read_buffer())
-
-            if st.button("Створити героя", type="secondary", width=150):
-                st.session_state.hero = HeroFactory.generate(
-                    level=level, profession=profession, name=name
-                )
-                st.session_state.hero.lives = HERO_LIVES
-                st.rerun()
-
-        else:
-            show_hero()
-            equipment()
-            show_log(expanded=True)
-            respawn()
     navigation()
