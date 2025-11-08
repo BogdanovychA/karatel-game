@@ -21,38 +21,22 @@ def init_session_state():
             st.session_state[key] = value
 
 
-def apply_styles():
-
-    st.set_page_config(
-        page_title="КАРАТЄЛЬ",
-        page_icon="./karatel/images/favicon.png",  # або emoji типу "⚔️"
-        # layout="wide"
-    )
-    st.markdown(
-        """
-        <style>
-        
-        /* Прибрати верхню сіру панель */
-        div[data-testid="stToolbar"] {
-            visibility: hidden;
-            height: 0;
-        }
-        
-        /* Мінімальний відступ зверху */
-        div.block-container {
-            padding-top: 3rem !important;
-        }
-        
-        /* Прибрати порожній простір під заголовком */
-        h1 {
-            margin-top: 0rem !important;
-            margin-bottom: 0.0rem !important;
-        }
-        
-        </style>
-        """,
-        unsafe_allow_html=True,
-    )
+def check_game_state() -> None:
+    match st.session_state.game_state:
+        case None:
+            hello()
+        case "menu":
+            menu()
+        case "hero":
+            hero()
+        case "enemy":
+            enemy()
+        case "on_map":
+            on_map()
+        case "fast":
+            fast()
+        case _:
+            st.title("Відсутній пункт меню")
 
 
 def read_buffer() -> str:
@@ -165,24 +149,6 @@ def show_hero() -> None:
         st.write(st.session_state.hero.display.inventory())
 
 
-def check_game_state() -> None:
-    match st.session_state.game_state:
-        case None:
-            hello()
-        case "menu":
-            menu()
-        case "hero":
-            hero()
-        case "enemy":
-            enemy()
-        case "on_map":
-            on_map()
-        case "fast":
-            fast()
-        case _:
-            st.title("Відсутній пункт меню")
-
-
 def hello() -> None:
     # st.title(TITLE)
     st.image("./karatel/images/logo.png")
@@ -226,7 +192,7 @@ def menu() -> None:
         )
 
 
-def on_map():
+def on_map() -> None:
     st.title(TITLE)
     st.header("Підземелля")
 
