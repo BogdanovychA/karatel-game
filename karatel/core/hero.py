@@ -476,6 +476,7 @@ class EquipmentManager:
             self.output.write(f"{shield.name} не є щитом", log=log)
 
     def add_item(self, item: Item, log: bool = LOG) -> None:
+        """Додавання предметів в інвентар"""
         if item != UNARMED_STRIKE and item != JUST_HAND:
             self.hero.inventory.append(item)
             self.output.write(f"{self.hero.name} підбирає: {item}", log=log)
@@ -483,6 +484,7 @@ class EquipmentManager:
             self.output.write(f"Не можна підібрати {item.name}", log=log)
 
     def select_item(self, item_class: Type | None = None) -> Item | None:
+        """Повертає перший предмет з інвентаря, заданого типу"""
         if self.hero.inventory is not None:
             for item in self.hero.inventory:
                 if isinstance(item, item_class):
