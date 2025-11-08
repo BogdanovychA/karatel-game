@@ -43,6 +43,8 @@ class Skill:
 
 
 class HealSelfSkill(Skill):
+    """Навички самолікування"""
+
     def __init__(
         self,
         name: str,
@@ -82,6 +84,7 @@ class HealSelfSkill(Skill):
             )
 
 
+# База навичок
 SKILLS = {
     "self_heal_small": HealSelfSkill(
         name="Слабке самолікування",

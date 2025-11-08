@@ -5,14 +5,19 @@ from karatel.utils.settings import OUTPUT_MODE
 
 
 class OutputSpace(ABC):
+    """Клас для опису 'відкритого простору'"""
+
     @abstractmethod
     def write(self, *args, **kwargs) -> None:
-        """Виводимо текст у "відкритий простір"""
+        """Виводимо текст у 'відкритий простір'"""
         pass
 
 
 class ConsoleOutput(OutputSpace):
+    """Вивід в консоль"""
+
     def write(self, *args, log=True, **kwargs) -> None:
+        """Вивід в консоль"""
         if log:
             text = " ".join(str(a) for a in args)
             # time.sleep(0.5)
@@ -26,6 +31,7 @@ class BufferedOutput(OutputSpace):
         self._buffer: list[str] = []
 
     def write(self, *args, log=True, **kwargs) -> None:
+        """Запис в буфер"""
         if log:
             text = " ".join(str(a) for a in args)
             self._buffer.append(text)
@@ -40,6 +46,7 @@ class BufferedOutput(OutputSpace):
         self._buffer.clear()
 
 
+# Обираємо абстрактний метод залежно від налаштувань
 match OUTPUT_MODE:
     case "gui":
         ui = BufferedOutput()

@@ -57,16 +57,19 @@ def move_hero(
 
         # Додаємо гроші
         add_money(the_map[pos_y][pos_x].obj, the_map[new_y][new_x], log=log)
+
         # Додаємо досвід
         the_map[pos_y][pos_x].obj.leveling.add_experience(
             the_map[new_y][new_x].experience, log=log
         )
+
         # Переміщуємо об'єкт персонажа в новий Cell
         the_map[new_y][new_x] = the_map[pos_y][pos_x]
         if new_y != pos_y or new_x != pos_x:
             the_map[pos_y][pos_x] = EMPTY_CELL
 
     pos_y, pos_x = find_hero(the_map)
+
     if pos_y is None or pos_x is None:
         return the_map
     else:
@@ -74,16 +77,20 @@ def move_hero(
         new_x = clamp_value((pos_x + step_x), 0, MapSize.X - 1)
 
         match the_map[new_y][new_x].type:
+
             case CellType.EMPTY | CellType.GOLD | CellType.BOOK:
                 step()
+
             case CellType.ITEM:
                 the_map[pos_y][pos_x].obj.equipment.add_item(
                     the_map[new_y][new_x].obj, log=log
                 )
                 step()
+
             case CellType.HEART:
                 add_lives(the_map[pos_y][pos_x].obj, 1)
                 step()
+
             case CellType.ENEMY:
                 ui.write(
                     f"Ваш ворог:\n"
@@ -98,6 +105,7 @@ def move_hero(
                 fight(the_map[pos_y][pos_x].obj, the_map[new_y][new_x].obj)
                 if the_map[pos_y][pos_x].obj.alive:
                     step()
+
             case CellType.EXIT:
                 ui.write(
                     f"{the_map[pos_y][pos_x].obj.name} знаходить вихід з підземелля",
