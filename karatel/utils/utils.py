@@ -5,13 +5,16 @@ from karatel.ui.abstract import OutputSpace, ui
 
 def get_modifier(stat_value: int) -> int:
     """Для типових DnD-розрахунків бонусів"""
+
     return (stat_value - 10) // 2
 
 
 def clamp_value(
     value: int | float, min_value: int | float | None, max_value: int | float | None
 ) -> int | float:
-    """Обмеження значення між min та max"""
+    """Обмеження значення між min та max.
+    Якщо щось обмежувати не треба -- передаємо None"""
+
     if min_value is not None:
         value = max(value, min_value)
     if max_value is not None:
@@ -20,12 +23,16 @@ def clamp_value(
 
 
 def log_print(*args, output: OutputSpace | None = None, log=True, **kwargs):
+    """Для запису у 'відкритий простір'. Зараз не використовується"""
+
     if log:
         out = output if output is not None else ui
         out.write(*args, **kwargs)
 
 
 def read_buffer() -> str:
+    """Читання буфера"""
+
     text = "\n".join(str(a) for a in ui.buffer)
     ui.clear()
     return text
