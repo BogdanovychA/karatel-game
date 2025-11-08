@@ -10,6 +10,8 @@ from karatel.utils.settings import DEBUG, MAX_LEVEL, MIN_LEVEL
 
 
 def menu() -> None:
+    """Екран меню. Наразі не використовується"""
+
     st.title(TITLE)
     st.header("Головне меню")
 
@@ -36,6 +38,8 @@ def menu() -> None:
 
 
 def enemy() -> None:
+    """Екран генерації ворога. Наразі не використовується"""
+
     st.title(TITLE)
     st.header("Ворог")
 
@@ -73,6 +77,8 @@ def enemy() -> None:
 
 
 def fast() -> None:
+    """Екран швидкого бою. Наразі не використовується"""
+
     st.title(TITLE)
     if not st.session_state.hero:
         st.subheader("Створіть героя, щоб почати бійку")
