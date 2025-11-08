@@ -2,6 +2,8 @@ import streamlit as st
 
 
 def apply_styles():
+    """Візуальні стилі вебзастосунка"""
+
     st.set_page_config(
         page_title="КАРАТЄЛЬ",
         page_icon="./karatel/images/favicon.png",  # або emoji типу "⚔️"
