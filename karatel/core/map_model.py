@@ -25,8 +25,8 @@ class Emoji(Enum):
     ITEM = " 💎 "
     HERO = " 🧙 "
     EXIT = " 🚪 "
-    TOMB = " 🪦 "
-    GOLD = " 🪙 "
+    TOMB = " 💀 "
+    GOLD = " 💵 "
     BOOK = " 📖 "
     HEART = " ❤️ "
 

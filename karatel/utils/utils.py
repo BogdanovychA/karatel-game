@@ -23,3 +23,9 @@ def log_print(*args, output: OutputSpace | None = None, log=True, **kwargs):
     if log:
         out = output if output is not None else ui
         out.write(*args, **kwargs)
+
+
+def read_buffer() -> str:
+    text = "\n".join(str(a) for a in ui.buffer)
+    ui.clear()
+    return text

@@ -1,13 +1,12 @@
 import streamlit as st
 
 from karatel.core.hero import HeroFactory
-from karatel.core.items import Shield, Weapon
 from karatel.core.map_model import Emoji, generate_map, render_map
 from karatel.core.professions import PROFESSIONS, Profession, show_professions
-from karatel.logic.combat import fight
 from karatel.logic.map_logic import move_hero
-from karatel.ui.abstract import ui
-from karatel.utils.settings import DEBUG, HERO_LIVES, LOG, MAX_LEVEL, MIN_LEVEL
+from karatel.ui.web_elements import equipment, navigation, respawn, show_hero, show_log
+from karatel.utils.settings import HERO_LIVES, LOG, MAX_LEVEL, MIN_LEVEL
+from karatel.utils.utils import read_buffer
 
 TITLE = "КАРАТЄЛЬ"
 
@@ -25,132 +24,21 @@ def check_game_state() -> None:
     match st.session_state.game_state:
         case None:
             hello()
-        case "menu":
-            menu()
         case "hero":
             hero()
-        case "enemy":
-            enemy()
         case "on_map":
             on_map()
-        case "fast":
-            fast()
+        # case "menu":
+        #     menu()
+        # case "enemy":
+        #     enemy()
+        # case "fast":
+        #     fast()
         case _:
             st.title("Відсутній пункт меню")
 
 
-def read_buffer() -> str:
-    text = "\n".join(str(a) for a in ui.buffer)
-    ui.clear()
-    return text
-
-
-def back_button() -> None:
-    if st.button("Назад", type="secondary", width=150):
-        st.session_state.game_state = None
-        st.rerun()
-
-
-def dungeon_button() -> None:
-    if st.session_state.hero:
-        if st.button("Підземелля", type="secondary", width=150):
-            st.session_state.game_state = "on_map"
-            st.rerun()
-
-
-def hero_button() -> None:
-    if st.button("Герой", type="secondary", width=150):
-        st.session_state.game_state = "hero"
-        st.rerun()
-
-
-def navigation() -> None:
-    col1, col2, col3, col4 = st.columns([1, 1, 1, 1])
-
-    with col1:
-        match st.session_state.game_state:
-            case "hero":
-                dungeon_button()
-            case "on_map" | None:
-                hero_button()
-    with col2:
-        pass
-    with col3:
-        pass
-    with col4:
-        if st.session_state.game_state is not None:
-            back_button()
-
-
-def respawn() -> None:
-
-    col1, col2, col3, col4 = st.columns([1, 1, 1, 1])
-    with col1:
-        if not st.session_state.hero.alive:
-            if st.session_state.hero.lives > 0:
-                if st.button("Відродитиcя", type="secondary", width=150):
-                    st.session_state.hero.leveling.set_hp()
-                    st.rerun()
-            else:
-                st.text("Ви програли!")
-    with col2:
-        pass
-    with col3:
-        pass
-    with col4:
-        if st.button("Знищити героя", type="primary", width=150):
-            st.session_state.hero = None
-            if 'game_map' in st.session_state and st.session_state.game_map:
-                st.session_state.game_map = None
-            ui.clear()
-            st.rerun()
-
-
-def equipment() -> None:
-    if st.session_state.hero.alive:
-        col1, col2, col3, col4 = st.columns([1, 1, 1, 1])
-        with col1:
-            if st.button("Екіпірувати зброю", type="secondary", width=150):
-                st.session_state.hero.equipment.equip_weapon(
-                    st.session_state.hero.equipment.select_item(Weapon)
-                )
-                st.rerun()
-        with col2:
-            if st.button("Екіпірувати щит", type="secondary", width=150):
-                st.session_state.hero.equipment.equip_shield(
-                    st.session_state.hero.equipment.select_item(Shield)
-                )
-                st.rerun()
-        with col3:
-            if st.button("Зняти зброю", type="secondary", width=150):
-                st.session_state.hero.equipment.equip_weapon()
-                st.rerun()
-        with col4:
-            if st.button("Зняти щит", type="secondary", width=150):
-                st.session_state.hero.equipment.equip_shield()
-                st.rerun()
-
-
-def show_log(expanded: bool = False) -> None:
-    with st.expander("Лог:", expanded=expanded):
-        st.text(read_buffer())
-
-
-def show_hero() -> None:
-    st.text(st.session_state.hero)
-    if st.session_state.hero.alive:
-        st.write(st.session_state.hero.display.lives())
-        st.write(st.session_state.hero.display.hp())
-        st.write(st.session_state.hero.display.level())
-        st.write(st.session_state.hero.display.stats())
-        st.write(st.session_state.hero.display.ac())
-        st.write(st.session_state.hero.display.modifiers())
-        st.write(st.session_state.hero.display.skills())
-        st.write(st.session_state.hero.display.inventory())
-
-
 def hello() -> None:
-    # st.title(TITLE)
     st.image("./karatel/images/logo.png")
     st.header(
         "КАРАТЄЛЬ — рольова гра, де ти створюєш героя, "
@@ -160,36 +48,15 @@ def hello() -> None:
         "Гра використовує спрощену систему D&D 5e з унікальними українськими "
         + "професіями."
     )
-    st.subheader("Гітхаб: https://github.com/BogdanovychA/karatel-game")
-    st.subheader("Автор: https://www.bogdanovych.org/")
+    st.subheader(
+        "Створіть собі героя та вирушайте в захопливі пригоди у підземелля. "
+        + "Вбивайте ворогів, знаходьте зброю та засоби захисту. "
+        + "Знайдіть вихід -- дійдіть до дверей."
+    )
+    st.write("Гітхаб: https://github.com/BogdanovychA/karatel-game")
+    st.write("Автор: https://www.bogdanovych.org/")
 
     navigation()
-
-
-def menu() -> None:
-    st.title(TITLE)
-    st.header("Головне меню")
-
-    col1, col2 = st.columns([1, 3])
-    with col1:
-        hero_button()
-        dungeon_button()
-        if DEBUG:
-            if st.button("Ворог", type="secondary", width=150):
-                st.session_state.game_state = "enemy"
-                st.rerun()
-            if st.button("Швидкий бій", type="secondary", width=150):
-                st.session_state.game_state = "fast"
-                st.rerun()
-        if st.button("Назад", type="secondary", width=150):
-            st.session_state.game_state = None
-            st.rerun()
-    with col2:
-        st.subheader(
-            "Створіть собі героя та вирушайте в захопливі пригоди у підземелля. "
-            + "Вбивайте ворогів, знаходьте зброю та засоби захисту. "
-            + "Знайдіть вихід -- дійдіть до дверей."
-        )
 
 
 def on_map() -> None:
@@ -228,7 +95,7 @@ def on_map() -> None:
                                 move_hero(-1, 1, st.session_state.game_map, log=LOG)
                                 st.rerun()
                         with col4:
-                            st.subheader("Легенда:")
+                            st.write(f"Легенда: {Emoji.HERO.value} -- ви")
 
                         # Середній ряд (3 кнопки)
                         col1, col2, col3, col4 = st.columns([1, 1, 1, 6])
@@ -244,8 +111,8 @@ def on_map() -> None:
                                 st.rerun()
                         with col4:
                             st.write(
-                                f"{Emoji.HERO.value} -- ви | {Emoji.ENEMY.value} -- вороги | "
-                                + f"{Emoji.ITEM.value} -- скарби"
+                                f"{Emoji.ENEMY.value} -- вороги | {Emoji.ITEM.value} -- скарби |"
+                                + f"{Emoji.GOLD.value} -- гроші"
                             )
 
                         # Нижній ряд (3 кнопки)
@@ -317,67 +184,4 @@ def hero() -> None:
             equipment()
             show_log(expanded=True)
             respawn()
-    navigation()
-
-
-def enemy() -> None:
-    st.title(TITLE)
-    st.header("Ворог")
-
-    if 'enemy' in st.session_state:
-        if not st.session_state.enemy:
-            profession = st.selectbox(
-                "Професія",
-                options=list(PROFESSIONS.keys()),
-                format_func=lambda x: PROFESSIONS[x].name,
-            )
-            level = st.slider(
-                "Рівень",
-                MIN_LEVEL,
-                MAX_LEVEL,
-                MIN_LEVEL if not st.session_state.hero else st.session_state.hero.level,
-            )
-
-            if st.button("Створити ворога", type="secondary", width=150):
-                st.session_state.enemy = HeroFactory.generate(
-                    level=level, profession=profession, name=HeroFactory.select_name()
-                )
-                st.success(f"Ворога {st.session_state.enemy.name} створено!")
-                st.rerun()
-
-        else:
-            st.success("Ворога створено")
-            st.text(st.session_state.enemy.display.show())
-
-            if st.button("Видалити ворога", type="primary", width=150):
-                st.session_state.enemy = None
-                ui.clear()
-                st.rerun()
-            show_log()
-    navigation()
-
-
-def fast() -> None:
-    st.title(TITLE)
-    if not st.session_state.hero:
-        st.subheader("Створіть героя, щоб почати бійку")
-
-    if 'hero' in st.session_state and st.session_state.hero:
-        with st.expander("Ваш Герой:", expanded=True):
-            st.text(st.session_state.hero.display.show())
-
-        if 'enemy' in st.session_state and (
-            not st.session_state.enemy or not st.session_state.enemy.alive
-        ):
-            st.session_state.enemy = HeroFactory.generate(
-                level=st.session_state.hero.level
-            )
-
-        if 'enemy' in st.session_state and st.session_state.enemy:
-            with st.expander("Ваш ворог:", expanded=True):
-                st.text(st.session_state.enemy.display.show())
-            if st.button("Почати бій", type="primary", width=150):
-                fight(st.session_state.hero, st.session_state.enemy)
-                show_log()
-
     navigation()
