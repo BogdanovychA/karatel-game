@@ -155,60 +155,73 @@ def on_map() -> None:
                     st.text(read_buffer())
 
                     if st.session_state.hero.alive:
-                        # Верхній ряд (3 кнопки)
-                        col1, col2, col3, col4 = st.columns([1, 1, 1, 6])
-                        with col1:
-                            if st.button("↖️"):
-                                move_hero(-1, -1, st.session_state.game_map, log=LOG)
-                                st.rerun()
-                        with col2:
-                            if st.button("⬆️"):
-                                move_hero(-1, 0, st.session_state.game_map, log=LOG)
-                                st.rerun()
-                        with col3:
-                            if st.button("↗️"):
-                                move_hero(-1, 1, st.session_state.game_map, log=LOG)
-                                st.rerun()
-                        with col4:
-                            st.write(f"Легенда: {Emoji.HERO.value} -- ви")
 
-                        # Середній ряд (3 кнопки)
-                        col1, col2, col3, col4 = st.columns([1, 1, 1, 6])
-                        with col1:
-                            if st.button("⬅️"):
-                                move_hero(0, -1, st.session_state.game_map, log=LOG)
-                                st.rerun()
-                        with col2:
-                            st.text(" ")
-                        with col3:
-                            if st.button("➡️"):
-                                move_hero(0, 1, st.session_state.game_map, log=LOG)
-                                st.rerun()
-                        with col4:
+                        colum1, colum2 = st.columns([1, 2])
+
+                        with colum1:
+
+                            # Верхній ряд (3 кнопки)
+                            col1, col2, col3 = st.columns([1, 1, 1])
+                            with col1:
+                                if st.button("↖️"):
+                                    move_hero(
+                                        -1, -1, st.session_state.game_map, log=LOG
+                                    )
+                                    st.rerun()
+                            with col2:
+                                if st.button("⬆️"):
+                                    move_hero(-1, 0, st.session_state.game_map, log=LOG)
+                                    st.rerun()
+                            with col3:
+                                if st.button("↗️"):
+                                    move_hero(-1, 1, st.session_state.game_map, log=LOG)
+                                    st.rerun()
+
+                            # Середній ряд (3 кнопки)
+                            col1, col2, col3 = st.columns(
+                                [
+                                    1,
+                                    1,
+                                    1,
+                                ]
+                            )
+                            with col1:
+                                if st.button("⬅️"):
+                                    move_hero(0, -1, st.session_state.game_map, log=LOG)
+                                    st.rerun()
+                            with col2:
+                                st.text(" ")
+                            with col3:
+                                if st.button("➡️"):
+                                    move_hero(0, 1, st.session_state.game_map, log=LOG)
+                                    st.rerun()
+
+                            # Нижній ряд (3 кнопки)
+                            col1, col2, col3 = st.columns([1, 1, 1])
+                            with col1:
+                                if st.button("↙️"):
+                                    move_hero(1, -1, st.session_state.game_map, log=LOG)
+                                    st.rerun()
+                            with col2:
+                                if st.button("⬇️"):
+                                    move_hero(1, 0, st.session_state.game_map, log=LOG)
+                                    st.rerun()
+                            with col3:
+                                if st.button("↘️"):
+                                    move_hero(1, 1, st.session_state.game_map, log=LOG)
+                                    st.rerun()
+
+                        with colum2:
+                            st.write(f"Легенда: {Emoji.HERO.value} -- ви")
+                            st.write(
+                                f"{Emoji.BOOK.value} -- досвід | {Emoji.EMPTY.value} -- нічого | "
+                                + f"{Emoji.EXIT.value} -- вихід"
+                            )
                             st.write(
                                 f"{Emoji.ENEMY.value} -- вороги | {Emoji.ITEM.value} -- скарби |"
                                 + f"{Emoji.GOLD.value} -- гроші"
                             )
 
-                        # Нижній ряд (3 кнопки)
-                        col1, col2, col3, col4 = st.columns([1, 1, 1, 6])
-                        with col1:
-                            if st.button("↙️"):
-                                move_hero(1, -1, st.session_state.game_map, log=LOG)
-                                st.rerun()
-                        with col2:
-                            if st.button("⬇️"):
-                                move_hero(1, 0, st.session_state.game_map, log=LOG)
-                                st.rerun()
-                        with col3:
-                            if st.button("↘️"):
-                                move_hero(1, 1, st.session_state.game_map, log=LOG)
-                                st.rerun()
-                        with col4:
-                            st.write(
-                                f"{Emoji.BOOK.value} -- досвід | {Emoji.EMPTY.value} -- нічого | "
-                                + f"{Emoji.EXIT.value} -- вихід"
-                            )
                     else:
                         st.write(
                             f"{Emoji.TOMB.value} {st.session_state.hero.display.show()}"
