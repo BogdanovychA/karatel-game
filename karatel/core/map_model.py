@@ -50,7 +50,7 @@ class MapSize(IntEnum):
     """Enum-клас для зберігання змінних, що
     відповідають за розмір мапи"""
 
-    X = 19
+    X = 15
     Y = 15
 
 
@@ -60,12 +60,13 @@ class GoldLimits(IntEnum):
     MIN = 1
     MAX = 5
     ENEMY = 10
+    EXIT = 500
 
 
 class ExpLimits(IntEnum):
     """Ліміти досвіду при генерації клітинок з книжками"""
 
-    MIN = 100
+    MIN = 300
     MAX = 500
 
 
@@ -273,7 +274,11 @@ def generate_map(hero: Hero) -> list[list[Cell]]:
 
             # Встановлюємо вихід
             elif coordinate_y == MapSize.Y - 1 and coordinate_x == MapSize.X - 1:
-                cell = Cell(CellType.EXIT, None)
+                cell = Cell(
+                    CellType.EXIT,
+                    None,
+                    gold=random.randint((GoldLimits.EXIT // 2), GoldLimits.EXIT),
+                )
 
             # Генеруємо випадкові клітинки мапи
             else:

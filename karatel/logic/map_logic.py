@@ -114,8 +114,8 @@ def move_hero(
             # Якщо це вихід
             case CellType.EXIT:
                 gsm.ui.write(
-                    f"{the_map[pos_y][pos_x].obj.name} знаходить вихід з підземелля"
-                    + "Тепер можна створити нове підземелля, з сильнішими ворогами",
+                    f"{the_map[pos_y][pos_x].obj.name} знаходить вихід. "
+                    + "Тепер можна створити нове підземелля, з сильнішими ворогами.",
                     log=log,
                 )
                 add_lives(the_map[pos_y][pos_x].obj, 1)
