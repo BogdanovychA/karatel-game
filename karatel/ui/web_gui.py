@@ -8,11 +8,10 @@ from karatel.core.map_model import Emoji, generate_map, render_map
 from karatel.core.professions import PROFESSIONS, Profession, show_professions
 from karatel.logic.map_logic import move_hero
 from karatel.ui.abstract import BufferedOutput
+from karatel.ui.web_constants import TITLE, GameState
 from karatel.ui.web_elements import equipment, navigation, respawn, show_hero, show_log
 from karatel.utils.settings import HERO_LIVES, LOG, MAX_LEVEL, MIN_LEVEL
 from karatel.utils.utils import read_buffer
-
-TITLE = "КАРАТЄЛЬ"
 
 
 def init_session_state():
@@ -43,9 +42,9 @@ def check_game_state() -> None:
     match st.session_state.game_state:
         case None:
             hello()
-        case "hero":
+        case GameState.HERO:
             hero()
-        case "on_map":
+        case GameState.ON_MAP:
             on_map()
         case _:
             st.title("Відсутній пункт меню")

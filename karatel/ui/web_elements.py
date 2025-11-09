@@ -4,6 +4,7 @@ import streamlit as st
 
 from karatel.core.game_state_manager import gsm
 from karatel.core.items import Shield, Weapon
+from karatel.ui.web_constants import GameState
 from karatel.utils.utils import read_buffer
 
 
@@ -20,7 +21,7 @@ def dungeon_button() -> None:
 
     if st.session_state.hero:
         if st.button("Підземелля", type="secondary", width=150):
-            st.session_state.game_state = "on_map"
+            st.session_state.game_state = GameState.ON_MAP
             st.rerun()
 
 
@@ -28,7 +29,7 @@ def hero_button() -> None:
     """Кнопка екрана героя"""
 
     if st.button("Герой", type="secondary", width=150):
-        st.session_state.game_state = "hero"
+        st.session_state.game_state = GameState.HERO
         st.rerun()
 
 
@@ -39,16 +40,15 @@ def navigation() -> None:
 
     with col1:
         match st.session_state.game_state:
-            case "hero":
+            case GameState.HERO:
                 dungeon_button()
-            case "on_map" | None:
+            case GameState.ON_MAP | None:
                 hero_button()
     with col2:
-        # pass
         if (
             'game_map' in st.session_state
             and st.session_state.game_map
-            and st.session_state.game_state == "on_map"
+            and st.session_state.game_state == GameState.ON_MAP
             and gsm.can_generate_map
         ):
             if st.button("Нове підземелля", type="primary", width=150):
