@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from os import write
 
 import streamlit as st
 
@@ -8,7 +9,7 @@ from karatel.core.map_model import generate_map, render_map
 from karatel.core.professions import PROFESSIONS, Profession, show_professions
 from karatel.logic.map_logic import move_hero
 from karatel.ui.abstract import BufferedOutput
-from karatel.ui.web_constants import TITLE, GameState
+from karatel.ui.web_constants import BUTTON_WIDTH, TITLE, GameState
 from karatel.ui.web_elements import equipment, navigation, respawn, show_hero, show_log
 from karatel.utils.constants import Emoji
 from karatel.utils.settings import HERO_LIVES, LOG, MAX_LEVEL, MIN_LEVEL
@@ -23,6 +24,7 @@ def init_session_state():
         'enemy': None,
         'game_state': None,
         'game_map': None,
+        'ui': None,
         'first_start': True,
     }
 
@@ -30,10 +32,16 @@ def init_session_state():
         if key not in st.session_state:
             st.session_state[key] = value
 
-    if st.session_state.first_start:
-        gsm.ui = BufferedOutput()
+    # Встановлюємо gsm.ui через st.session_state.ui для
+    # більшої стабільності, щоб не видавало помилку, коли редагуєш код
+    # під час роботи Streamlit. Більш актуально для етапу розробки.
 
-    st.session_state.first_start = False
+    if st.session_state.first_start:
+        st.session_state.ui = BufferedOutput()
+        st.session_state.first_start = False
+
+    if gsm.ui != st.session_state.ui:
+        gsm.ui = st.session_state.ui
 
 
 def check_game_state() -> None:
@@ -43,12 +51,13 @@ def check_game_state() -> None:
     match st.session_state.game_state:
         case None:
             hello()
-        case GameState.HERO:
+        case GameState.HERO.value:
             hero()
-        case GameState.ON_MAP:
+        case GameState.ON_MAP.value:
             on_map()
         case _:
             st.title(f"{Emoji.X.value} Відсутній пункт меню")
+            st.write(f"{st.session_state.game_state.value}")
 
 
 def hello() -> None:
@@ -106,7 +115,9 @@ def hero() -> None:
                 show_professions(profession)
                 st.text(read_buffer())
 
-            if st.button(f"{Emoji.HERO.value} Створити", type="secondary", width=150):
+            if st.button(
+                f"{Emoji.HERO.value} Створити", type="secondary", width=BUTTON_WIDTH
+            ):
                 st.session_state.hero = HeroFactory.generate(
                     level=level, profession=profession, name=name
                 )

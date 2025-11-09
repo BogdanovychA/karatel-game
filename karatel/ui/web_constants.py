@@ -3,6 +3,8 @@ from enum import Enum
 
 TITLE = "КАРАТЄЛЬ"
 
+BUTTON_WIDTH = 150
+
 
 class GameState(Enum):
 

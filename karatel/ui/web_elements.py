@@ -4,7 +4,7 @@ import streamlit as st
 
 from karatel.core.game_state_manager import gsm
 from karatel.core.items import Shield, Weapon
-from karatel.ui.web_constants import GameState
+from karatel.ui.web_constants import BUTTON_WIDTH, GameState
 from karatel.utils.constants import Emoji
 from karatel.utils.utils import read_buffer
 
@@ -12,7 +12,7 @@ from karatel.utils.utils import read_buffer
 def back_button() -> None:
     """Кнопка НАЗАД"""
 
-    if st.button(f"{Emoji.BACK.value} Назад", type="secondary", width=150):
+    if st.button(f"{Emoji.BACK.value} Назад", type="secondary", width=BUTTON_WIDTH):
         st.session_state.game_state = None
         st.rerun()
 
@@ -21,16 +21,18 @@ def dungeon_button() -> None:
     """Кнопка підземелля"""
 
     if st.session_state.hero:
-        if st.button(f"{Emoji.DUNG.value} Підземелля", type="secondary", width=150):
-            st.session_state.game_state = GameState.ON_MAP
+        if st.button(
+            f"{Emoji.DUNG.value} Підземелля", type="secondary", width=BUTTON_WIDTH
+        ):
+            st.session_state.game_state = GameState.ON_MAP.value
             st.rerun()
 
 
 def hero_button() -> None:
     """Кнопка екрана героя"""
 
-    if st.button(f"{Emoji.HERO.value} Герой", type="secondary", width=150):
-        st.session_state.game_state = GameState.HERO
+    if st.button(f"{Emoji.HERO.value} Герой", type="secondary", width=BUTTON_WIDTH):
+        st.session_state.game_state = GameState.HERO.value
         st.rerun()
 
 
@@ -41,19 +43,21 @@ def navigation() -> None:
 
     with col1:
         match st.session_state.game_state:
-            case GameState.HERO:
+            case GameState.HERO.value:
                 dungeon_button()
-            case GameState.ON_MAP | None:
+            case GameState.ON_MAP.value | None:
                 hero_button()
     with col2:
         if (
             'game_map' in st.session_state
             and st.session_state.game_map
-            and st.session_state.game_state == GameState.ON_MAP
+            and st.session_state.game_state == GameState.ON_MAP.value
             and gsm.can_generate_map
         ):
             if st.button(
-                f"{Emoji.DUNG.value} Нове підземелля", type="primary", width=150
+                f"{Emoji.DUNG.value} Нове підземелля",
+                type="primary",
+                width=BUTTON_WIDTH,
             ):
                 st.session_state.game_map = None
                 gsm.can_generate_map = False
@@ -73,7 +77,9 @@ def respawn() -> None:
         if not st.session_state.hero.alive:
             if st.session_state.hero.lives > 0:
                 if st.button(
-                    f"{Emoji.RESP.value} Відродити", type="secondary", width=150
+                    f"{Emoji.RESP.value} Відродити",
+                    type="secondary",
+                    width=BUTTON_WIDTH,
                 ):
                     st.session_state.hero.leveling.set_hp()
                     st.rerun()
@@ -84,7 +90,9 @@ def respawn() -> None:
     with col3:
         pass
     with col4:
-        if st.button(f"{Emoji.X.value} Знищити героя", type="primary", width=150):
+        if st.button(
+            f"{Emoji.X.value} Знищити героя", type="primary", width=BUTTON_WIDTH
+        ):
             st.session_state.hero = None
             if 'game_map' in st.session_state and st.session_state.game_map:
                 st.session_state.game_map = None
@@ -99,7 +107,9 @@ def equipment() -> None:
         col1, col2, col3, col4 = st.columns([1, 1, 1, 1])
         with col1:
             if st.button(
-                f"{Emoji.WEAPON.value} Екіпірувати зброю", type="secondary", width=150
+                f"{Emoji.WEAPON.value} Екіпірувати зброю",
+                type="secondary",
+                width=BUTTON_WIDTH,
             ):
                 st.session_state.hero.equipment.equip_weapon(
                     st.session_state.hero.equipment.select_item(Weapon)
@@ -107,18 +117,24 @@ def equipment() -> None:
                 st.rerun()
         with col2:
             if st.button(
-                f"{Emoji.SHIELD.value} Екіпірувати щит", type="secondary", width=150
+                f"{Emoji.SHIELD.value} Екіпірувати щит",
+                type="secondary",
+                width=BUTTON_WIDTH,
             ):
                 st.session_state.hero.equipment.equip_shield(
                     st.session_state.hero.equipment.select_item(Shield)
                 )
                 st.rerun()
         with col3:
-            if st.button(f"{Emoji.X.value} Зняти зброю", type="secondary", width=150):
+            if st.button(
+                f"{Emoji.X.value} Зняти зброю", type="secondary", width=BUTTON_WIDTH
+            ):
                 st.session_state.hero.equipment.equip_weapon()
                 st.rerun()
         with col4:
-            if st.button(f"{Emoji.X.value} Зняти щит", type="secondary", width=150):
+            if st.button(
+                f"{Emoji.X.value} Зняти щит", type="secondary", width=BUTTON_WIDTH
+            ):
                 st.session_state.hero.equipment.equip_shield()
                 st.rerun()
 
