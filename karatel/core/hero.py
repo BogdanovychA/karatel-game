@@ -16,17 +16,15 @@ from karatel.core.items import (
 from karatel.core.professions import PROFESSIONS, Profession, show_professions
 from karatel.core.skills import SKILLS, Skill, SkillTiming
 from karatel.ui.abstract import OutputSpace
+from karatel.utils.constants import FEMALE_NAMES, MALE_NAMES, TRANSLATIONS
 from karatel.utils.settings import (
     BASE_SKILL_LEVELS,
     DEBUG,
     EXPERIENCE_FOR_LEVEL,
-    FEMALE_NAMES,
     LOG,
-    MALE_NAMES,
     MAX_LEVEL,
     MIN_LEVEL,
 )
-from karatel.utils.translate import TRANSLATIONS
 from karatel.utils.utils import clamp_value, get_modifier
 
 

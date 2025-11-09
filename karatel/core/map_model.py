@@ -16,20 +16,7 @@ from karatel.core.items import (
     Item,
 )
 from karatel.ui.abstract import OutputSpace
-
-
-class Emoji(Enum):
-    """Enum-клас для зберігання емоджі"""
-
-    EMPTY = " ⬜ "
-    ENEMY = " 👹 "
-    ITEM = " 💎 "
-    HERO = " 🧙 "
-    EXIT = " 🚪 "
-    TOMB = " 💀 "
-    GOLD = " 💵 "
-    BOOK = " 📖 "
-    HEART = " ❤️ "
+from karatel.utils.constants import Emoji
 
 
 class CellType(Enum):

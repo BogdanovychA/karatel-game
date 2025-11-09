@@ -2,8 +2,8 @@
 from dataclasses import dataclass
 
 from karatel.core.game_state_manager import gsm
+from karatel.utils.constants import TRANSLATIONS
 from karatel.utils.settings import LOG
-from karatel.utils.translate import TRANSLATIONS
 
 
 @dataclass
