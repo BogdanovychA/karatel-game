@@ -1,4 +1,3 @@
-import time
 from abc import ABC, abstractmethod
 
 from karatel.utils.settings import OUTPUT_MODE
@@ -46,7 +45,7 @@ class BufferedOutput(OutputSpace):
         self._buffer.clear()
 
 
-# Обираємо абстрактний метод залежно від налаштувань
+# Обираємо метод залежно від налаштувань
 match OUTPUT_MODE:
     case "gui":
         ui = BufferedOutput()

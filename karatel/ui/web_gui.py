@@ -14,15 +14,25 @@ TITLE = "КАРАТЄЛЬ"
 def init_session_state():
     """Ініціалізує всі змінні сесії"""
 
-    defaults = {'hero': None, 'enemy': None, 'game_state': None, 'game_map': None}
+    defaults = {
+        'hero': None,
+        'enemy': None,
+        'game_state': None,
+        'game_map': None,
+        'first_start': True,
+    }
 
     for key, value in defaults.items():
         if key not in st.session_state:
             st.session_state[key] = value
 
+    # if st.session_state.first_start:
+    #
+    # st.session_state.first_start = False
+
 
 def check_game_state() -> None:
-    """Перевіряє статус гри і направляє на відповідний екран
+    """Перевіряє статус гри й направляє на відповідний екран
     (викликає відповідну функцію)"""
 
     match st.session_state.game_state:
@@ -83,7 +93,7 @@ def hero() -> None:
                     secondary_bonuses=("",),
                     penalties=("",),
                 ),
-                **PROFESSIONS,  # об'єднуємо із словником наявних професій
+                **PROFESSIONS,  # Об'єднуємо зі словником наявних професій
             }
 
             profession = st.selectbox(

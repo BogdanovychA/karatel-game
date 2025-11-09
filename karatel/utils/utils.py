@@ -32,7 +32,6 @@ def log_print(*args, output: OutputSpace | None = None, log=True, **kwargs):
 
 def read_buffer() -> str:
     """Читання буфера"""
-
     text = "\n".join(str(a) for a in ui.buffer)
     ui.clear()
     return text

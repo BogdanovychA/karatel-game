@@ -1,5 +1,6 @@
 import streamlit as st
 
+from karatel.core.game_state_manager import gsm
 from karatel.core.items import Shield, Weapon
 from karatel.ui.abstract import ui
 from karatel.utils.utils import read_buffer
@@ -23,7 +24,7 @@ def dungeon_button() -> None:
 
 
 def hero_button() -> None:
-    """Кнопка екрану героя"""
+    """Кнопка екрана героя"""
 
     if st.button("Герой", type="secondary", width=150):
         st.session_state.game_state = "hero"
@@ -42,7 +43,17 @@ def navigation() -> None:
             case "on_map" | None:
                 hero_button()
     with col2:
-        pass
+        # pass
+        if (
+            'game_map' in st.session_state
+            and st.session_state.game_map
+            and st.session_state.game_state == "on_map"
+            and gsm.can_generate_map
+        ):
+            if st.button("Нове підземелля", type="primary", width=150):
+                st.session_state.game_map = None
+                gsm.can_generate_map = False
+                st.rerun()
     with col3:
         pass
     with col4:
@@ -57,7 +68,7 @@ def respawn() -> None:
     with col1:
         if not st.session_state.hero.alive:
             if st.session_state.hero.lives > 0:
-                if st.button("Відродитиcя", type="secondary", width=150):
+                if st.button("Відродити", type="secondary", width=150):
                     st.session_state.hero.leveling.set_hp()
                     st.rerun()
             else:

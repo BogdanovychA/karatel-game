@@ -3,6 +3,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Tuple
 
+from karatel.core.game_state_manager import gsm
 from karatel.core.map_model import EMPTY_CELL, CellType, MapSize
 from karatel.logic.combat import fight
 from karatel.ui.abstract import ui
@@ -76,21 +77,26 @@ def move_hero(
         new_y = clamp_value((pos_y + step_y), 0, MapSize.Y - 1)
         new_x = clamp_value((pos_x + step_x), 0, MapSize.X - 1)
 
+        # Перевіряємо клітинку, куди треба перемістити героя
         match the_map[new_y][new_x].type:
 
+            # Якщо клітинка пуста
             case CellType.EMPTY | CellType.GOLD | CellType.BOOK:
                 step()
 
+            # Якщо там предмет
             case CellType.ITEM:
                 the_map[pos_y][pos_x].obj.equipment.add_item(
                     the_map[new_y][new_x].obj, log=log
                 )
                 step()
 
+            # Якщо там життя
             case CellType.HEART:
                 add_lives(the_map[pos_y][pos_x].obj, 1)
                 step()
 
+            # Якщо там ворог
             case CellType.ENEMY:
                 ui.write(
                     f"Ваш ворог:\n"
@@ -106,12 +112,15 @@ def move_hero(
                 if the_map[pos_y][pos_x].obj.alive:
                     step()
 
+            # Якщо це вихід
             case CellType.EXIT:
                 ui.write(
-                    f"{the_map[pos_y][pos_x].obj.name} знаходить вихід з підземелля",
+                    f"{the_map[pos_y][pos_x].obj.name} знаходить вихід з підземелля"
+                    + "Тепер можна створити нове підземелля, з сильнішими ворогами",
                     log=log,
                 )
                 add_lives(the_map[pos_y][pos_x].obj, 1)
+                gsm.can_generate_map = True
                 step()
 
         return the_map
