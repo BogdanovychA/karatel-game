@@ -70,10 +70,11 @@ class ExpLimits(IntEnum):
 
 class StartHeroPosition(IntEnum):
     """Enum-клас для зберігання змінних, що
-    відповідають за стартову позицію героя"""
+    відповідають за стартову позицію героя.
+    Герой встановлюється на позицію від 0 до X|Y"""
 
-    X = random.randint(0, 4)
-    Y = random.randint(0, 4)
+    X = 2
+    Y = 2
 
 
 class EnemyLine(IntEnum):
@@ -245,15 +246,22 @@ def select_obj(
 def generate_map(hero: Hero) -> list[list[Cell]]:
     """Генерація мапи"""
 
+    start_hero_position_y = random.randint(0, StartHeroPosition.Y)
+    start_hero_position_x = random.randint(0, StartHeroPosition.X)
+
     line_y: list[list] = []
     for coordinate_y in range(MapSize.Y):
         line_x: list[Cell] = []
         for coordinate_x in range(0, MapSize.X):
+
+            # Встановлюємо гравця на стартову позицію
             if (
-                coordinate_y == StartHeroPosition.X
-                and coordinate_x == StartHeroPosition.Y
+                coordinate_y == start_hero_position_y
+                and coordinate_x == start_hero_position_x
             ):
                 cell = Cell(CellType.HERO, hero)
+
+            # Встановлюємо ворогів перед виходом з підземелля
             elif (
                 MapSize.Y - EnemyLine.Y <= coordinate_y <= MapSize.Y - 1
                 and MapSize.X - EnemyLine.X <= coordinate_x <= MapSize.X - 1
@@ -261,8 +269,12 @@ def generate_map(hero: Hero) -> list[list[Cell]]:
                 cell = select_obj(
                     CellType.ENEMY, enemy_level=hero.level + EnemyLine.MULTIPLIER
                 )
+
+            # Встановлюємо вихід
             elif coordinate_y == MapSize.Y - 1 and coordinate_x == MapSize.X - 1:
                 cell = Cell(CellType.EXIT, None)
+
+            # Генеруємо випадкові клітинки мапи
             else:
                 cell = select_obj(enemy_level=hero.level)
 
