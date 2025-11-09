@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 import streamlit as st
 
 from karatel.core.game_state_manager import gsm
