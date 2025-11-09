@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 import random
 
-from karatel.ui.abstract import ui
+from karatel.core.game_state_manager import gsm
 from karatel.utils.settings import DEBUG
 
 
@@ -30,7 +30,7 @@ class Dice:
         # Беремо строку, розділювач "+", додаємо "0", якщо в функцію
         # не передали модифікатор, вибираємо тільки два перші елементи
         num_sides, modifier = (dice_expression.split("+") + [0])[:2]
-        ui.write(
+        gsm.ui.write(
             f"Кубиків: {num_dice}, Граней: {num_sides}, Модифікатор: {modifier}",
             log=DEBUG,
         )
@@ -41,7 +41,7 @@ class Dice:
             total += value
 
         result = total + int(modifier)
-        ui.write(
+        gsm.ui.write(
             f"Загальний результат: {result} це сума кидків: {total} "
             + f"плюс модифікатор: {modifier}\n",
             log=DEBUG,

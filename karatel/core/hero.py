@@ -3,6 +3,7 @@ import math
 import random
 from typing import Type
 
+from karatel.core.game_state_manager import gsm
 from karatel.core.items import (
     JUST_HAND,
     UNARMED_STRIKE,
@@ -14,7 +15,7 @@ from karatel.core.items import (
 )
 from karatel.core.professions import PROFESSIONS, Profession, show_professions
 from karatel.core.skills import SKILLS, Skill, SkillTiming
-from karatel.ui.abstract import OutputSpace, ui
+from karatel.ui.abstract import OutputSpace
 from karatel.utils.settings import (
     BASE_SKILL_LEVELS,
     DEBUG,
@@ -65,7 +66,7 @@ class Hero:
             "Charisma": 10,
         }
         # Менеджери
-        self.output = output if output is not None else ui
+        self.output = output if output is not None else gsm.ui
         self.leveling = LevelSystem(self, output=self.output)
         self.equipment = EquipmentManager(self, output=self.output)
         self.display = HeroDisplay(self)
@@ -504,11 +505,11 @@ class HeroFactory:
         professions = list(PROFESSIONS.keys())
         menu = {}
         while True:
-            ui.write("Обери одну з професій:", log=log)
+            gsm.ui.write("Обери одну з професій:", log=log)
             for i in range(len(PROFESSIONS)):
-                ui.write(i + 1, "-", PROFESSIONS[professions[i]].name, log=log)
+                gsm.ui.write(i + 1, "-", PROFESSIONS[professions[i]].name, log=log)
                 menu[str(i + 1)] = professions[i]
-            ui.write("L - Переглянути опис професій", log=log)
+            gsm.ui.write("L - Переглянути опис професій", log=log)
             choice = input("Зроби свій вибір: ").upper()
             if choice == "L" or choice == "Д":
                 show_professions()
@@ -516,8 +517,8 @@ class HeroFactory:
                 profession = PROFESSIONS[menu[choice]]
                 break
             else:
-                ui.write("Зробіть правильний вибір!", log=log)
-        ui.write(
+                gsm.ui.write("Зробіть правильний вибір!", log=log)
+        gsm.ui.write(
             f"Створюємо персонажа з ім'ям {name} та професією {profession.name}",
             log=log,
         )

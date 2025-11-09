@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
+from karatel.core.game_state_manager import gsm
 from karatel.core.hero import Hero
 from karatel.core.skills import SkillTiming
-from karatel.ui.abstract import ui
 from karatel.utils.dice import Dice
 from karatel.utils.settings import LOG, XP_MULTIPLIER
 
@@ -11,13 +11,13 @@ def attack(attacker: Hero, defender: Hero) -> bool:
 
     def apply_damage(att: Hero, defn: Hero, damg: int) -> None:
         """Допоміжна функція для забезпечення принципів DRY"""
-        ui.write(
+        gsm.ui.write(
             f"{att.name} наносить {damg} шкоди за "
             + f"допомогою {att.right_hand.name}",
             log=LOG,
         )
         defn.hp -= damg
-        ui.write(
+        gsm.ui.write(
             f"У {defn.name} лишається {defn.hp} з " + f"{defn.max_hp} здоров'я",
             end="\n\n",
             log=LOG,
@@ -26,7 +26,7 @@ def attack(attacker: Hero, defender: Hero) -> bool:
     attack_chance = Dice.roll("1d20")
 
     if attack_chance == 20:
-        ui.write(
+        gsm.ui.write(
             f"Шанс атаки: {attack_chance}. Критичний успіх! "
             f"{attacker.name} наносить подвійну шкоду!",
             end="\n\n",
@@ -37,7 +37,7 @@ def attack(attacker: Hero, defender: Hero) -> bool:
         apply_damage(attacker, defender, attack_value)
         return not defender.alive
     elif attack_chance == 1:
-        ui.write(
+        gsm.ui.write(
             f"Шанс атаки: {attack_chance}. Критичний провал! "
             + f"{attacker.name} Промахується!",
             end="\n\n",
@@ -45,7 +45,7 @@ def attack(attacker: Hero, defender: Hero) -> bool:
         )
         return False
     elif (attack_chance + attacker.attack_modifier) >= defender.ac:
-        ui.write(
+        gsm.ui.write(
             f"Шанс атаки: {attack_chance} плюс модифікатор "
             + f"{attacker.attack_modifier}, це >= {defender.ac}",
             log=LOG,
@@ -54,12 +54,12 @@ def attack(attacker: Hero, defender: Hero) -> bool:
         apply_damage(attacker, defender, attack_value)
         return not defender.alive
     else:
-        ui.write(
+        gsm.ui.write(
             f"Шанс атаки: {attack_chance} плюс модифікатор "
             + f"{attacker.attack_modifier}, це < {defender.ac}",
             log=LOG,
         )
-        ui.write(f"{attacker.name} промахується", end="\n\n", log=LOG)
+        gsm.ui.write(f"{attacker.name} промахується", end="\n\n", log=LOG)
         return False
 
 
@@ -68,7 +68,7 @@ def fight(hero_a: Hero, hero_b: Hero) -> None:
 
     def after_fight_actions(comb_x: Hero, comb_y: Hero) -> None:
         """Дії, які виконуються після бою"""
-        ui.write(
+        gsm.ui.write(
             f"{comb_x.name} — переміг, {comb_y.name} — загинув!", end="\n\n", log=LOG
         )
         comb_x.skill_manager.use_all_skills(SkillTiming.POST_BATTLE, log=LOG)
@@ -77,7 +77,7 @@ def fight(hero_a: Hero, hero_b: Hero) -> None:
 
     if hero_a.alive and hero_b.alive:
         comb_a, comb_b = roll_initiative(hero_a, hero_b)
-        ui.write(
+        gsm.ui.write(
             f"Починається бій між {comb_a.name} та {comb_b.name}. "
             + f"{comb_a.name} ходить першим.",
             end="\n\n",
@@ -91,18 +91,18 @@ def fight(hero_a: Hero, hero_b: Hero) -> None:
                 after_fight_actions(comb_b, comb_a)
                 break
     else:
-        ui.write("Мертві не воюють!", end="\n\n", log=LOG)
-        ui.write(hero_a, log=LOG)
-        ui.write(hero_b, log=LOG)
+        gsm.ui.write("Мертві не воюють!", end="\n\n", log=LOG)
+        gsm.ui.write(hero_a, log=LOG)
+        gsm.ui.write(hero_b, log=LOG)
 
 
 def roll_initiative(comb_a: Hero, comb_b: Hero) -> tuple[Hero, Hero]:
     """Визначає порядок ходів. Повертає пару (перший, другий)."""
-    ui.write(f"Готуємося до бою між {comb_a.name} та {comb_b.name}", log=LOG)
+    gsm.ui.write(f"Готуємося до бою між {comb_a.name} та {comb_b.name}", log=LOG)
 
     init_a = Dice.roll("1d20")
     total_a = init_a + comb_a.initiative
-    ui.write(
+    gsm.ui.write(
         f"Ініціатива {comb_a.name}: {init_a} + "
         + f"модифікатор {comb_a.initiative} = {total_a}",
         log=LOG,
@@ -110,7 +110,7 @@ def roll_initiative(comb_a: Hero, comb_b: Hero) -> tuple[Hero, Hero]:
 
     init_b = Dice.roll("1d20")
     total_b = init_b + comb_b.initiative
-    ui.write(
+    gsm.ui.write(
         f"Ініціатива {comb_b.name}: {init_b} + "
         + f"модифікатор {comb_b.initiative} = {total_b}",
         end="\n\n",
@@ -122,5 +122,5 @@ def roll_initiative(comb_a: Hero, comb_b: Hero) -> tuple[Hero, Hero]:
     elif total_a < total_b:
         return comb_b, comb_a
     else:
-        ui.write("Нічия в ініціативі, кидаємо ще раз...", end="\n\n", log=LOG)
+        gsm.ui.write("Нічия в ініціативі, кидаємо ще раз...", end="\n\n", log=LOG)
         return roll_initiative(comb_a, comb_b)

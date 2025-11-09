@@ -2,7 +2,6 @@ import streamlit as st
 
 from karatel.core.game_state_manager import gsm
 from karatel.core.items import Shield, Weapon
-from karatel.ui.abstract import ui
 from karatel.utils.utils import read_buffer
 
 
@@ -82,7 +81,7 @@ def respawn() -> None:
             st.session_state.hero = None
             if 'game_map' in st.session_state and st.session_state.game_map:
                 st.session_state.game_map = None
-            ui.clear()
+            gsm.ui.clear()
             st.rerun()
 
 

@@ -8,9 +8,6 @@ HERO_LIVES = 3
 
 XP_MULTIPLIER = 100
 
-# OUTPUT_MODE = "console"
-OUTPUT_MODE = "gui"
-
 EXPERIENCE_FOR_LEVEL = (
     0,
     300,

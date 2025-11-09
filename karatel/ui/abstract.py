@@ -1,7 +1,5 @@
 from abc import ABC, abstractmethod
 
-from karatel.utils.settings import OUTPUT_MODE
-
 
 class OutputSpace(ABC):
     """Клас для опису 'відкритого простору'"""
@@ -43,11 +41,3 @@ class BufferedOutput(OutputSpace):
     def clear(self) -> None:
         """Очистити буфер"""
         self._buffer.clear()
-
-
-# Обираємо метод залежно від налаштувань
-match OUTPUT_MODE:
-    case "gui":
-        ui = BufferedOutput()
-    case "console" | _:
-        ui = ConsoleOutput()

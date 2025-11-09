@@ -3,6 +3,7 @@
 import random
 from enum import Enum, IntEnum
 
+from karatel.core.game_state_manager import gsm
 from karatel.core.hero import Hero, HeroFactory
 from karatel.core.items import (
     CHARISMA_WEAPONS,
@@ -14,7 +15,7 @@ from karatel.core.items import (
     UNARMED_STRIKE,
     Item,
 )
-from karatel.ui.abstract import OutputSpace, ui
+from karatel.ui.abstract import OutputSpace
 
 
 class Emoji(Enum):
@@ -125,7 +126,7 @@ class Cell:
         self.experience = experience
 
         # Менеджери
-        self.output = output if output is not None else ui
+        self.output = output if output is not None else gsm.ui
 
     @property
     def emoji(self) -> str:
@@ -291,4 +292,4 @@ def render_map(the_map: list) -> None:
         for x in y:
             text += x.emoji
         text += "\n"
-    ui.write(text)
+    gsm.ui.write(text)

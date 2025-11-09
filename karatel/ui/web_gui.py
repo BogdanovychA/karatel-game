@@ -1,9 +1,11 @@
 import streamlit as st
 
+from karatel.core.game_state_manager import gsm
 from karatel.core.hero import HeroFactory
 from karatel.core.map_model import Emoji, generate_map, render_map
 from karatel.core.professions import PROFESSIONS, Profession, show_professions
 from karatel.logic.map_logic import move_hero
+from karatel.ui.abstract import BufferedOutput
 from karatel.ui.web_elements import equipment, navigation, respawn, show_hero, show_log
 from karatel.utils.settings import HERO_LIVES, LOG, MAX_LEVEL, MIN_LEVEL
 from karatel.utils.utils import read_buffer
@@ -26,9 +28,10 @@ def init_session_state():
         if key not in st.session_state:
             st.session_state[key] = value
 
-    # if st.session_state.first_start:
-    #
-    # st.session_state.first_start = False
+    if st.session_state.first_start:
+        gsm.ui = BufferedOutput()
+
+    st.session_state.first_start = False
 
 
 def check_game_state() -> None:
@@ -42,12 +45,6 @@ def check_game_state() -> None:
             hero()
         case "on_map":
             on_map()
-        # case "menu":
-        #     menu()
-        # case "enemy":
-        #     enemy()
-        # case "fast":
-        #     fast()
         case _:
             st.title("Відсутній пункт меню")
 

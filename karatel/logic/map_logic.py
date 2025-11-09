@@ -6,7 +6,6 @@ from typing import TYPE_CHECKING, Tuple
 from karatel.core.game_state_manager import gsm
 from karatel.core.map_model import EMPTY_CELL, CellType, MapSize
 from karatel.logic.combat import fight
-from karatel.ui.abstract import ui
 from karatel.utils.settings import LOG
 from karatel.utils.utils import clamp_value
 
@@ -29,7 +28,7 @@ def add_money(hero: Hero, cell: Cell, log=LOG) -> None:
 
     if cell.gold > 0:
         hero.money += cell.gold
-        ui.write(f"{hero.name} отримує {cell.gold} грн", log=log)
+        gsm.ui.write(f"{hero.name} отримує {cell.gold} грн", log=log)
 
 
 def add_lives(hero: Hero, value: int | None, log=LOG) -> None:
@@ -40,9 +39,9 @@ def add_lives(hero: Hero, value: int | None, log=LOG) -> None:
             value = hero.lives * -1
         hero.lives += value
         if value > 0:
-            ui.write(f"{hero.name} отримує {value} життя", log=log)
+            gsm.ui.write(f"{hero.name} отримує {value} життя", log=log)
         elif value < 0:
-            ui.write(f"{hero.name} втрачає {abs(value)} життя", log=log)
+            gsm.ui.write(f"{hero.name} втрачає {abs(value)} життя", log=log)
 
 
 def move_hero(
@@ -98,7 +97,7 @@ def move_hero(
 
             # Якщо там ворог
             case CellType.ENEMY:
-                ui.write(
+                gsm.ui.write(
                     f"Ваш ворог:\n"
                     + f"{the_map[new_y][new_x].obj}\n"
                     + f"{the_map[new_y][new_x].obj.display.hp()} "
@@ -114,7 +113,7 @@ def move_hero(
 
             # Якщо це вихід
             case CellType.EXIT:
-                ui.write(
+                gsm.ui.write(
                     f"{the_map[pos_y][pos_x].obj.name} знаходить вихід з підземелля"
                     + "Тепер можна створити нове підземелля, з сильнішими ворогами",
                     log=log,

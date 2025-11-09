@@ -1,9 +1,9 @@
 import streamlit as st
 
+from karatel.core.game_state_manager import gsm
 from karatel.core.hero import HeroFactory
 from karatel.core.professions import PROFESSIONS
 from karatel.logic.combat import fight
-from karatel.ui.abstract import ui
 from karatel.ui.web_elements import dungeon_button, hero_button, navigation, show_log
 from karatel.ui.web_gui import TITLE
 from karatel.utils.settings import DEBUG, MAX_LEVEL, MIN_LEVEL
@@ -70,7 +70,7 @@ def enemy() -> None:
 
             if st.button("Видалити ворога", type="primary", width=150):
                 st.session_state.enemy = None
-                ui.clear()
+                gsm.ui.clear()
                 st.rerun()
             show_log()
     navigation()

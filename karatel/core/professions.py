@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from dataclasses import dataclass
 
-from karatel.ui.abstract import ui
+from karatel.core.game_state_manager import gsm
 from karatel.utils.settings import LOG
 from karatel.utils.translate import TRANSLATIONS
 
@@ -73,7 +73,7 @@ def show_professions(
 
     for profession in professions:
         prof = PROFESSIONS[profession]
-        ui.write(
+        gsm.ui.write(
             f"{prof.name.upper()}.\n{prof.description}\n"
             + f"Основні бонуси: "
             + f"{', '.join(TRANSLATIONS.get(bonus, bonus) for bonus in prof.main_bonuses)}. "
