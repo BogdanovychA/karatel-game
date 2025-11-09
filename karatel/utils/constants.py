@@ -5,15 +5,22 @@ from enum import Enum
 class Emoji(Enum):
     """Enum-клас для зберігання емоджі"""
 
-    EMPTY = " ⬜ "
-    ENEMY = " 👹 "
-    ITEM = " 💎 "
-    HERO = " 🧙 "
-    EXIT = " 🚪 "
-    TOMB = " 💀 "
-    GOLD = " 💵 "
-    BOOK = " 📖 "
-    HEART = " ❤️ "
+    EMPTY = "⬜"
+    ENEMY = "👹"
+    ITEM = "💎"
+    HERO = "🧙"
+    EXIT = "🚪"
+    TOMB = "💀"
+    GOLD = "💵"
+    BOOK = "📖"
+    HEART = "❤️"
+    BACK = "◀️"
+    DUNG = "🗺️"
+    RESP = "🔄"
+    X = "❌"
+    SHIELD = "🛡️"
+    WEAPON = "🗡️"
+    LOG = "📜"
 
 
 TRANSLATIONS = {

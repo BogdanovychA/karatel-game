@@ -48,7 +48,7 @@ def check_game_state() -> None:
         case GameState.ON_MAP:
             on_map()
         case _:
-            st.title("Відсутній пункт меню")
+            st.title(f"{Emoji.X.value} Відсутній пункт меню")
 
 
 def hello() -> None:
@@ -78,7 +78,7 @@ def hero() -> None:
     """ "Екран з гравцем (героєм)"""
 
     st.title(TITLE)
-    st.header("Герой")
+    st.header(f"{Emoji.HERO.value} Герой")
 
     if 'hero' in st.session_state:
         if not st.session_state.hero:
@@ -106,7 +106,7 @@ def hero() -> None:
                 show_professions(profession)
                 st.text(read_buffer())
 
-            if st.button("Створити героя", type="secondary", width=150):
+            if st.button(f"{Emoji.HERO.value} Створити", type="secondary", width=150):
                 st.session_state.hero = HeroFactory.generate(
                     level=level, profession=profession, name=name
                 )
@@ -125,13 +125,13 @@ def on_map() -> None:
     """Карта (підземелля)"""
 
     st.title(TITLE)
-    st.header("Підземелля")
+    st.header(f"{Emoji.DUNG.value} Підземелля")
 
     if st.session_state.hero is None:
         st.subheader("Створіть героя, щоб почати гру")
 
     if 'hero' in st.session_state and st.session_state.hero:
-        with st.expander("Ваш Герой:", expanded=False):
+        with st.expander(f"{Emoji.HERO.value} Ваш Герой:", expanded=False):
             show_hero()
             equipment()
         show_log(expanded=True)
@@ -139,7 +139,7 @@ def on_map() -> None:
             if not st.session_state.game_map:
                 st.session_state.game_map = generate_map(st.session_state.hero)
             if st.session_state.game_map:
-                with st.expander("Мапа", expanded=True):
+                with st.expander(f"{Emoji.DUNG.value} Мапа", expanded=True):
                     render_map(st.session_state.game_map)
                     st.text(read_buffer())
 

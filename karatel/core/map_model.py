@@ -282,6 +282,6 @@ def render_map(the_map: list) -> None:
     text = ""
     for y in the_map:
         for x in y:
-            text += x.emoji
+            text += " " + x.emoji + " "
         text += "\n"
     gsm.ui.write(text)
