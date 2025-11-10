@@ -4,15 +4,17 @@ import streamlit as st
 
 from karatel.core.game_state_manager import gsm
 from karatel.core.items import Shield, Weapon
+from karatel.logic.map_logic import move_hero
 from karatel.ui.web_constants import BUTTON_WIDTH, GameState
 from karatel.utils.constants import Emoji
+from karatel.utils.settings import LOG
 from karatel.utils.utils import read_buffer
 
 
 def back_button() -> None:
     """Кнопка НАЗАД"""
 
-    if st.button(f"{Emoji.BACK.value} Назад", type="secondary", width=BUTTON_WIDTH):
+    if st.button("Назад", icon=Emoji.BACK.value, type="secondary", width=BUTTON_WIDTH):
         st.session_state.game_state = None
         st.rerun()
 
@@ -22,7 +24,7 @@ def dungeon_button() -> None:
 
     if st.session_state.hero:
         if st.button(
-            f"{Emoji.DUNG.value} Підземелля", type="secondary", width=BUTTON_WIDTH
+            "Підземелля", icon=Emoji.DUNG.value, type="secondary", width=BUTTON_WIDTH
         ):
             st.session_state.game_state = GameState.ON_MAP.value
             st.rerun()
@@ -31,7 +33,7 @@ def dungeon_button() -> None:
 def hero_button() -> None:
     """Кнопка екрана героя"""
 
-    if st.button(f"{Emoji.HERO.value} Герой", type="secondary", width=BUTTON_WIDTH):
+    if st.button("Герой", icon=Emoji.HERO.value, type="secondary", width=BUTTON_WIDTH):
         st.session_state.game_state = GameState.HERO.value
         st.rerun()
 
@@ -55,7 +57,8 @@ def navigation() -> None:
             and gsm.can_generate_map
         ):
             if st.button(
-                f"{Emoji.DUNG.value} Нове підземелля",
+                "Нове підземелля",
+                icon=Emoji.DUNG.value,
                 type="primary",
                 width=BUTTON_WIDTH,
             ):
@@ -77,7 +80,8 @@ def respawn() -> None:
         if not st.session_state.hero.alive:
             if st.session_state.hero.lives > 0:
                 if st.button(
-                    f"{Emoji.RESP.value} Відродити",
+                    "Відродити",
+                    icon=Emoji.RESP.value,
                     type="secondary",
                     width=BUTTON_WIDTH,
                 ):
@@ -91,7 +95,7 @@ def respawn() -> None:
         pass
     with col4:
         if st.button(
-            f"{Emoji.X.value} Знищити героя", type="primary", width=BUTTON_WIDTH
+            "Знищити", icon=Emoji.TOMB.value, type="primary", width=BUTTON_WIDTH
         ):
             st.session_state.hero = None
             if 'game_map' in st.session_state and st.session_state.game_map:
@@ -107,7 +111,8 @@ def equipment() -> None:
         col1, col2, col3, col4 = st.columns([1, 1, 1, 1])
         with col1:
             if st.button(
-                f"{Emoji.WEAPON.value} Екіпірувати зброю",
+                "Екіпірувати зброю",
+                icon=Emoji.WEAPON.value,
                 type="secondary",
                 width=BUTTON_WIDTH,
             ):
@@ -117,7 +122,8 @@ def equipment() -> None:
                 st.rerun()
         with col2:
             if st.button(
-                f"{Emoji.SHIELD.value} Екіпірувати щит",
+                "Екіпірувати щит",
+                icon=Emoji.SHIELD.value,
                 type="secondary",
                 width=BUTTON_WIDTH,
             ):
@@ -127,16 +133,66 @@ def equipment() -> None:
                 st.rerun()
         with col3:
             if st.button(
-                f"{Emoji.X.value} Зняти зброю", type="secondary", width=BUTTON_WIDTH
+                "Зняти зброю", icon=Emoji.X.value, type="secondary", width=BUTTON_WIDTH
             ):
                 st.session_state.hero.equipment.equip_weapon()
                 st.rerun()
         with col4:
             if st.button(
-                f"{Emoji.X.value} Зняти щит", type="secondary", width=BUTTON_WIDTH
+                "Зняти щит", icon=Emoji.X.value, type="secondary", width=BUTTON_WIDTH
             ):
                 st.session_state.hero.equipment.equip_shield()
                 st.rerun()
+
+
+MOVE_BUTTONS = [
+    [
+        (Emoji.MOVE_Q.value, "move_q", -1, -1, "Вліво-вгору"),
+        (Emoji.MOVE_W.value, "move_w", -1, 0, "Вгору"),
+        (Emoji.MOVE_E.value, "move_e", -1, 1, "Вправо-вгору"),
+    ],
+    [
+        (Emoji.MOVE_A.value, "move_a", 0, -1, "Вліво"),
+        None,  # Центр
+        (Emoji.MOVE_D.value, "move_d", 0, 1, "Вправо"),
+    ],
+    [
+        (Emoji.MOVE_Z.value, "move_z", 1, -1, "Вліво-вниз"),
+        (Emoji.MOVE_S.value, "move_s", 1, 0, "Вниз"),
+        (Emoji.MOVE_C.value, "move_c", 1, 1, "Вправо-вниз"),
+    ],
+]
+
+
+def movement_controls() -> None:
+    """Рендерить кнопки керування 3x3"""
+    st.subheader(f"{Emoji.CTRL.value} Керування")
+
+    for line in MOVE_BUTTONS:
+
+        cols = st.columns(3)
+        for index, value in enumerate(line):
+            with cols[index]:
+                if value is None:
+                    pass
+                else:
+                    text, key, y, x, description = value
+                    if st.button(label=text, key=key, help=description):
+                        move_hero(y, x, st.session_state.game_map, log=LOG)
+                        st.rerun()
+
+
+def legend() -> None:
+    st.subheader(f"{Emoji.LOG.value} Легенда:")
+    st.write(f"{Emoji.HERO.value} -- ви")
+    st.write(
+        f"{Emoji.BOOK.value} -- досвід | {Emoji.EMPTY.value} -- нічого | "
+        + f"{Emoji.EXIT.value} -- вихід"
+    )
+    st.write(
+        f"{Emoji.ENEMY.value} -- вороги | {Emoji.ITEM.value} -- скарби |"
+        + f"{Emoji.GOLD.value} -- гроші"
+    )
 
 
 def show_log(expanded: bool = False) -> None:

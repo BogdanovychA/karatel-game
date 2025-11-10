@@ -21,6 +21,15 @@ class Emoji(Enum):
     SHIELD = "🛡️"
     WEAPON = "🗡️"
     LOG = "📜"
+    MOVE_Q = "↖️"
+    MOVE_W = "⬆️"
+    MOVE_E = "↗️"
+    MOVE_A = "⬅️"
+    MOVE_D = "➡️"
+    MOVE_Z = "↙️"
+    MOVE_S = "⬇️"
+    MOVE_C = "↘️"
+    CTRL = "🎮"
 
 
 TRANSLATIONS = {

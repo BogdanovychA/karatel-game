@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-from os import write
 
 import streamlit as st
 
@@ -7,12 +6,19 @@ from karatel.core.game_state_manager import gsm
 from karatel.core.hero import HeroFactory
 from karatel.core.map_model import generate_map, render_map
 from karatel.core.professions import PROFESSIONS, Profession, show_professions
-from karatel.logic.map_logic import move_hero
 from karatel.ui.abstract import BufferedOutput
 from karatel.ui.web_constants import BUTTON_WIDTH, TITLE, GameState
-from karatel.ui.web_elements import equipment, navigation, respawn, show_hero, show_log
+from karatel.ui.web_elements import (
+    equipment,
+    legend,
+    movement_controls,
+    navigation,
+    respawn,
+    show_hero,
+    show_log,
+)
 from karatel.utils.constants import Emoji
-from karatel.utils.settings import HERO_LIVES, LOG, MAX_LEVEL, MIN_LEVEL
+from karatel.utils.settings import HERO_LIVES, MAX_LEVEL, MIN_LEVEL
 from karatel.utils.utils import read_buffer
 
 
@@ -116,7 +122,7 @@ def hero() -> None:
                 st.text(read_buffer())
 
             if st.button(
-                f"{Emoji.HERO.value} Створити", type="secondary", width=BUTTON_WIDTH
+                "Створити", icon=Emoji.HERO.value, type="secondary", width=BUTTON_WIDTH
             ):
                 st.session_state.hero = HeroFactory.generate(
                     level=level, profession=profession, name=name
@@ -155,73 +161,11 @@ def on_map() -> None:
                     st.text(read_buffer())
 
                     if st.session_state.hero.alive:
-
                         colum1, colum2 = st.columns([1, 2])
-
                         with colum1:
-
-                            # Верхній ряд (3 кнопки)
-                            col1, col2, col3 = st.columns([1, 1, 1])
-                            with col1:
-                                if st.button("↖️"):
-                                    move_hero(
-                                        -1, -1, st.session_state.game_map, log=LOG
-                                    )
-                                    st.rerun()
-                            with col2:
-                                if st.button("⬆️"):
-                                    move_hero(-1, 0, st.session_state.game_map, log=LOG)
-                                    st.rerun()
-                            with col3:
-                                if st.button("↗️"):
-                                    move_hero(-1, 1, st.session_state.game_map, log=LOG)
-                                    st.rerun()
-
-                            # Середній ряд (3 кнопки)
-                            col1, col2, col3 = st.columns(
-                                [
-                                    1,
-                                    1,
-                                    1,
-                                ]
-                            )
-                            with col1:
-                                if st.button("⬅️"):
-                                    move_hero(0, -1, st.session_state.game_map, log=LOG)
-                                    st.rerun()
-                            with col2:
-                                st.text(" ")
-                            with col3:
-                                if st.button("➡️"):
-                                    move_hero(0, 1, st.session_state.game_map, log=LOG)
-                                    st.rerun()
-
-                            # Нижній ряд (3 кнопки)
-                            col1, col2, col3 = st.columns([1, 1, 1])
-                            with col1:
-                                if st.button("↙️"):
-                                    move_hero(1, -1, st.session_state.game_map, log=LOG)
-                                    st.rerun()
-                            with col2:
-                                if st.button("⬇️"):
-                                    move_hero(1, 0, st.session_state.game_map, log=LOG)
-                                    st.rerun()
-                            with col3:
-                                if st.button("↘️"):
-                                    move_hero(1, 1, st.session_state.game_map, log=LOG)
-                                    st.rerun()
-
+                            movement_controls()
                         with colum2:
-                            st.write(f"Легенда: {Emoji.HERO.value} -- ви")
-                            st.write(
-                                f"{Emoji.BOOK.value} -- досвід | {Emoji.EMPTY.value} -- нічого | "
-                                + f"{Emoji.EXIT.value} -- вихід"
-                            )
-                            st.write(
-                                f"{Emoji.ENEMY.value} -- вороги | {Emoji.ITEM.value} -- скарби |"
-                                + f"{Emoji.GOLD.value} -- гроші"
-                            )
-
+                            legend()
                     else:
                         st.write(
                             f"{Emoji.TOMB.value} {st.session_state.hero.display.show()}"
