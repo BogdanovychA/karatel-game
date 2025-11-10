@@ -145,7 +145,8 @@ def on_map() -> None:
     st.header(f"{Emoji.DUNG.value} Підземелля")
 
     if st.session_state.hero is None:
-        st.subheader("Створіть героя, щоб почати гру")
+        st.warning("Створіть героя, щоб почати гру")
+        return
 
     if 'hero' in st.session_state and st.session_state.hero:
         with st.expander(f"{Emoji.HERO.value} Ваш Герой:", expanded=False):

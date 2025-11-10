@@ -98,6 +98,7 @@ def respawn() -> None:
             "Знищити", icon=Emoji.TOMB.value, type="primary", width=BUTTON_WIDTH
         ):
             st.session_state.hero = None
+            st.session_state.game_state = GameState.HERO.value
             if 'game_map' in st.session_state and st.session_state.game_map:
                 st.session_state.game_map = None
             gsm.ui.clear()
