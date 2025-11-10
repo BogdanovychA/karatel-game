@@ -183,7 +183,7 @@ def movement_controls() -> None:
 
 
 def legend() -> None:
-    st.subheader(f"{Emoji.LOG.value} Легенда:")
+    st.subheader(f"{Emoji.LEGEND.value} Легенда:")
     st.write(f"{Emoji.HERO.value} -- ви")
     st.write(
         f"{Emoji.BOOK.value} -- досвід | {Emoji.EMPTY.value} -- нічого | "
@@ -211,11 +211,14 @@ def show_hero() -> None:
 
     st.text(st.session_state.hero)
     if st.session_state.hero.alive:
-        st.write(st.session_state.hero.display.lives())
-        st.write(st.session_state.hero.display.hp())
         st.write(st.session_state.hero.display.level())
+        col1, col2 = st.columns(2)
+        with col1:
+            st.write(st.session_state.hero.display.lives())
+            st.write(st.session_state.hero.display.hp())
+        with col2:
+            st.write(st.session_state.hero.display.modifiers())
+            st.write(st.session_state.hero.display.ac())
         st.write(st.session_state.hero.display.stats())
-        st.write(st.session_state.hero.display.ac())
-        st.write(st.session_state.hero.display.modifiers())
         st.write(st.session_state.hero.display.skills())
         st.write(st.session_state.hero.display.inventory())

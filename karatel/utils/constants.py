@@ -21,6 +21,7 @@ class Emoji(Enum):
     SHIELD = "🛡️"
     WEAPON = "🗡️"
     LOG = "📜"
+    LEGEND = "📋"
     MOVE_Q = "↖️"
     MOVE_W = "⬆️"
     MOVE_E = "↗️"

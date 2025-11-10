@@ -264,8 +264,8 @@ class HeroDisplay:
     def inventory(self) -> str:
         """Виводить екіпірування та інвентар."""
         text = [
-            f"Права рука (зброя):\n\n{str(self.hero.right_hand)}\n",
-            f"Ліва рука (щит):\n\n{str(self.hero.left_hand)}\n",
+            f"Права рука (зброя): {str(self.hero.right_hand)}\n",
+            f"Ліва рука (щит): {str(self.hero.left_hand)}\n",
         ]
         if self.hero.inventory is None or self.hero.inventory == []:
             text.append("Інвентар: [пусто].\n")
