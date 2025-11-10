@@ -167,7 +167,8 @@ MOVE_BUTTONS = [
 
 def movement_controls() -> None:
     """Рендерить кнопки керування 3x3"""
-    st.subheader(f"{Emoji.CTRL.value} Керування")
+
+    st.html(f"{Emoji.CTRL.value} <b>Керування:</b>")
 
     for line in MOVE_BUTTONS:
 
@@ -184,15 +185,12 @@ def movement_controls() -> None:
 
 
 def legend() -> None:
-    st.subheader(f"{Emoji.LEGEND.value} Легенда:")
-    st.write(f"{Emoji.HERO.value} -- ви")
-    st.write(
-        f"{Emoji.BOOK.value} -- досвід | {Emoji.EMPTY.value} -- нічого | "
-        + f"{Emoji.EXIT.value} -- вихід"
-    )
-    st.write(
-        f"{Emoji.ENEMY.value} -- вороги | {Emoji.ITEM.value} -- скарби |"
-        + f"{Emoji.GOLD.value} -- гроші"
+    st.html(f"{Emoji.LEGEND.value} <b>Легенда:</b>")
+    st.html(
+        f"{Emoji.HERO.value} — ти (герой) | {Emoji.ENEMY.value} — ворог | "
+        + f"{Emoji.EXIT.value} — вихід<br>{Emoji.BOOK.value} — досвід | "
+        + f"{Emoji.ITEM.value} — скарб | {Emoji.GOLD.value} — гроші<br>"
+        + f"{Emoji.EMPTY.value} — нічого"
     )
 
 
@@ -204,13 +202,13 @@ def show_log(expanded: bool = False) -> None:
         if text:
             st.text(text)
         else:
-            st.text(f"Подій поки не було {Emoji.X.value}")
+            st.text(f"Подій поки не було...")
 
 
 def show_hero() -> None:
     """Перегляд характеристик героя"""
 
-    st.text(st.session_state.hero)
+    st.html(f"<b>{st.session_state.hero}</b>")
     if st.session_state.hero.alive:
         st.write(st.session_state.hero.display.level())
         col1, col2 = st.columns(2)

@@ -63,7 +63,7 @@ def check_game_state() -> None:
             on_map()
         case _:
             st.title(f"{Emoji.X.value} Відсутній пункт меню")
-            st.write(f"{st.session_state.game_state.value}")
+            st.write(f"game_state: {st.session_state.game_state.value}")
 
 
 def hello() -> None:
@@ -162,7 +162,7 @@ def on_map() -> None:
                     st.text(read_buffer())
 
                     if st.session_state.hero.alive:
-                        colum1, colum2 = st.columns([1, 2])
+                        colum1, colum2 = st.columns([1, 3])
                         with colum1:
                             movement_controls()
                         with colum2:
