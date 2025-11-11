@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 
+XML_SAVES_PATH = "../saves/hero.xml"
+
 LOG = True
 
 DEBUG = False

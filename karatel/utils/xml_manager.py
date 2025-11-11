@@ -1,6 +1,7 @@
 import xml.etree.ElementTree as ET
 
 from karatel.core.hero import Hero
+from karatel.utils.settings import XML_SAVES_PATH
 
 
 def xml_hero_writer(hero: Hero) -> None:
@@ -27,5 +28,5 @@ def xml_hero_writer(hero: Hero) -> None:
 
     tree = ET.ElementTree(root)
 
-    with open('../saves/hero.xml', 'wb') as file:
-        tree.write(file, encoding='utf-8', xml_declaration=True)
+    with open(XML_SAVES_PATH, "wb") as file:
+        tree.write(file, encoding="utf-8", xml_declaration=True)
