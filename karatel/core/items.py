@@ -314,6 +314,10 @@ SHIELDS = (
     Shield("Сталеві двері під’їзду", "Коли ти — останній бастіон цивілізації", 9),
 )
 
+WEAPONS = CHARISMA_WEAPONS + DEXTERITY_WEAPONS + INTELLIGENCE_WEAPONS + STRENGTH_WEAPONS
+
+ITEMS = WEAPONS + SHIELDS
+
 
 def match_level(level: int = 1) -> int:
     """Підбирає предмет під рівень персонажа в залежності

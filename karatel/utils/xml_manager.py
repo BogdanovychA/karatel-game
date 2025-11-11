@@ -2,13 +2,7 @@ import xml.etree.ElementTree as ET
 
 from karatel.core.game_state_manager import gsm
 from karatel.core.hero import Hero
-from karatel.core.items import (
-    CHARISMA_WEAPONS,
-    DEXTERITY_WEAPONS,
-    INTELLIGENCE_WEAPONS,
-    SHIELDS,
-    STRENGTH_WEAPONS,
-)
+from karatel.core.items import ITEMS, SHIELDS, WEAPONS
 from karatel.core.professions import PROFESSIONS
 from karatel.core.skills import SKILLS
 from karatel.utils.settings import DEBUG, XML_SAVES_PATH
@@ -74,44 +68,41 @@ def xml_hero_loader(path: str) -> Hero | None:
     if root.find('money') is not None:
         money = int(root.find('money').text)
 
+    hero_skills = []
     skills_root = root.find('skills')
     if skills_root is not None:
         skills = skills_root.findall('skill')
-        # for skill in skills:
+        for skill in skills:
+            hero_skills.append(obj_finder(skill.text, SKILLS))
 
+    hero_inventory = []
     inventory_root = root.find('inventory')
     if inventory_root is not None:
         inventory = inventory_root.findall('item')
+        for item in inventory:
+            hero_inventory.append(obj_finder(item.text, ITEMS))
 
+    hero_left_hand = None
     if root.find('left_hand') is not None:
         left_hand = root.find('left_hand').text
+        hero_left_hand = obj_finder(left_hand, SHIELDS)
 
+    hero_right_hand = None
     if root.find('right_hand') is not None:
         right_hand = root.find('right_hand').text
+        hero_right_hand = obj_finder(right_hand, WEAPONS)
 
     hero = Hero(
         name=name,
         profession=obj_finder(profession, PROFESSIONS),
         experience=experience,
-        # inventory = inventory: list[Item],
     )
+
     hero.lives = lives
     hero.money = money
-
-    # right_hand = right_hand: Weapon,
-    # left_hand = left_hand: Shield,
-    # skills = skills: list[Skill],
-
-    gsm.ui.write(
-        name,
-        profession,
-        experience,
-        lives,
-        money,
-        skills,
-        inventory,
-        left_hand,
-        right_hand,
-    )
+    hero.skills = hero_skills
+    hero.inventory = hero_inventory
+    hero.right_hand = hero_right_hand
+    hero.left_hand = hero_left_hand
 
     return hero
