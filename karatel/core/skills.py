@@ -84,13 +84,6 @@ class HealSelfSkill(Skill):
             )
 
 
-def skill_finder(name: str, the_dict: dict) -> Skill | None:
-    for skill in the_dict.values():
-        if name == skill.name:
-            return skill
-    return None
-
-
 # База навичок
 SKILLS = {
     "self_heal_small": HealSelfSkill(

@@ -54,13 +54,6 @@ class Shield(Item):
         )
 
 
-def item_finder(name: str, the_tuple: tuple[Item]) -> Item | None:
-    for item in the_tuple:
-        if name == item.name:
-            return item
-    return None
-
-
 # База предметів -- зброя з модифікатором від сили
 STRENGTH_WEAPONS = (
     Weapon(

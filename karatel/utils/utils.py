@@ -36,3 +36,18 @@ def read_buffer() -> str:
     text = "\n".join(str(a) for a in gsm.ui.buffer)
     gsm.ui.clear()
     return text
+
+
+def obj_finder(name: str, data_container: dict | tuple | list) -> object | None:
+
+    if isinstance(data_container, dict):
+        iterable = data_container.values()
+    elif isinstance(data_container, (tuple, list)):
+        iterable = data_container
+    else:
+        return None
+
+    for obj in iterable:
+        if getattr(obj, "name", None) == name:
+            return obj
+    return None
