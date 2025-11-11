@@ -13,7 +13,7 @@ from karatel.core.items import (
     select_shield,
     select_weapon,
 )
-from karatel.core.professions import PROFESSIONS, Profession, show_professions
+from karatel.core.professions import PROFESSIONS, Profession
 from karatel.core.skills import SKILLS, Skill, SkillTiming
 from karatel.ui.abstract import OutputSpace
 from karatel.utils.constants import FEMALE_NAMES, MALE_NAMES, TRANSLATIONS
@@ -478,32 +478,6 @@ class EquipmentManager:
 
 class HeroFactory:
     """Клас управління героєм"""
-
-    # @staticmethod
-    # def create(log=LOG) -> Hero:
-    #     """Для створення героя гравцем"""
-    #     name = input("Введіть ім'я вашого персонажа: ")
-    #     professions = list(PROFESSIONS.keys())
-    #     menu = {}
-    #     while True:
-    #         gsm.ui.write("Обери одну з професій:", log=log)
-    #         for i in range(len(PROFESSIONS)):
-    #             gsm.ui.write(i + 1, "-", PROFESSIONS[professions[i]].name, log=log)
-    #             menu[str(i + 1)] = professions[i]
-    #         gsm.ui.write("L - Переглянути опис професій", log=log)
-    #         choice = input("Зроби свій вибір: ").upper()
-    #         if choice == "L" or choice == "Д":
-    #             show_professions()
-    #         elif choice in menu:
-    #             profession = PROFESSIONS[menu[choice]]
-    #             break
-    #         else:
-    #             gsm.ui.write("Зробіть правильний вибір!", log=log)
-    #     gsm.ui.write(
-    #         f"Створюємо персонажа з ім'ям {name} та професією {profession.name}",
-    #         log=log,
-    #     )
-    #     return Hero(name, profession)
 
     @staticmethod
     def generate(

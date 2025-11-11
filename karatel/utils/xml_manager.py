@@ -38,6 +38,25 @@ def xml_hero_saver(hero: Hero, path: str) -> None:
 
 
 def xml_hero_loader(path: str) -> Hero | None:
+
+    def create_list(parent_tag: str, child_tag: str, base: tuple) -> list:
+
+        the_list: list = []
+        parent_root = root.find(parent_tag)
+        if parent_root is not None:
+            tags = parent_root.findall(child_tag)
+            for tag in tags:
+                the_list.append(obj_finder(tag.text, base))
+
+        return the_list
+
+    def find_text(text: str) -> str | None:
+        element = root.find(text)
+        if element is not None and element.text:
+            return element.text
+        else:
+            return None
+
     try:
         tree = ET.parse(path)
         root = tree.getroot()
@@ -45,64 +64,29 @@ def xml_hero_loader(path: str) -> Hero | None:
         gsm.ui.write(f"Помилка: файл {XML_SAVES_PATH} не знайдено", log=DEBUG)
         return None
     except Exception as e:
-        gsm.ui.write(f"Error loading XML: {e}", log=DEBUG)
+        gsm.ui.write(f"Помилка завантаження XML: {e}", log=DEBUG)
         return None
 
-    name: str = ""
-    if root.find('name') is not None:
-        name = root.find('name').text
-
-    profession: str = ""
-    if root.find('profession') is not None:
-        profession = root.find('profession').text
-
-    experience: int = 0
-    if root.find('experience') is not None:
-        experience = int(root.find('experience').text)
-
-    lives: int = 0
-    if root.find('lives') is not None:
-        lives = int(root.find('lives').text)
-
-    money: int = 0
-    if root.find('money') is not None:
-        money = int(root.find('money').text)
-
-    hero_skills = []
-    skills_root = root.find('skills')
-    if skills_root is not None:
-        skills = skills_root.findall('skill')
-        for skill in skills:
-            hero_skills.append(obj_finder(skill.text, SKILLS))
-
-    hero_inventory = []
-    inventory_root = root.find('inventory')
-    if inventory_root is not None:
-        inventory = inventory_root.findall('item')
-        for item in inventory:
-            hero_inventory.append(obj_finder(item.text, ITEMS))
-
-    hero_left_hand = None
-    if root.find('left_hand') is not None:
-        left_hand = root.find('left_hand').text
-        hero_left_hand = obj_finder(left_hand, SHIELDS)
-
-    hero_right_hand = None
-    if root.find('right_hand') is not None:
-        right_hand = root.find('right_hand').text
-        hero_right_hand = obj_finder(right_hand, WEAPONS)
+    name = find_text("name")
+    profession = find_text("profession")
+    experience = int(find_text("experience") or "0")
+    lives = int(find_text("lives") or "0")
+    money = int(find_text("money") or "0")
+    left_hand = obj_finder(find_text("left_hand"), SHIELDS)
+    right_hand = obj_finder(find_text("right_hand"), WEAPONS)
+    skills = create_list('skills', 'skill', SKILLS)
+    inventory = create_list('inventory', 'item', ITEMS)
 
     hero = Hero(
         name=name,
         profession=obj_finder(profession, PROFESSIONS),
         experience=experience,
     )
-
     hero.lives = lives
     hero.money = money
-    hero.skills = hero_skills
-    hero.inventory = hero_inventory
-    hero.right_hand = hero_right_hand
-    hero.left_hand = hero_left_hand
+    hero.skills = skills
+    hero.inventory = inventory
+    hero.right_hand = right_hand
+    hero.left_hand = left_hand
 
     return hero
