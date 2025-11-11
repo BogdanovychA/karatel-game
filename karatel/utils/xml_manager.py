@@ -4,7 +4,7 @@ from karatel.core.hero import Hero
 from karatel.utils.settings import XML_SAVES_PATH
 
 
-def xml_hero_writer(hero: Hero) -> None:
+def xml_hero_saver(hero: Hero) -> None:
     root = ET.Element('hero')
 
     ET.SubElement(root, "name").text = hero.name
@@ -30,3 +30,7 @@ def xml_hero_writer(hero: Hero) -> None:
 
     with open(XML_SAVES_PATH, "wb") as file:
         tree.write(file, encoding="utf-8", xml_declaration=True)
+
+
+def xml_hero_loader(hero: Hero) -> Hero:
+    pass
