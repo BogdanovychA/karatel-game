@@ -479,31 +479,31 @@ class EquipmentManager:
 class HeroFactory:
     """Клас управління героєм"""
 
-    @staticmethod
-    def create(log=LOG) -> Hero:
-        """Для створення героя гравцем"""
-        name = input("Введіть ім'я вашого персонажа: ")
-        professions = list(PROFESSIONS.keys())
-        menu = {}
-        while True:
-            gsm.ui.write("Обери одну з професій:", log=log)
-            for i in range(len(PROFESSIONS)):
-                gsm.ui.write(i + 1, "-", PROFESSIONS[professions[i]].name, log=log)
-                menu[str(i + 1)] = professions[i]
-            gsm.ui.write("L - Переглянути опис професій", log=log)
-            choice = input("Зроби свій вибір: ").upper()
-            if choice == "L" or choice == "Д":
-                show_professions()
-            elif choice in menu:
-                profession = PROFESSIONS[menu[choice]]
-                break
-            else:
-                gsm.ui.write("Зробіть правильний вибір!", log=log)
-        gsm.ui.write(
-            f"Створюємо персонажа з ім'ям {name} та професією {profession.name}",
-            log=log,
-        )
-        return Hero(name, profession)
+    # @staticmethod
+    # def create(log=LOG) -> Hero:
+    #     """Для створення героя гравцем"""
+    #     name = input("Введіть ім'я вашого персонажа: ")
+    #     professions = list(PROFESSIONS.keys())
+    #     menu = {}
+    #     while True:
+    #         gsm.ui.write("Обери одну з професій:", log=log)
+    #         for i in range(len(PROFESSIONS)):
+    #             gsm.ui.write(i + 1, "-", PROFESSIONS[professions[i]].name, log=log)
+    #             menu[str(i + 1)] = professions[i]
+    #         gsm.ui.write("L - Переглянути опис професій", log=log)
+    #         choice = input("Зроби свій вибір: ").upper()
+    #         if choice == "L" or choice == "Д":
+    #             show_professions()
+    #         elif choice in menu:
+    #             profession = PROFESSIONS[menu[choice]]
+    #             break
+    #         else:
+    #             gsm.ui.write("Зробіть правильний вибір!", log=log)
+    #     gsm.ui.write(
+    #         f"Створюємо персонажа з ім'ям {name} та професією {profession.name}",
+    #         log=log,
+    #     )
+    #     return Hero(name, profession)
 
     @staticmethod
     def generate(
@@ -512,7 +512,6 @@ class HeroFactory:
         name: str | None = None,
         right_hand: Weapon | None = None,
         left_hand: Shield | None = None,
-        money: int = 0,
     ) -> Hero:
         """Генерація рандомного героя, або героя з
         конкретними характеристиками"""
@@ -546,8 +545,6 @@ class HeroFactory:
             )
         else:
             hero.equipment.equip_weapon(right_hand, log=DEBUG)
-
-        hero.money = money
 
         return hero
 
