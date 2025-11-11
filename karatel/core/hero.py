@@ -43,9 +43,10 @@ class Hero:
         self._level = MIN_LEVEL
         self._experience = 0
         # Ініціалізуємо HP до будь-яких викликів
-        self._hp = 0
+        self._hp = 1  # тимчасове значення
+        self.max_hp = 1  # тимчасове значення
+
         self._lives = 1
-        self.max_hp = 0
 
         self._money = 0
 
@@ -102,9 +103,9 @@ class Hero:
     @hp.setter
     def hp(self, value: int) -> None:
         """Сеттер здоров'я"""
-
+        old_hp = self._hp
         self._hp = math.floor(clamp_value(value, 0, self.max_hp))
-        if self._hp == 0:
+        if old_hp > 0 and self._hp == 0:  # Тільки якщо щойно помер
             self.lives -= 1
 
     @property
@@ -125,7 +126,7 @@ class Hero:
     @property
     def alive(self) -> bool:
         """Повертає статус чи живий герой"""
-        return True if self.hp > 0 else False
+        return self.hp > 0
 
     @property
     def money(self) -> int:
@@ -291,17 +292,16 @@ class LevelSystem:
     def add_experience(self, amount: int | None = None, log: bool = LOG) -> None:
         """Перевіряє чи отримав герой новий рівень."""
 
-        if amount is not None and amount != 0:
-            self.hero.experience += amount
-            self.output.write(f"{self.hero.name} отримує {amount} досвіду", log=log)
-            if self.hero.experience == EXPERIENCE_FOR_LEVEL[-1]:
-                self.output.write(
-                    f"{self.hero.name} досяг максимального досвіду: "
-                    + f"{EXPERIENCE_FOR_LEVEL[-1]}",
-                    log=log,
-                )
-        else:
+        if not amount:
             return
+        self.hero.experience += amount
+        self.output.write(f"{self.hero.name} отримує {amount} досвіду", log=log)
+        if self.hero.experience == EXPERIENCE_FOR_LEVEL[-1]:
+            self.output.write(
+                f"{self.hero.name} досяг максимального досвіду: "
+                + f"{EXPERIENCE_FOR_LEVEL[-1]}",
+                log=log,
+            )
 
         if self.hero.level == MAX_LEVEL:
             self.output.write(
