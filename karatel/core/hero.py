@@ -33,20 +33,13 @@ class Hero:
 
     def __init__(
         self,
-        name: str | None = None,
-        profession: Profession | None = None,
+        name: str,
+        profession: Profession,
         experience: int = 0,
-        skills: list[Skill] | None = None,
-        right_hand: Weapon | None = None,
-        left_hand: Shield | None = None,
-        inventory: list[Item] | None = None,
-        money: int = 0,
         output: OutputSpace | None = None,
     ) -> None:
-        self.name = name or HeroFactory.select_name()
-
-        self.profession = profession or PROFESSIONS["commando"]
-
+        self.name = name
+        self.profession = profession
         self._level = MIN_LEVEL
         self._experience = 0
         # Ініціалізуємо HP до будь-яких викликів
@@ -70,7 +63,7 @@ class Hero:
         self.display = HeroDisplay(self)
         self.skill_manager = SkillSystem(self, output=self.output)
 
-        self.skills = skills or []
+        self.skills = []
 
         # Ініціалізація героя
         self.leveling.level_up(add_constitution=False, log=DEBUG)
@@ -80,24 +73,10 @@ class Hero:
         if experience > 0:
             self.leveling.add_experience(experience, log=DEBUG)
 
-        self.inventory = inventory or []
+        self.inventory = []
 
         self.left_hand = JUST_HAND
         self.right_hand = UNARMED_STRIKE
-
-        if left_hand is None:
-            self.equipment.equip_shield(select_shield(self.level), log=DEBUG)
-        else:
-            self.equipment.equip_shield(left_hand, log=DEBUG)
-
-        if right_hand is None:
-            self.equipment.equip_weapon(
-                select_weapon(self.level, self.profession.main_bonuses[0]), log=DEBUG
-            )
-        else:
-            self.equipment.equip_weapon(right_hand, log=DEBUG)
-
-        self.money: int = money
 
         self.output.write(f"Персонажа {self.name} створено", log=DEBUG)
 
@@ -524,9 +503,16 @@ class HeroFactory:
 
     @staticmethod
     def generate(
-        level: int | None = None, profession: str | None = None, name: str | None = None
+        level: int | None = None,
+        profession: str | None = None,
+        name: str | None = None,
+        right_hand: Weapon | None = None,
+        left_hand: Shield | None = None,
+        money: int = 0,
     ) -> Hero:
-        """Генерація рандомного героя"""
+        """Генерація рандомного героя, або героя з
+        конкретними характеристиками"""
+
         if name is None:
             name = HeroFactory.select_name()
         if profession is None:
@@ -538,7 +524,28 @@ class HeroFactory:
         else:
             level = clamp_value(level, MIN_LEVEL, MAX_LEVEL)
             experience = EXPERIENCE_FOR_LEVEL[level - 1]
-        return Hero(name, profession, experience)
+
+        hero = Hero(
+            name=name,
+            profession=profession,
+            experience=experience,
+        )
+
+        if left_hand is None:
+            hero.equipment.equip_shield(select_shield(hero.level), log=DEBUG)
+        else:
+            hero.equipment.equip_shield(left_hand, log=DEBUG)
+
+        if right_hand is None:
+            hero.equipment.equip_weapon(
+                select_weapon(hero.level, hero.profession.main_bonuses[0]), log=DEBUG
+            )
+        else:
+            hero.equipment.equip_weapon(right_hand, log=DEBUG)
+
+        hero.money = money
+
+        return hero
 
     @staticmethod
     def select_name(sex: str | None = None) -> str:
