@@ -52,7 +52,7 @@ def move_hero(
 ) -> list:
     """Переміщення персонажа по мапі"""
 
-    def step():
+    def _step():
         """Винесено в окрему функцію для забезпечення принципу DRY"""
 
         # Додаємо гроші
@@ -81,19 +81,19 @@ def move_hero(
 
             # Якщо клітинка пуста
             case CellType.EMPTY | CellType.GOLD | CellType.BOOK:
-                step()
+                _step()
 
             # Якщо там предмет
             case CellType.ITEM:
                 the_map[pos_y][pos_x].obj.equipment.add_item(
                     the_map[new_y][new_x].obj, log=log
                 )
-                step()
+                _step()
 
             # Якщо там життя
             case CellType.HEART:
                 add_lives(the_map[pos_y][pos_x].obj, 1)
-                step()
+                _step()
 
             # Якщо там ворог
             case CellType.ENEMY:
@@ -109,7 +109,7 @@ def move_hero(
                 )
                 fight(the_map[pos_y][pos_x].obj, the_map[new_y][new_x].obj)
                 if the_map[pos_y][pos_x].obj.alive:
-                    step()
+                    _step()
 
             # Якщо це вихід
             case CellType.EXIT:
@@ -120,6 +120,6 @@ def move_hero(
                 )
                 add_lives(the_map[pos_y][pos_x].obj, 1)
                 gsm.can_generate_map = True
-                step()
+                _step()
 
         return the_map

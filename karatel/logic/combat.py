@@ -9,7 +9,7 @@ from karatel.utils.settings import LOG, XP_MULTIPLIER
 def attack(attacker: Hero, defender: Hero) -> bool:
     """Атака одного героя на іншого. Повертає True якщо захисник загинув."""
 
-    def apply_damage(att: Hero, defn: Hero, damg: int) -> None:
+    def _apply_damage(att: Hero, defn: Hero, damg: int) -> None:
         """Допоміжна функція для забезпечення принципів DRY"""
         gsm.ui.write(
             f"{att.name} наносить {damg} шкоди за "
@@ -34,7 +34,7 @@ def attack(attacker: Hero, defender: Hero) -> bool:
         )
         attack_value = Dice.roll(attacker.right_hand.damage)
         attack_value += Dice.roll(attacker.right_hand.damage)
-        apply_damage(attacker, defender, attack_value)
+        _apply_damage(attacker, defender, attack_value)
         return not defender.alive
     elif attack_chance == 1:
         gsm.ui.write(
@@ -51,7 +51,7 @@ def attack(attacker: Hero, defender: Hero) -> bool:
             log=LOG,
         )
         attack_value = Dice.roll(attacker.right_hand.damage)
-        apply_damage(attacker, defender, attack_value)
+        _apply_damage(attacker, defender, attack_value)
         return not defender.alive
     else:
         gsm.ui.write(

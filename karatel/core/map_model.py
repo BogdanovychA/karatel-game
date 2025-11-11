@@ -150,7 +150,7 @@ def select_obj(
 ) -> Cell:
     """Вибір клітинки. Якщо не задано тип -- випадковий"""
 
-    def generate_enemy(level: int | None = None) -> Cell:
+    def _generate_enemy(level: int | None = None) -> Cell:
         """Створення клітинки з ворогом"""
 
         enemy = HeroFactory.generate(level)
@@ -161,7 +161,7 @@ def select_obj(
         )
         return enemy_cell
 
-    def generate_item() -> Cell:
+    def _generate_item() -> Cell:
         """Створення клітинки з предметом"""
 
         all_items = list(
@@ -179,7 +179,7 @@ def select_obj(
         )
         return item_cell
 
-    def generate_gold() -> Cell:
+    def _generate_gold() -> Cell:
         """Створення клітинки з грошима"""
 
         gold_cell = Cell(
@@ -189,7 +189,7 @@ def select_obj(
         )
         return gold_cell
 
-    def generate_book() -> Cell:
+    def _generate_book() -> Cell:
         """Створення клітинки з досвідом"""
 
         book_cell = Cell(
@@ -199,7 +199,7 @@ def select_obj(
         )
         return book_cell
 
-    def generate_heart() -> Cell:
+    def _generate_heart() -> Cell:
         """Створення клітинки з життям"""
 
         heart_cell = Cell(
@@ -208,28 +208,28 @@ def select_obj(
         )
         return heart_cell
 
-    def create() -> Cell:
+    def _create() -> Cell:
         """Допоміжна функція, для створення клітинки.
         Для забезпечення принципу DRY"""
 
         match cell_type:
             case CellType.ENEMY:
-                return generate_enemy(enemy_level)
+                return _generate_enemy(enemy_level)
             case CellType.ITEM:
-                return generate_item()
+                return _generate_item()
             case CellType.GOLD:
-                return generate_gold()
+                return _generate_gold()
             case CellType.BOOK:
-                return generate_book()
+                return _generate_book()
             case CellType.HEART:
-                return generate_heart()
+                return _generate_heart()
             case CellType.EMPTY | _:
                 return EMPTY_CELL
 
     if cell_type is None:
         cell_type = random.choice(TYPES_OF_CELL)
 
-    return create()
+    return _create()
 
 
 def generate_map(hero: Hero) -> list[list[Cell]]:
