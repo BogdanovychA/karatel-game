@@ -1,13 +1,18 @@
 # -*- coding: utf-8 -*-
-import xml.etree.ElementTree as ET
+from __future__ import annotations
 
-from karatel.core.game_state_manager import gsm
+import xml.etree.ElementTree as ET
+from typing import TYPE_CHECKING
+
 from karatel.core.hero import Hero
 from karatel.core.items import ITEMS, SHIELDS, WEAPONS
 from karatel.core.professions import PROFESSIONS
 from karatel.core.skills import SKILLS
-from karatel.utils.settings import DEBUG, LOG, XML_SAVES_PATH
+from karatel.utils.settings import DEBUG, LOG
 from karatel.utils.utils import obj_finder
+
+if TYPE_CHECKING:
+    from karatel.ui.abstract import OutputSpace
 
 
 def xml_hero_saver(hero: Hero, path: str, log: bool = LOG) -> None:
@@ -35,10 +40,10 @@ def xml_hero_saver(hero: Hero, path: str, log: bool = LOG) -> None:
     with open(path, "wb") as file:
         tree.write(file, encoding="utf-8", xml_declaration=True)
 
-    gsm.ui.write(f"Героя {hero.name} збережено", log=log)
+    hero.output.write(f"Героя {hero.name} збережено", log=log)
 
 
-def xml_hero_loader(path: str, log: bool = LOG) -> Hero | None:
+def xml_hero_loader(output: OutputSpace, path: str, log: bool = LOG) -> Hero | None:
 
     def _create_list(parent_tag: str, child_tag: str, base: tuple) -> list:
 
@@ -62,13 +67,14 @@ def xml_hero_loader(path: str, log: bool = LOG) -> Hero | None:
         tree = ET.parse(path)
         root = tree.getroot()
     except FileNotFoundError:
-        gsm.ui.write(f"Помилка: файл {XML_SAVES_PATH} не знайдено", log=DEBUG)
+        output.write(f"Помилка: файл {path} не знайдено", log=DEBUG)
         return None
     except Exception as e:
-        gsm.ui.write(f"Помилка завантаження XML: {e}", log=DEBUG)
+        output.write(f"Помилка завантаження XML: {e}", log=DEBUG)
         return None
 
     hero = Hero(
+        output=output,
         name=_find_text("name"),
         profession=obj_finder(_find_text("profession"), PROFESSIONS),
         experience=int(_find_text("experience") or "0"),
@@ -80,5 +86,5 @@ def xml_hero_loader(path: str, log: bool = LOG) -> Hero | None:
     hero.inventory = _create_list('inventory', 'item', ITEMS)
     hero.skills = _create_list('skills', 'skill', SKILLS)
 
-    gsm.ui.write(f"Героя {hero.name} завантажено", log=log)
+    hero.output.write(f"Героя {hero.name} завантажено", log=log)
     return hero

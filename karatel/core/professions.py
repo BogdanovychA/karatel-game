@@ -1,9 +1,15 @@
 # -*- coding: utf-8 -*-
-from dataclasses import dataclass
 
-from karatel.core.game_state_manager import gsm
+from __future__ import annotations
+
+from dataclasses import dataclass
+from typing import TYPE_CHECKING
+
 from karatel.utils.constants import TRANSLATIONS
 from karatel.utils.settings import LOG
+
+if TYPE_CHECKING:
+    from karatel.ui.abstract import OutputSpace
 
 
 @dataclass
@@ -59,7 +65,7 @@ PROFESSIONS = {
 
 
 def show_professions(
-    professions: str | list[str] | None = None, log: bool = LOG
+    output: OutputSpace, professions: str | list[str] | None = None, log: bool = LOG
 ) -> None:
     """Виводить одну або кілька професій. Якщо аргумент відсутній — виводить всі."""
 
@@ -73,7 +79,7 @@ def show_professions(
 
     for profession in professions:
         prof = PROFESSIONS[profession]
-        gsm.ui.write(
+        output.write(
             f"{prof.name.upper()}.\n{prof.description}\n"
             + f"Основні бонуси: "
             + f"{', '.join(TRANSLATIONS.get(bonus, bonus) for bonus in prof.main_bonuses)}. "

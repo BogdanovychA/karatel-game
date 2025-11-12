@@ -2,9 +2,47 @@
 
 from abc import ABC, abstractmethod
 
+from karatel.utils.settings import XML_SAVES_PATH
+from karatel.utils.xml_manager import xml_hero_loader, xml_hero_saver
+
+
+class SaveHero(ABC):
+    """'Відкритий простір' для збереження героя"""
+
+    @abstractmethod
+    def save(self, *args, **kwargs) -> None:
+        """Зберігаємо героя у 'відкритий простір'"""
+        pass
+
+    @abstractmethod
+    def load(
+        self,
+        *args,
+        **kwargs,
+    ):
+        """Завантажуємо героя з 'відкритого простору'"""
+        pass
+
+
+class XMLSaver(SaveHero):
+    """Збереження в XML"""
+
+    def __init__(self):
+        self._path = XML_SAVES_PATH
+
+    def save(self, *args, **kwargs) -> None:
+        xml_hero_saver(*args, path=self._path, **kwargs)
+
+    def load(
+        self,
+        *args,
+        **kwargs,
+    ):
+        return xml_hero_loader(*args, path=self._path, **kwargs)
+
 
 class OutputSpace(ABC):
-    """Клас для опису 'відкритого простору'"""
+    """'Відкритий простір' для виводу інформації"""
 
     @abstractmethod
     def write(self, *args, **kwargs) -> None:

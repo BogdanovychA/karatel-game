@@ -7,9 +7,14 @@ from karatel.core.items import Shield, Weapon
 from karatel.logic.map_logic import find_hero, move_hero
 from karatel.ui.web_constants import BUTTON_WIDTH, GameState
 from karatel.utils.constants import Emoji
-from karatel.utils.settings import LOG, XML_SAVES_PATH
-from karatel.utils.utils import read_buffer
-from karatel.utils.xml_manager import xml_hero_loader, xml_hero_saver
+from karatel.utils.settings import LOG
+
+
+def read_buffer() -> str:
+    """Читання буфера"""
+    text = "\n".join(str(a) for a in gsm.ui.buffer)
+    gsm.ui.clear()
+    return text
 
 
 def back_button() -> None:
@@ -44,7 +49,7 @@ def load_button() -> None:
     if st.button(
         "Завантажити", icon=Emoji.MOVE_W.value, type="secondary", width=BUTTON_WIDTH
     ):
-        st.session_state.hero = xml_hero_loader(XML_SAVES_PATH, log=LOG)
+        st.session_state.hero = gsm.saver.load(output=gsm.ui, log=LOG)
         if 'game_map' in st.session_state and st.session_state.game_map:
             y, x = find_hero(st.session_state.game_map)
             st.session_state.game_map[y][x].obj = st.session_state.hero
@@ -56,7 +61,7 @@ def save_button() -> None:
     if st.button(
         "Зберегти", icon=Emoji.MOVE_S.value, type="secondary", width=BUTTON_WIDTH
     ):
-        xml_hero_saver(st.session_state.hero, XML_SAVES_PATH, log=LOG)
+        gsm.saver.save(st.session_state.hero, log=LOG)
         st.rerun()
 
 
@@ -203,7 +208,7 @@ def movement_controls() -> None:
                 else:
                     text, key, y, x, description = value
                     if st.button(label=text, key=key, help=description):
-                        move_hero(y, x, st.session_state.game_map, log=LOG)
+                        move_hero(gsm, y, x, st.session_state.game_map, log=LOG)
                         st.rerun()
 
 

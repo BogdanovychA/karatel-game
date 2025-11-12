@@ -1,8 +1,13 @@
 # -*- coding: utf-8 -*-
-import random
+from __future__ import annotations
 
-from karatel.core.game_state_manager import gsm
+import random
+from typing import TYPE_CHECKING
+
 from karatel.utils.settings import DEBUG
+
+if TYPE_CHECKING:
+    from karatel.ui.abstract import OutputSpace
 
 
 class Dice:
@@ -17,7 +22,7 @@ class Dice:
         return f"{num_dice}d{num_sides}+{modifier}"
 
     @staticmethod
-    def roll(dice_string: str) -> int:
+    def roll(output: OutputSpace, dice_string: str) -> int:
         """
         Виконує кидок кубика у форматі XdY+Z.
         Повертає суму кидків + модифікатор.
@@ -30,7 +35,7 @@ class Dice:
         # Беремо строку, розділювач "+", додаємо "0", якщо в функцію
         # не передали модифікатор, вибираємо тільки два перші елементи
         num_sides, modifier = (dice_expression.split("+") + [0])[:2]
-        gsm.ui.write(
+        output.write(
             f"Кубиків: {num_dice}, Граней: {num_sides}, Модифікатор: {modifier}",
             log=DEBUG,
         )
@@ -41,7 +46,7 @@ class Dice:
             total += value
 
         result = total + int(modifier)
-        gsm.ui.write(
+        output.write(
             f"Загальний результат: {result} це сума кидків: {total} "
             + f"плюс модифікатор: {modifier}\n",
             log=DEBUG,

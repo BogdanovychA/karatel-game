@@ -1,9 +1,10 @@
 # -*- coding: utf-8 -*-
+from __future__ import annotations
 
 import random
 from enum import Enum, IntEnum
+from typing import TYPE_CHECKING
 
-from karatel.core.game_state_manager import gsm
 from karatel.core.hero import Hero, HeroFactory
 from karatel.core.items import (
     CHARISMA_WEAPONS,
@@ -15,8 +16,10 @@ from karatel.core.items import (
     UNARMED_STRIKE,
     Item,
 )
-from karatel.ui.abstract import OutputSpace
 from karatel.utils.constants import Emoji
+
+if TYPE_CHECKING:
+    from karatel.ui.abstract import OutputSpace
 
 
 class CellType(Enum):
@@ -106,15 +109,11 @@ class Cell:
         obj: Hero | Item | None = None,
         gold: int = 0,
         experience: int = 0,
-        output: OutputSpace | None = None,
     ) -> None:
         self.type = cell_type
         self.obj = obj
         self.gold = gold
         self.experience = experience
-
-        # Менеджери
-        self.output = output if output is not None else gsm.ui
 
     @property
     def emoji(self) -> str:
@@ -146,14 +145,16 @@ EMPTY_CELL = Cell(CellType.EMPTY, None)  # Пуста клітинка
 
 
 def select_obj(
-    cell_type: CellType | None = None, enemy_level: int | None = None
+    output: OutputSpace,
+    cell_type: CellType | None = None,
+    enemy_level: int | None = None,
 ) -> Cell:
     """Вибір клітинки. Якщо не задано тип -- випадковий"""
 
     def _generate_enemy(level: int | None = None) -> Cell:
         """Створення клітинки з ворогом"""
 
-        enemy = HeroFactory.generate(level)
+        enemy = HeroFactory.generate(output=output, level=level)
         enemy_cell = Cell(
             cell_type=CellType.ENEMY,
             obj=enemy,
@@ -256,7 +257,9 @@ def generate_map(hero: Hero) -> list[list[Cell]]:
                 and MapSize.X - EnemyLine.X <= coordinate_x <= MapSize.X - 1
             ) and (coordinate_y != MapSize.Y - 1 or coordinate_x != MapSize.X - 1):
                 cell = select_obj(
-                    CellType.ENEMY, enemy_level=hero.level + EnemyLine.MULTIPLIER
+                    output=hero.output,
+                    cell_type=CellType.ENEMY,
+                    enemy_level=hero.level + EnemyLine.MULTIPLIER,
                 )
 
             # Встановлюємо вихід
@@ -269,14 +272,14 @@ def generate_map(hero: Hero) -> list[list[Cell]]:
 
             # Генеруємо випадкові клітинки мапи
             else:
-                cell = select_obj(enemy_level=hero.level)
+                cell = select_obj(output=hero.output, enemy_level=hero.level)
 
             line_x.append(cell)
         line_y.append(line_x)
     return line_y
 
 
-def render_map(the_map: list) -> None:
+def render_map(output: OutputSpace, the_map: list) -> None:
     """Рендеринг мапи"""
 
     text = ""
@@ -284,4 +287,4 @@ def render_map(the_map: list) -> None:
         for x in y:
             text += " " + x.emoji + " "
         text += "\n"
-    gsm.ui.write(text)
+    output.write(text)

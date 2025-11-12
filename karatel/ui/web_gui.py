@@ -6,7 +6,7 @@ from karatel.core.game_state_manager import gsm
 from karatel.core.hero import HeroFactory
 from karatel.core.map_model import generate_map, render_map
 from karatel.core.professions import PROFESSIONS, Profession, show_professions
-from karatel.ui.abstract import BufferedOutput
+from karatel.ui.abstract import BufferedOutput, XMLSaver
 from karatel.ui.web_constants import BUTTON_WIDTH, TITLE, GameState
 from karatel.ui.web_elements import (
     equipment,
@@ -14,13 +14,13 @@ from karatel.ui.web_elements import (
     load_button,
     movement_controls,
     navigation,
+    read_buffer,
     respawn,
     show_hero,
     show_log,
 )
 from karatel.utils.constants import Emoji
 from karatel.utils.settings import HERO_LIVES, MAX_LEVEL, MIN_LEVEL
-from karatel.utils.utils import read_buffer
 
 
 def init_session_state():
@@ -45,6 +45,8 @@ def init_session_state():
 
     if st.session_state.first_start:
         st.session_state.ui = BufferedOutput()
+        gsm.saver = XMLSaver()
+
         st.session_state.first_start = False
 
     if gsm.ui != st.session_state.ui:
@@ -119,7 +121,7 @@ def hero() -> None:
             level = st.slider("Рівень", MIN_LEVEL, MAX_LEVEL, MIN_LEVEL)
 
             with st.expander("Професії", expanded=True):
-                show_professions(profession)
+                show_professions(output=gsm.ui, professions=profession)
                 st.text(read_buffer())
 
             col1, col2, col3, col4 = st.columns([1, 1, 1, 1])
@@ -132,7 +134,7 @@ def hero() -> None:
                     width=BUTTON_WIDTH,
                 ):
                     st.session_state.hero = HeroFactory.generate(
-                        level=level, profession=profession, name=name
+                        output=gsm.ui, level=level, profession=profession, name=name
                     )
                     st.session_state.hero.lives = HERO_LIVES
                     st.rerun()
@@ -171,7 +173,7 @@ def on_map() -> None:
                 st.session_state.game_map = generate_map(st.session_state.hero)
             if st.session_state.game_map:
                 with st.expander(f"{Emoji.DUNG.value} Мапа", expanded=True):
-                    render_map(st.session_state.game_map)
+                    render_map(gsm.ui, st.session_state.game_map)
                     st.text(read_buffer())
 
                     if st.session_state.hero.alive:

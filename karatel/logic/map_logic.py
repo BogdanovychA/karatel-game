@@ -3,13 +3,13 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Tuple
 
-from karatel.core.game_state_manager import gsm
 from karatel.core.map_model import EMPTY_CELL, CellType, MapSize
 from karatel.logic.combat import fight
 from karatel.utils.settings import LOG
 from karatel.utils.utils import clamp_value
 
 if TYPE_CHECKING:
+    from karatel.core.game_state_manager import GameStateManager
     from karatel.core.hero import Hero
     from karatel.core.map_model import Cell
 
@@ -28,7 +28,7 @@ def add_money(hero: Hero, cell: Cell, log=LOG) -> None:
 
     if cell.gold > 0:
         hero.money += cell.gold
-        gsm.ui.write(f"{hero.name} отримує {cell.gold} грн", log=log)
+        hero.output.write(f"{hero.name} отримує {cell.gold} грн", log=log)
 
 
 def add_lives(hero: Hero, value: int | None, log=LOG) -> None:
@@ -39,12 +39,13 @@ def add_lives(hero: Hero, value: int | None, log=LOG) -> None:
             value = hero.lives * -1
         hero.lives += value
         if value > 0:
-            gsm.ui.write(f"{hero.name} отримує {value} життя", log=log)
+            hero.output.write(f"{hero.name} отримує {value} життя", log=log)
         elif value < 0:
-            gsm.ui.write(f"{hero.name} втрачає {abs(value)} життя", log=log)
+            hero.output.write(f"{hero.name} втрачає {abs(value)} життя", log=log)
 
 
 def move_hero(
+    gsm: GameStateManager,
     step_y: int,
     step_x: int,
     the_map: list,

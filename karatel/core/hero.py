@@ -1,9 +1,13 @@
 # -*- coding: utf-8 -*-
+from __future__ import annotations
+
 import math
 import random
-from typing import Type
+from typing import TYPE_CHECKING, Type
 
-from karatel.core.game_state_manager import gsm
+if TYPE_CHECKING:
+    from karatel.ui.abstract import OutputSpace
+
 from karatel.core.items import (
     JUST_HAND,
     UNARMED_STRIKE,
@@ -15,7 +19,6 @@ from karatel.core.items import (
 )
 from karatel.core.professions import PROFESSIONS, Profession
 from karatel.core.skills import SKILLS, Skill, SkillTiming
-from karatel.ui.abstract import OutputSpace
 from karatel.utils.constants import FEMALE_NAMES, MALE_NAMES, TRANSLATIONS
 from karatel.utils.settings import (
     BASE_SKILL_LEVELS,
@@ -33,10 +36,10 @@ class Hero:
 
     def __init__(
         self,
+        output: OutputSpace,
         name: str,
         profession: Profession,
         experience: int = 0,
-        output: OutputSpace | None = None,
     ) -> None:
         self.name = name
         self.profession = profession
@@ -58,7 +61,7 @@ class Hero:
             "Charisma": 10,
         }
         # Менеджери
-        self.output = output if output is not None else gsm.ui
+        self.output = output
         self.leveling = LevelSystem(self, output=self.output)
         self.equipment = EquipmentManager(self, output=self.output)
         self.display = HeroDisplay(self)
@@ -481,6 +484,7 @@ class HeroFactory:
 
     @staticmethod
     def generate(
+        output: OutputSpace,
         level: int | None = None,
         profession: str | None = None,
         name: str | None = None,
@@ -506,6 +510,7 @@ class HeroFactory:
             name=name,
             profession=profession,
             experience=experience,
+            output=output,
         )
 
         if left_hand is None:

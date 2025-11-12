@@ -9,8 +9,6 @@ from karatel.utils.dice import Dice
 if TYPE_CHECKING:
     from karatel.core.hero import Hero
 
-from karatel.core.game_state_manager import gsm
-
 
 class SkillTiming(Enum):
     """Enum-клас для зберігання змінних, що
@@ -73,12 +71,12 @@ class HealSelfSkill(Skill):
             power = 0
             match self.power:
                 case str():
-                    power = Dice.roll(self.power)
+                    power = Dice.roll(hero.output, self.power)
                 case int():
                     power = self.power
             # Обмеження максимального здоров'я реалізовано через сеттер Hero.hp
             hero.hp += power
-            gsm.ui.write(
+            hero.output.write(
                 f"{hero.name} Відновлює {power} здоров'я за допомогою {self.name}",
                 log=log,
             )
