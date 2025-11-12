@@ -98,7 +98,7 @@ def move_hero(
 
             # Якщо там ворог
             case CellType.ENEMY:
-                gsm.ui.write(
+                gsm.output.write(
                     f"Ваш ворог:\n"
                     + f"{the_map[new_y][new_x].obj}\n"
                     + f"{the_map[new_y][new_x].obj.display.hp()} "
@@ -114,7 +114,7 @@ def move_hero(
 
             # Якщо це вихід
             case CellType.EXIT:
-                gsm.ui.write(
+                gsm.output.write(
                     f"{the_map[pos_y][pos_x].obj.name} знаходить вихід. "
                     + "Тепер можна створити нове підземелля, з сильнішими ворогами.",
                     log=log,

@@ -12,8 +12,8 @@ from karatel.utils.settings import LOG
 
 def read_buffer() -> str:
     """Читання буфера"""
-    text = "\n".join(str(a) for a in gsm.ui.buffer)
-    gsm.ui.clear()
+    text = "\n".join(str(a) for a in gsm.output.buffer)
+    gsm.output.clear()
     return text
 
 
@@ -49,7 +49,7 @@ def load_button() -> None:
     if st.button(
         "Завантажити", icon=Emoji.MOVE_W.value, type="secondary", width=BUTTON_WIDTH
     ):
-        st.session_state.hero = gsm.saver.load(output=gsm.ui, log=LOG)
+        st.session_state.hero = gsm.saver.load(output=gsm.output, log=LOG)
         if 'game_map' in st.session_state and st.session_state.game_map:
             y, x = find_hero(st.session_state.game_map)
             st.session_state.game_map[y][x].obj = st.session_state.hero
@@ -129,7 +129,7 @@ def respawn() -> None:
             st.session_state.game_state = GameState.HERO.value
             if 'game_map' in st.session_state and st.session_state.game_map:
                 st.session_state.game_map = None
-            gsm.ui.clear()
+            gsm.output.clear()
             st.rerun()
 
 

@@ -8,13 +8,13 @@ from karatel.ui.abstract import ConsoleOutput, OutputSpace, SaveHero, XMLSaver
 class GameStateManager:
     """Керує різними статусами гри"""
 
-    ui: OutputSpace
+    output: OutputSpace
     saver: SaveHero
     can_generate_map: bool
 
 
 gsm = GameStateManager(
-    ui=ConsoleOutput(),
+    output=ConsoleOutput(),
     saver=XMLSaver(),
     can_generate_map=False,
 )

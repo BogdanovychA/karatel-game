@@ -31,7 +31,7 @@ def init_session_state():
         'enemy': None,
         'game_state': None,
         'game_map': None,
-        'ui': None,
+        'output': None,
         'first_start': True,
     }
 
@@ -39,18 +39,18 @@ def init_session_state():
         if key not in st.session_state:
             st.session_state[key] = value
 
-    # Встановлюємо gsm.ui через st.session_state.ui для
+    # Встановлюємо gsm.output через st.session_state.output для
     # більшої стабільності, щоб не видавало помилку, коли редагуєш код
     # під час роботи Streamlit. Більш актуально для етапу розробки.
 
     if st.session_state.first_start:
-        st.session_state.ui = BufferedOutput()
+        st.session_state.output = BufferedOutput()
         gsm.saver = XMLSaver()
 
         st.session_state.first_start = False
 
-    if gsm.ui != st.session_state.ui:
-        gsm.ui = st.session_state.ui
+    if gsm.output != st.session_state.output:
+        gsm.output = st.session_state.output
 
 
 def check_game_state() -> None:
@@ -121,7 +121,7 @@ def hero() -> None:
             level = st.slider("Рівень", MIN_LEVEL, MAX_LEVEL, MIN_LEVEL)
 
             with st.expander("Професії", expanded=True):
-                show_professions(output=gsm.ui, professions=profession)
+                show_professions(output=gsm.output, professions=profession)
                 st.text(read_buffer())
 
             col1, col2, col3, col4 = st.columns([1, 1, 1, 1])
@@ -134,7 +134,7 @@ def hero() -> None:
                     width=BUTTON_WIDTH,
                 ):
                     st.session_state.hero = HeroFactory.generate(
-                        output=gsm.ui, level=level, profession=profession, name=name
+                        output=gsm.output, level=level, profession=profession, name=name
                     )
                     st.session_state.hero.lives = HERO_LIVES
                     st.rerun()
@@ -173,7 +173,7 @@ def on_map() -> None:
                 st.session_state.game_map = generate_map(st.session_state.hero)
             if st.session_state.game_map:
                 with st.expander(f"{Emoji.DUNG.value} Мапа", expanded=True):
-                    render_map(gsm.ui, st.session_state.game_map)
+                    render_map(gsm.output, st.session_state.game_map)
                     st.text(read_buffer())
 
                     if st.session_state.hero.alive:
