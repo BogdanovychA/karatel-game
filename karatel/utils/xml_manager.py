@@ -6,11 +6,11 @@ from karatel.core.hero import Hero
 from karatel.core.items import ITEMS, SHIELDS, WEAPONS
 from karatel.core.professions import PROFESSIONS
 from karatel.core.skills import SKILLS
-from karatel.utils.settings import DEBUG, XML_SAVES_PATH
+from karatel.utils.settings import DEBUG, LOG, XML_SAVES_PATH
 from karatel.utils.utils import obj_finder
 
 
-def xml_hero_saver(hero: Hero, path: str) -> None:
+def xml_hero_saver(hero: Hero, path: str, log: bool = LOG) -> None:
     root = ET.Element('hero')
 
     ET.SubElement(root, "name").text = hero.name
@@ -35,8 +35,10 @@ def xml_hero_saver(hero: Hero, path: str) -> None:
     with open(path, "wb") as file:
         tree.write(file, encoding="utf-8", xml_declaration=True)
 
+    gsm.ui.write(f"Героя {hero.name} збережено", log=log)
 
-def xml_hero_loader(path: str) -> Hero | None:
+
+def xml_hero_loader(path: str, log: bool = LOG) -> Hero | None:
 
     def _create_list(parent_tag: str, child_tag: str, base: tuple) -> list:
 
@@ -78,4 +80,5 @@ def xml_hero_loader(path: str) -> Hero | None:
     hero.inventory = _create_list('inventory', 'item', ITEMS)
     hero.skills = _create_list('skills', 'skill', SKILLS)
 
+    gsm.ui.write(f"Героя {hero.name} завантажено", log=log)
     return hero

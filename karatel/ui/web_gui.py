@@ -11,6 +11,7 @@ from karatel.ui.web_constants import BUTTON_WIDTH, TITLE, GameState
 from karatel.ui.web_elements import (
     equipment,
     legend,
+    load_button,
     movement_controls,
     navigation,
     respawn,
@@ -121,14 +122,26 @@ def hero() -> None:
                 show_professions(profession)
                 st.text(read_buffer())
 
-            if st.button(
-                "Створити", icon=Emoji.HERO.value, type="secondary", width=BUTTON_WIDTH
-            ):
-                st.session_state.hero = HeroFactory.generate(
-                    level=level, profession=profession, name=name
-                )
-                st.session_state.hero.lives = HERO_LIVES
-                st.rerun()
+            col1, col2, col3, col4 = st.columns([1, 1, 1, 1])
+
+            with col1:
+                if st.button(
+                    "Створити",
+                    icon=Emoji.HERO.value,
+                    type="secondary",
+                    width=BUTTON_WIDTH,
+                ):
+                    st.session_state.hero = HeroFactory.generate(
+                        level=level, profession=profession, name=name
+                    )
+                    st.session_state.hero.lives = HERO_LIVES
+                    st.rerun()
+            with col2:
+                load_button()
+            with col3:
+                pass
+            with col4:
+                pass
 
         else:
             show_hero()
