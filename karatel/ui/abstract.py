@@ -81,3 +81,9 @@ class BufferedOutput(OutputSpace):
     def clear(self) -> None:
         """Очистити буфер"""
         self._buffer.clear()
+
+    def read_buffer(self) -> str:
+        """Читання буфера"""
+        text = "\n".join(str(a) for a in self.buffer)
+        self.clear()
+        return text

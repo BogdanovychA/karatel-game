@@ -14,7 +14,6 @@ from karatel.ui.web_elements import (
     load_button,
     movement_controls,
     navigation,
-    read_buffer,
     respawn,
     show_hero,
     show_log,
@@ -122,7 +121,7 @@ def hero() -> None:
 
             with st.expander("Професії", expanded=True):
                 show_professions(output=gsm.output, professions=profession)
-                st.text(read_buffer())
+                st.text(gsm.output.read_buffer())
 
             col1, col2, col3, col4 = st.columns([1, 1, 1, 1])
 
@@ -174,7 +173,7 @@ def on_map() -> None:
             if st.session_state.game_map:
                 with st.expander(f"{Emoji.DUNG.value} Мапа", expanded=True):
                     render_map(gsm.output, st.session_state.game_map)
-                    st.text(read_buffer())
+                    st.text(gsm.output.read_buffer())
 
                     if st.session_state.hero.alive:
                         colum1, colum2 = st.columns([1, 3])

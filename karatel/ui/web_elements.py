@@ -10,13 +10,6 @@ from karatel.utils.constants import Emoji
 from karatel.utils.settings import LOG
 
 
-def read_buffer() -> str:
-    """Читання буфера"""
-    text = "\n".join(str(a) for a in gsm.output.buffer)
-    gsm.output.clear()
-    return text
-
-
 def back_button() -> None:
     """Кнопка НАЗАД"""
 
@@ -226,7 +219,7 @@ def show_log(expanded: bool = False) -> None:
     """Експандер з логом гри"""
 
     with st.expander(f"{Emoji.LOG.value} Лог подій:", expanded=expanded):
-        text = read_buffer()
+        text = gsm.output.read_buffer()
         if text:
             st.text(text)
         else:
