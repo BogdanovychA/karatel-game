@@ -1,16 +1,23 @@
 # -*- coding: utf-8 -*-
 
+from __future__ import annotations
+
+import os
 from abc import ABC, abstractmethod
+from typing import TYPE_CHECKING
 
 from karatel.utils.settings import XML_SAVES_PATH
 from karatel.utils.xml_manager import xml_hero_loader, xml_hero_saver
+
+if TYPE_CHECKING:
+    from karatel.core.hero import Hero
 
 
 class SaveHero(ABC):
     """'Відкритий простір' для збереження героя"""
 
     @abstractmethod
-    def save(self, *args, **kwargs) -> None:
+    def save(self, *args, hero: Hero, **kwargs) -> None:
         """Зберігаємо героя у 'відкритий простір'"""
         pass
 
@@ -19,25 +26,22 @@ class SaveHero(ABC):
         self,
         *args,
         **kwargs,
-    ):
+    ) -> Hero:
         """Завантажуємо героя з 'відкритого простору'"""
         pass
 
 
-class XMLSaver(SaveHero):
+class XMLHeroSaver(SaveHero):
     """Збереження в XML"""
 
     def __init__(self):
         self._path = XML_SAVES_PATH
 
-    def save(self, *args, **kwargs) -> None:
-        xml_hero_saver(*args, path=self._path, **kwargs)
+    def save(self, *args, hero: Hero, **kwargs) -> None:
+        os.makedirs(os.path.dirname(self._path), exist_ok=True)
+        xml_hero_saver(*args, hero=hero, path=self._path, **kwargs)
 
-    def load(
-        self,
-        *args,
-        **kwargs,
-    ):
+    def load(self, *args, **kwargs) -> Hero:
         return xml_hero_loader(*args, path=self._path, **kwargs)
 
 

@@ -2,11 +2,11 @@
 
 import streamlit as st
 
-from karatel.core.game_state_manager import gsm
+from karatel.core.game_state_manager import GameStateManager
 from karatel.core.hero import HeroFactory
 from karatel.core.map_model import generate_map, render_map
 from karatel.core.professions import PROFESSIONS, Profession, show_professions
-from karatel.ui.abstract import BufferedOutput, XMLSaver
+from karatel.ui.abstract import BufferedOutput, XMLHeroSaver
 from karatel.ui.web_constants import BUTTON_WIDTH, TITLE, GameState
 from karatel.ui.web_elements import (
     equipment,
@@ -30,7 +30,7 @@ def init_session_state():
         'enemy': None,
         'game_state': None,
         'game_map': None,
-        'output': None,
+        'gsm': None,
         'first_start': True,
     }
 
@@ -38,18 +38,13 @@ def init_session_state():
         if key not in st.session_state:
             st.session_state[key] = value
 
-    # Встановлюємо gsm.output через st.session_state.output для
-    # більшої стабільності, щоб не видавало помилку, коли редагуєш код
-    # під час роботи Streamlit. Більш актуально для етапу розробки.
-
     if st.session_state.first_start:
-        st.session_state.output = BufferedOutput()
-        gsm.saver = XMLSaver()
-
+        st.session_state.gsm = GameStateManager(
+            output=BufferedOutput(),
+            saver=XMLHeroSaver(),
+            can_generate_map=False,
+        )
         st.session_state.first_start = False
-
-    if gsm.output != st.session_state.output:
-        gsm.output = st.session_state.output
 
 
 def check_game_state() -> None:
@@ -120,8 +115,10 @@ def hero() -> None:
             level = st.slider("Рівень", MIN_LEVEL, MAX_LEVEL, MIN_LEVEL)
 
             with st.expander("Професії", expanded=True):
-                show_professions(output=gsm.output, professions=profession)
-                st.text(gsm.output.read_buffer())
+                show_professions(
+                    output=st.session_state.gsm.output, professions=profession
+                )
+                st.text(st.session_state.gsm.output.read_buffer())
 
             col1, col2, col3, col4 = st.columns([1, 1, 1, 1])
 
@@ -133,7 +130,10 @@ def hero() -> None:
                     width=BUTTON_WIDTH,
                 ):
                     st.session_state.hero = HeroFactory.generate(
-                        output=gsm.output, level=level, profession=profession, name=name
+                        output=st.session_state.gsm.output,
+                        level=level,
+                        profession=profession,
+                        name=name,
                     )
                     st.session_state.hero.lives = HERO_LIVES
                     st.rerun()
@@ -172,8 +172,8 @@ def on_map() -> None:
                 st.session_state.game_map = generate_map(st.session_state.hero)
             if st.session_state.game_map:
                 with st.expander(f"{Emoji.DUNG.value} Мапа", expanded=True):
-                    render_map(gsm.output, st.session_state.game_map)
-                    st.text(gsm.output.read_buffer())
+                    render_map(st.session_state.gsm.output, st.session_state.game_map)
+                    st.text(st.session_state.gsm.output.read_buffer())
 
                     if st.session_state.hero.alive:
                         colum1, colum2 = st.columns([1, 3])
