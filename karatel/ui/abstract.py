@@ -6,7 +6,8 @@ import os
 from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING
 
-from karatel.utils.settings import XML_SAVES_PATH
+from karatel.utils.json_manager import json_hero_loader, json_hero_saver
+from karatel.utils.settings import JSON_SAVES_PATH, XML_SAVES_PATH
 from karatel.utils.xml_manager import xml_hero_loader, xml_hero_saver
 
 if TYPE_CHECKING:
@@ -29,6 +30,20 @@ class SaveHero(ABC):
     ) -> Hero:
         """Завантажуємо героя з 'відкритого простору'"""
         pass
+
+
+class JSONHeroSaver(SaveHero):
+    """Збереження в XML"""
+
+    def __init__(self):
+        self._path = JSON_SAVES_PATH
+
+    def save(self, *args, hero: Hero, **kwargs) -> None:
+        os.makedirs(os.path.dirname(self._path), exist_ok=True)
+        json_hero_saver(*args, hero=hero, path=self._path, **kwargs)
+
+    def load(self, *args, **kwargs) -> Hero:
+        return json_hero_loader(*args, path=self._path, **kwargs)
 
 
 class XMLHeroSaver(SaveHero):

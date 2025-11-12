@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 XML_SAVES_PATH = "./karatel/saves/hero.xml"
+JSON_SAVES_PATH = "./karatel/saves/hero.json"
 
 LOG = True
 
