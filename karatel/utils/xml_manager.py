@@ -16,6 +16,8 @@ if TYPE_CHECKING:
 
 
 def xml_hero_saver(hero: Hero, path: str, log: bool = LOG) -> None:
+    """Збереження героя"""
+
     root = ET.Element('hero')
 
     ET.SubElement(root, "name").text = hero.name
@@ -37,15 +39,21 @@ def xml_hero_saver(hero: Hero, path: str, log: bool = LOG) -> None:
 
     tree = ET.ElementTree(root)
 
-    with open(path, "wb") as file:
-        tree.write(file, encoding="utf-8", xml_declaration=True)
+    try:
+        with open(path, "wb") as file:
+            tree.write(file, encoding="utf-8", xml_declaration=True)
 
-    hero.output.write(f"Героя {hero.name} збережено", log=log)
+        hero.output.write(f"Героя {hero.name} збережено", log=log)
+
+    except Exception as e:
+        hero.output.write(f"Сталася помилка при збереженні файлу: {e}", log=log)
 
 
 def xml_hero_loader(output: OutputSpace, path: str, log: bool = LOG) -> Hero | None:
+    """Завантаження героя"""
 
     def _create_list(parent_tag: str, child_tag: str, base: tuple) -> list:
+        """Допоміжна функція для забезпечення DRY"""
 
         the_list: list = []
         parent_root = root.find(parent_tag)
@@ -57,6 +65,7 @@ def xml_hero_loader(output: OutputSpace, path: str, log: bool = LOG) -> Hero | N
         return the_list
 
     def _find_text(text: str) -> str | None:
+        """Допоміжна функція для забезпечення DRY"""
         element = root.find(text)
         if element is not None and element.text:
             return element.text

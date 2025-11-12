@@ -2,7 +2,6 @@
 from __future__ import annotations
 
 import json
-
 from typing import TYPE_CHECKING
 
 from karatel.core.hero import Hero
@@ -17,6 +16,7 @@ if TYPE_CHECKING:
 
 
 def json_hero_saver(hero: Hero, path: str, log: bool = LOG) -> None:
+    """Збереження героя"""
 
     the_dict: dict = {
         "name": hero.name,
@@ -45,8 +45,10 @@ def json_hero_saver(hero: Hero, path: str, log: bool = LOG) -> None:
 
 
 def json_hero_loader(output: OutputSpace, path: str, log: bool = LOG) -> Hero | None:
+    """Завантаження героя"""
 
     def _create_list(input_list: list, base: tuple) -> list:
+        """Допоміжна функція для забезпечення DRY"""
         the_list = []
         for item in input_list:
             the_list.append(obj_finder(item, base))

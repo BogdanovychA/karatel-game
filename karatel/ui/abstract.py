@@ -15,7 +15,7 @@ if TYPE_CHECKING:
 
 
 class SaveHero(ABC):
-    """'Відкритий простір' для збереження героя"""
+    """'Відкритий простір' для збереження/завантаження героя"""
 
     @abstractmethod
     def save(self, *args, hero: Hero, **kwargs) -> None:
@@ -23,17 +23,13 @@ class SaveHero(ABC):
         pass
 
     @abstractmethod
-    def load(
-        self,
-        *args,
-        **kwargs,
-    ) -> Hero:
+    def load(self, *args, **kwargs) -> Hero:
         """Завантажуємо героя з 'відкритого простору'"""
         pass
 
 
 class JSONHeroSaver(SaveHero):
-    """Збереження в XML"""
+    """Збереження в JSON"""
 
     def __init__(self):
         self._path = JSON_SAVES_PATH
