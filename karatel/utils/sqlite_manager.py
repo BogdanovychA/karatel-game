@@ -83,10 +83,10 @@ def table_exists(
             (table_name,),
         )
         if cursor.fetchone() is not None:
-            output.write(f"Таблиця {table_name} існує", log=DEBUG)
+            output.write(f"Таблиця '{table_name}' існує", log=DEBUG)
             return True
         else:
-            output.write(f"Таблиця {table_name} не існує", log=DEBUG)
+            output.write(f"Таблиця '{table_name}' не існує", log=DEBUG)
             return False
     finally:
         cursor.close()
@@ -173,12 +173,31 @@ def delete_table(output: OutputSpace, table_name: str) -> bool:
         return False
 
 
-# cursor.execute("SELECT * FROM heroes")
-# print(cursor.fetchall())
-# cursor.execute("SELECT * FROM heroes")
-# print(cursor.fetchmany(1))
-# cursor.execute("SELECT * FROM heroes")
-# print(cursor.fetchone())
+def select_all_heroes(output: OutputSpace, table_name: str) -> list | bool:
+
+    table_name = sanitize_word(table_name)
+    if not table_name:
+        return False
+
+    try:
+        with sqlite3.connect(SQLITE_PATH) as connection:
+
+            if not table_exists(output, connection, table_name):
+                return False
+
+            cursor = connection.cursor()
+            try:
+                # cursor.execute(f"SELECT id, name FROM {table_name} ORDER BY id DESC")
+                cursor.execute(f"SELECT * FROM {table_name} ORDER BY id")
+                all_heroes = cursor.fetchall()
+            finally:
+                cursor.close()
+
+            return all_heroes
+
+    except sqlite3.Error as e:
+        output.write(f"Помилка SQLite: '{e}'", log=DEBUG)
+        return False
 
 
 # def sqlite_hero_saver(hero: Hero, path: str, log: bool = LOG) -> None:
