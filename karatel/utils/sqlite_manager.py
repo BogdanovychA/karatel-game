@@ -67,11 +67,9 @@ def insert_hero(hero: Hero, table_name: str) -> None:
     if not table_name:
         return
 
-    data = hero_to_dict(hero)
-    json_data = json.dumps(data, ensure_ascii=False)
+    json_data = json.dumps(hero_to_dict(hero), ensure_ascii=False)
 
     insert = False
-
     old_data = select_heroes(hero.output, table_name, hero.name)
     if not old_data:
         insert = True
