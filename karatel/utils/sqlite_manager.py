@@ -21,10 +21,6 @@ from karatel.utils.utils import hero_to_dict, obj_finder
 if TYPE_CHECKING:
     from karatel.ui.abstract import OutputSpace
 
-# connection = sqlite3.connect(':memory:')
-# connection = sqlite3.connect(SQLITE_PATH)
-# connection = sqlite3.connect("../saves/karatel.db")
-
 DEBUG = True
 
 FORBIDDEN_SQL_CHARS = (
@@ -84,17 +80,17 @@ def table_exists(output: OutputSpace, table_name: str) -> bool | None:
         with sqlite3.connect(SQLITE_PATH) as connection:
             cursor = connection.cursor()
 
-        cursor.execute(
-            "SELECT name FROM sqlite_master WHERE type='table' AND name=?",
-            (table_name,),
-        )
+            cursor.execute(
+                "SELECT name FROM sqlite_master WHERE type='table' AND name=?",
+                (table_name,),
+            )
 
-        if cursor.fetchone() is not None:
-            output.write(f"Таблиця {table_name} існує", log=DEBUG)
-            return True
-        else:
-            output.write(f"Таблиця {table_name} не існує", log=DEBUG)
-            return False
+            if cursor.fetchone() is not None:
+                output.write(f"Таблиця {table_name} існує", log=DEBUG)
+                return True
+            else:
+                output.write(f"Таблиця {table_name} не існує", log=DEBUG)
+                return False
 
     except sqlite3.Error as e:
         output.write(f"Помилка SQLite: {e}", log=DEBUG)
@@ -123,9 +119,8 @@ def create_table(output: OutputSpace, table_name: str) -> None:
             if table_exists(output, table_name):
                 output.write(f"Таблиця {table_name} вже існує", log=DEBUG)
             else:
+                cursor.execute(sql)
                 output.write(f"Таблицю {table_name} успішно створено", log=DEBUG)
-
-            cursor.execute(sql)
 
     except sqlite3.Error as e:
         output.write(f"Помилка SQLite: {e}", log=DEBUG)
@@ -136,14 +131,14 @@ def delete_table(output: OutputSpace, table_name: str) -> None:
         with sqlite3.connect(SQLITE_PATH) as connection:
             cursor = connection.cursor()
 
-        if not check_word(table_name):
-            output.write(
-                "Неможливо видалити таблицю: містить заборонені символи", log=DEBUG
-            )
-            return
+            if not check_word(table_name):
+                output.write(
+                    "Неможливо видалити таблицю: містить заборонені символи", log=DEBUG
+                )
+                return
 
-        cursor.execute(f"DROP TABLE {table_name}")
-        output.write("Таблицю успішно видалено", log=DEBUG)
+            cursor.execute(f"DROP TABLE {table_name}")
+            output.write("Таблицю успішно видалено", log=DEBUG)
 
     except sqlite3.Error as e:
         output.write(f"Помилка SQLite: {e}", log=DEBUG)
