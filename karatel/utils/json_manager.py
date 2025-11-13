@@ -9,7 +9,7 @@ from karatel.core.items import ITEMS, SHIELDS, WEAPONS
 from karatel.core.professions import PROFESSIONS
 from karatel.core.skills import SKILLS
 from karatel.utils.settings import DEBUG, LOG
-from karatel.utils.utils import obj_finder
+from karatel.utils.utils import hero_to_dict, obj_finder
 
 if TYPE_CHECKING:
     from karatel.ui.abstract import OutputSpace
@@ -18,25 +18,9 @@ if TYPE_CHECKING:
 def json_hero_saver(hero: Hero, path: str, log: bool = LOG) -> None:
     """Збереження героя"""
 
-    the_dict: dict = {
-        "name": hero.name,
-        "profession": hero.profession.name,
-        "experience": hero.experience,
-        "lives": hero.lives,
-        "money": hero.money,
-        "left_hand": hero.left_hand.name,
-        "right_hand": hero.right_hand.name,
-        "skills": [],
-        "inventory": [],
-    }
-    for skill in hero.skills:
-        the_dict["skills"].append(skill.name)
-    for item in hero.inventory:
-        the_dict["inventory"].append(item.name)
-
     try:
         with open(path, 'w', encoding='utf-8') as file:
-            json.dump(the_dict, file, indent=4, ensure_ascii=False)
+            json.dump(hero_to_dict(hero), file, indent=4, ensure_ascii=False)
 
         hero.output.write(f"Героя {hero.name} збережено", log=log)
 
