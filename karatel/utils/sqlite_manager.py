@@ -112,15 +112,20 @@ def create_hero_table(
         output.write(f"Таблицю '{table_name}' успішно створено", log=DEBUG)
 
 
-def insert_hero(hero: Hero, table_name: str) -> int | None:
+def insert_hero(hero: Hero, table_name: str) -> None:
 
     table_name = sanitize_word(table_name)
     if not table_name:
-        return None
+        return
 
     data = hero_to_dict(hero)
-    name = data.pop("name")
     json_data = json.dumps(data, ensure_ascii=False)
+
+    insert = False
+
+    old_data = select_heroes(hero.output, table_name, hero.name)
+    if not old_data:
+        insert = True
 
     try:
         with sqlite3.connect(SQLITE_PATH) as connection:
@@ -129,23 +134,30 @@ def insert_hero(hero: Hero, table_name: str) -> int | None:
 
             cursor = connection.cursor()
             try:
-                cursor.execute(
-                    f"INSERT INTO {table_name} (name, data) VALUES (?, ?)",
-                    (name, json_data),
-                )
-                hero_id = cursor.lastrowid
+                if insert:
+                    cursor.execute(
+                        f"INSERT INTO {table_name} (name, data) VALUES (?, ?)",
+                        (hero.name, json_data),
+                    )
+                    hero_id = cursor.lastrowid
+                    hero.output.write(
+                        f"Герой '{hero.name}' збережений з ID: {hero_id}", log=DEBUG
+                    )
+                else:
+                    cursor.execute(
+                        f"UPDATE {table_name} SET data = ? WHERE name = ?",
+                        (json_data, hero.name),
+                    )
+                    hero.output.write(
+                        f"Герой '{hero.name}' оновлений. ID: {old_data[0][0]}",
+                        log=DEBUG,
+                    )
+
             finally:
                 cursor.close()
 
-            hero.output.write(
-                f"Герой '{hero.name}' збережений з ID: {hero_id}", log=DEBUG
-            )
-
-        return hero_id
-
     except sqlite3.Error as e:
         hero.output.write(f"Помилка SQLite: {e}", log=DEBUG)
-        return None
 
 
 def delete_table(output: OutputSpace, table_name: str) -> bool:
