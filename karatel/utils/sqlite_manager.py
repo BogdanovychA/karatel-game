@@ -96,17 +96,16 @@ def create_hero_table(
     output: OutputSpace, conn: sqlite3.Connection, table_name: str
 ) -> None:
 
-    sql = f"""CREATE TABLE IF NOT EXISTS {table_name} (
-                id INTEGER PRIMARY KEY,
-                name TEXT NOT NULL,
-                data TEXT NOT NULL
-            )"""
-
     if table_exists(output, conn, table_name):
         output.write(f"Таблиця '{table_name}' вже існує", log=DEBUG)
     else:
         cursor = conn.cursor()
         try:
+            sql = f"""CREATE TABLE IF NOT EXISTS {table_name} (
+                id INTEGER PRIMARY KEY,
+                name TEXT NOT NULL,
+                data TEXT NOT NULL
+            )"""
             cursor.execute(sql)
         finally:
             cursor.close()
@@ -120,6 +119,7 @@ def insert_hero(hero: Hero, table_name: str) -> int | None:
         return None
 
     data = hero_to_dict(hero)
+    name = data.pop("name")
     json_data = json.dumps(data, ensure_ascii=False)
 
     try:
@@ -131,7 +131,7 @@ def insert_hero(hero: Hero, table_name: str) -> int | None:
             try:
                 cursor.execute(
                     f"INSERT INTO {table_name} (name, data) VALUES (?, ?)",
-                    (hero.name, json_data),
+                    (name, json_data),
                 )
                 hero_id = cursor.lastrowid
             finally:
@@ -173,31 +173,49 @@ def delete_table(output: OutputSpace, table_name: str) -> bool:
         return False
 
 
-def select_all_heroes(output: OutputSpace, table_name: str) -> list | bool:
+def select_heroes(
+    output: OutputSpace,
+    table_name: str,
+    hero_name: str | None = None,
+) -> list:
+    """
+    Універсальна функція вибірки.
+    Якщо hero_name надано, шукає героя за іменем.
+    Якщо hero_name = None, повертає список усіх героїв.
+    """
 
     table_name = sanitize_word(table_name)
     if not table_name:
-        return False
+        return []
+
+    sql_where = ""
+
+    if hero_name is not None:
+        sql_where = " WHERE name = ?"
+
+    sql = f"SELECT id, name, data FROM {table_name}{sql_where} ORDER BY id DESC"
 
     try:
         with sqlite3.connect(SQLITE_PATH) as connection:
 
             if not table_exists(output, connection, table_name):
-                return False
+                return []
 
             cursor = connection.cursor()
             try:
-                # cursor.execute(f"SELECT id, name FROM {table_name} ORDER BY id DESC")
-                cursor.execute(f"SELECT * FROM {table_name} ORDER BY id")
-                all_heroes = cursor.fetchall()
+                if sql_where:
+                    cursor.execute(sql, (hero_name,))
+                else:
+                    cursor.execute(sql)
+                rows = cursor.fetchall()
             finally:
                 cursor.close()
 
-            return all_heroes
+            return rows
 
     except sqlite3.Error as e:
         output.write(f"Помилка SQLite: '{e}'", log=DEBUG)
-        return False
+        return []
 
 
 # def sqlite_hero_saver(hero: Hero, path: str, log: bool = LOG) -> None:
