@@ -16,6 +16,13 @@ def get_modifier(stat_value: int) -> int:
     return (stat_value - 10) // 2
 
 
+def sanitize_word(word: str) -> str | bool:
+    if not word or word is True:
+        return False
+    word = word.replace(" ", "_")
+    return ''.join(c for c in word if c.isalnum() or c == '_')
+
+
 def clamp_value(
     value: int | float, min_value: int | float | None, max_value: int | float | None
 ) -> int | float:
