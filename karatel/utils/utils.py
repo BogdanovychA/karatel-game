@@ -5,7 +5,6 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from karatel.core.hero import Hero
     from karatel.core.items import Item
     from karatel.core.professions import Profession
     from karatel.core.skills import Skill
@@ -52,23 +51,3 @@ def obj_finder(
         if getattr(obj, "name", None) == name:
             return obj
     return None
-
-
-def hero_to_dict(hero: Hero) -> dict:
-    the_dict: dict = {
-        "name": hero.name,
-        "profession": hero.profession.name,
-        "experience": hero.experience,
-        "lives": hero.lives,
-        "money": hero.money,
-        "left_hand": hero.left_hand.name,
-        "right_hand": hero.right_hand.name,
-        "skills": [],
-        "inventory": [],
-    }
-    for skill in hero.skills:
-        the_dict["skills"].append(skill.name)
-    for item in hero.inventory:
-        the_dict["inventory"].append(item.name)
-
-    return the_dict

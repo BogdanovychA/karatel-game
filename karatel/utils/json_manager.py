@@ -6,7 +6,6 @@ from typing import TYPE_CHECKING
 
 from karatel.core.hero import HeroFactory
 from karatel.utils.settings import DEBUG, LOG
-from karatel.utils.utils import hero_to_dict
 
 if TYPE_CHECKING:
     from karatel.core.hero import Hero
@@ -18,7 +17,9 @@ def json_hero_saver(hero: Hero, path: str, log: bool = LOG) -> None:
 
     try:
         with open(path, 'w', encoding='utf-8') as file:
-            json.dump(hero_to_dict(hero), file, indent=4, ensure_ascii=False)
+            json.dump(
+                HeroFactory.hero_to_dict(hero), file, indent=4, ensure_ascii=False
+            )
 
         hero.output.write(f"Героя {hero.name} збережено", log=log)
 
@@ -32,7 +33,7 @@ def json_hero_loader(output: OutputSpace, path: str, log: bool = LOG) -> Hero | 
     try:
         with open(path, 'r', encoding='utf-8') as file:
             the_dict = json.load(file)
-        return HeroFactory.create_from_dict(output, the_dict, log=log)
+        return HeroFactory.dict_to_hero(output, the_dict, log=log)
 
     except FileNotFoundError:
         output.write(f"Помилка: Файл '{path}' не знайдено.", log=DEBUG)

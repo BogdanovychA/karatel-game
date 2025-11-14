@@ -531,7 +531,7 @@ class HeroFactory:
         return hero
 
     @staticmethod
-    def create_from_dict(output: OutputSpace, the_dict: dict, log: bool = LOG) -> Hero:
+    def dict_to_hero(output: OutputSpace, the_dict: dict, log: bool = LOG) -> Hero:
         """Створення героя передаючи словник.
         Використовується при завантаженнях зі збереження"""
 
@@ -557,6 +557,26 @@ class HeroFactory:
 
         output.write(f"Героя {hero.name} завантажено", log=log)
         return hero
+
+    @staticmethod
+    def hero_to_dict(hero: Hero) -> dict:
+        the_dict: dict = {
+            "name": hero.name,
+            "profession": hero.profession.name,
+            "experience": hero.experience,
+            "lives": hero.lives,
+            "money": hero.money,
+            "left_hand": hero.left_hand.name,
+            "right_hand": hero.right_hand.name,
+            "skills": [],
+            "inventory": [],
+        }
+        for skill in hero.skills:
+            the_dict["skills"].append(skill.name)
+        for item in hero.inventory:
+            the_dict["inventory"].append(item.name)
+
+        return the_dict
 
     @staticmethod
     def select_name(sex: str | None = None) -> str:
