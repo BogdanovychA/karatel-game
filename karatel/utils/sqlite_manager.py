@@ -36,6 +36,7 @@ def table_exists(
 
 
 def delete_table(output: OutputSpace, table_name: str) -> bool:
+    """Видалення таблиці по назві"""
 
     table_name = sanitize_word(table_name)
     if not table_name:
@@ -63,6 +64,7 @@ def delete_table(output: OutputSpace, table_name: str) -> bool:
 def create_hero_table(
     output: OutputSpace, conn: sqlite3.Connection, table_name: str
 ) -> None:
+    """Створення таблиці для зберігання героя"""
 
     if table_exists(output, conn, table_name):
         output.write(f"Таблиця '{table_name}' вже існує", log=DEBUG)
@@ -135,6 +137,7 @@ def select_heroes(
 
 
 def insert_hero(hero: Hero, table_name: str) -> None:
+    """Вставка героя в БД -- новий запис або перезапис"""
 
     table_name = sanitize_word(table_name)
     if not table_name:
