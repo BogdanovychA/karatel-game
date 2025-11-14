@@ -167,8 +167,19 @@ def insert_hero(hero: Hero, table_name: str) -> None:
                         f"Герой '{hero.name}' збережений з ID: {hero_id}", log=DEBUG
                     )
                 else:
+                    # cursor.execute(
+                    #     f"UPDATE {table_name} SET data = ? WHERE name = ?",
+                    #     (json_data, hero.name),
+                    # )
                     cursor.execute(
-                        f"UPDATE {table_name} SET data = ? WHERE name = ?",
+                        f"""UPDATE {table_name}
+                        SET data = ? 
+                        WHERE id = (
+                            SELECT MIN(id) 
+                            FROM {table_name} 
+                            WHERE name = ?
+                        );
+                        """,
                         (json_data, hero.name),
                     )
                     hero.output.write(
@@ -199,9 +210,12 @@ def sqlite_hero_loader(
 ) -> Hero:
     """Завантаження героя"""
 
+    # Робимо вибірку по імені героя. Якщо декілька -- беремо перший запис
+    # З нех беремо третю комірку, саме там дані в форматі JSON
     sql_data = select_heroes(output, HERO_SQL_TABLE, name)
     json_data = sql_data[0][2]
     data = json.loads(json_data)
+
     output.write(
         f"Героя {data["name"]} завантажено.",
         log=log,
