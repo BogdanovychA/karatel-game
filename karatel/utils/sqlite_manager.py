@@ -6,14 +6,12 @@ import sqlite3
 from typing import TYPE_CHECKING
 
 from karatel.core.hero import HeroFactory
-from karatel.utils.settings import DEBUG, LOG, SQLITE_PATH
+from karatel.utils.settings import DEBUG, HERO_SQL_TABLE, LOG, SQLITE_PATH
 from karatel.utils.utils import sanitize_word
 
 if TYPE_CHECKING:
     from karatel.core.hero import Hero
     from karatel.ui.abstract import OutputSpace
-
-DEBUG = True  # На час розробки модуля
 
 
 def table_exists(
@@ -37,6 +35,31 @@ def table_exists(
         cursor.close()
 
 
+def delete_table(output: OutputSpace, table_name: str) -> bool:
+
+    table_name = sanitize_word(table_name)
+    if not table_name:
+        return False
+
+    try:
+        with sqlite3.connect(SQLITE_PATH) as connection:
+
+            if not table_exists(output, connection, table_name):
+                return False
+
+            cursor = connection.cursor()
+            try:
+                cursor.execute(f"DROP TABLE {table_name}")
+            finally:
+                cursor.close()
+            output.write(f"Таблицю '{table_name}' успішно видалено", log=DEBUG)
+            return True
+
+    except sqlite3.Error as e:
+        output.write(f"Помилка SQLite: '{e}'", log=DEBUG)
+        return False
+
+
 def create_hero_table(
     output: OutputSpace, conn: sqlite3.Connection, table_name: str
 ) -> None:
@@ -55,6 +78,60 @@ def create_hero_table(
         finally:
             cursor.close()
         output.write(f"Таблицю '{table_name}' успішно створено", log=DEBUG)
+
+
+def select_heroes(
+    output: OutputSpace,
+    table_name: str,
+    hero_name: str | None = None,
+    conn: sqlite3.Connection | None = None,
+) -> list:
+    """
+    Універсальна функція вибірки.
+    Якщо hero_name надано, шукає героя за іменем.
+    Якщо hero_name = None, повертає список усіх героїв.
+    """
+
+    if not conn:
+        table_name = sanitize_word(table_name)
+        if not table_name:
+            return []
+
+    sql_where = ""
+
+    if hero_name is not None:
+        sql_where = " WHERE name = ?"
+
+    sql = f"SELECT id, name, data FROM {table_name}{sql_where} ORDER BY id"
+
+    def _select():
+        """Допоміжна функція для забезпечення DRY"""
+
+        cursor = connection.cursor()
+        try:
+            if sql_where:
+                cursor.execute(sql, (hero_name,))
+            else:
+                cursor.execute(sql)
+            return cursor.fetchall()
+        finally:
+            cursor.close()
+
+    try:
+        if not conn:
+            with sqlite3.connect(SQLITE_PATH) as connection:
+                if not table_exists(output, connection, table_name):
+                    return []
+                return _select()
+        else:
+            connection = conn
+            if not table_exists(output, connection, table_name):
+                return []
+            return _select()
+
+    except sqlite3.Error as e:
+        output.write(f"Помилка SQLite: '{e}'", log=DEBUG)
+        return []
 
 
 def insert_hero(hero: Hero, table_name: str) -> None:
@@ -102,80 +179,28 @@ def insert_hero(hero: Hero, table_name: str) -> None:
         hero.output.write(f"Помилка SQLite: {e}", log=DEBUG)
 
 
-def delete_table(output: OutputSpace, table_name: str) -> bool:
+def sqlite_hero_saver(hero: Hero, log: bool = LOG) -> None:
+    """Збереження героя"""
 
-    table_name = sanitize_word(table_name)
-    if not table_name:
-        return False
-
-    try:
-        with sqlite3.connect(SQLITE_PATH) as connection:
-
-            if not table_exists(output, connection, table_name):
-                return False
-
-            cursor = connection.cursor()
-            try:
-                cursor.execute(f"DROP TABLE {table_name}")
-            finally:
-                cursor.close()
-            output.write(f"Таблицю '{table_name}' успішно видалено", log=DEBUG)
-            return True
-
-    except sqlite3.Error as e:
-        output.write(f"Помилка SQLite: '{e}'", log=DEBUG)
-        return False
+    insert_hero(hero, HERO_SQL_TABLE)
+    hero.output.write(
+        f"Героя {hero.name} збережено.",
+        log=log,
+    )
 
 
-def select_heroes(
+def sqlite_hero_loader(
     output: OutputSpace,
-    table_name: str,
-    hero_name: str | None = None,
-    conn: sqlite3.Connection | None = None,
-) -> list:
-    """
-    Універсальна функція вибірки.
-    Якщо hero_name надано, шукає героя за іменем.
-    Якщо hero_name = None, повертає список усіх героїв.
-    """
+    name: str,
+    log: bool = LOG,
+) -> Hero:
+    """Завантаження героя"""
 
-    if not conn:
-        table_name = sanitize_word(table_name)
-        if not table_name:
-            return []
-
-    sql_where = ""
-
-    if hero_name is not None:
-        sql_where = " WHERE name = ?"
-
-    sql = f"SELECT id, name, data FROM {table_name}{sql_where} ORDER BY id DESC"
-
-    def _select():
-        """Допоміжна функція для забезпечення DRY"""
-
-        cursor = connection.cursor()
-        try:
-            if sql_where:
-                cursor.execute(sql, (hero_name,))
-            else:
-                cursor.execute(sql)
-            return cursor.fetchall()
-        finally:
-            cursor.close()
-
-    try:
-        if not conn:
-            with sqlite3.connect(SQLITE_PATH) as connection:
-                if not table_exists(output, connection, table_name):
-                    return []
-                return _select()
-        else:
-            connection = conn
-            if not table_exists(output, connection, table_name):
-                return []
-            return _select()
-
-    except sqlite3.Error as e:
-        output.write(f"Помилка SQLite: '{e}'", log=DEBUG)
-        return []
+    sql_data = select_heroes(output, HERO_SQL_TABLE, name)
+    json_data = sql_data[0][2]
+    data = json.loads(json_data)
+    output.write(
+        f"Героя {data["name"]} завантажено.",
+        log=log,
+    )
+    return HeroFactory.dict_to_hero(output, data)

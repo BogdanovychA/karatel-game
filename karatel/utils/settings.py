@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 
 SQLITE_PATH = "./karatel/saves/karatel.db"
+HERO_SQL_TABLE = "heroes"
+
 XML_SAVES_PATH = "./karatel/saves/hero.xml"
 JSON_SAVES_PATH = "./karatel/saves/hero.json"
 

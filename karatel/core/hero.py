@@ -555,7 +555,6 @@ class HeroFactory:
         hero.inventory = _create_list(the_dict["inventory"], ITEMS)
         hero.skills = _create_list(the_dict["skills"], SKILLS)
 
-        output.write(f"Героя {hero.name} завантажено", log=log)
         return hero
 
     @staticmethod
