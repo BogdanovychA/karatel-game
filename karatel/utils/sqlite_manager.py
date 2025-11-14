@@ -231,10 +231,10 @@ def delete_row_by_id(output: OutputSpace, table_name: str, row_id: int) -> bool:
         return False
 
 
-def sqlite_hero_saver(hero: Hero, log: bool = LOG) -> None:
+def sqlite_hero_saver(hero: Hero, table_name, log: bool = LOG) -> None:
     """Збереження героя"""
 
-    insert_hero(hero, HERO_SQL_TABLE)
+    insert_hero(hero, table_name)
     hero.output.write(
         f"Героя {hero.name} збережено.",
         log=log,
@@ -243,6 +243,7 @@ def sqlite_hero_saver(hero: Hero, log: bool = LOG) -> None:
 
 def sqlite_hero_loader(
     output: OutputSpace,
+    table_name: str,
     hero_name: str | None = None,
     hero_id: int | None = None,
     log: bool = LOG,
@@ -250,11 +251,11 @@ def sqlite_hero_loader(
     """Завантаження героя"""
 
     if hero_name:
-        sql_data = select_heroes(output, HERO_SQL_TABLE, hero_name=hero_name)
+        sql_data = select_heroes(output, table_name, hero_name=hero_name)
     elif hero_id:
-        sql_data = select_heroes(output, HERO_SQL_TABLE, hero_id=hero_id)
+        sql_data = select_heroes(output, table_name, hero_id=hero_id)
     else:
-        sql_data = select_heroes(output, HERO_SQL_TABLE)
+        sql_data = select_heroes(output, table_name)
 
     json_data = sql_data[0][2]
     data = json.loads(json_data)

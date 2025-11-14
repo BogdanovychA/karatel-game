@@ -255,7 +255,6 @@ def load_hero() -> None:
             ):
                 st.session_state.gsm.saver.delete(
                     output=st.session_state.gsm.output,
-                    table_name=HERO_SQL_TABLE,
                     row_id=hero_id,
                 )
                 st.rerun()
