@@ -209,11 +209,11 @@ def load_hero() -> None:
 
     col1, col2, col3, col4, col5 = st.columns([1, 5, 5, 5, 5])
     with col1:
-        st.text("№")
+        st.html("<b>ID</b>")
     with col2:
-        st.text("Ім'я")
+        st.html("<b>Ім'я</b>")
     with col3:
-        st.text("Професія")
+        st.html("<b>Професія</b>")
     with col4:
         pass
     with col5:
@@ -248,12 +248,17 @@ def load_hero() -> None:
         with col5:
             if st.button(
                 "Видалити",
-                icon=Emoji.X.value,
+                icon=Emoji.TOMB.value,
                 type="primary",
                 width=BUTTON_WIDTH,
                 key=f"del{hero_id}",
             ):
-                pass
+                st.session_state.gsm.saver.delete(
+                    output=st.session_state.gsm.output,
+                    table_name=HERO_SQL_TABLE,
+                    row_id=hero_id,
+                )
+                st.rerun()
 
     st.write()
     navigation()

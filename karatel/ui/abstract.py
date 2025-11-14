@@ -8,7 +8,11 @@ from typing import TYPE_CHECKING
 
 from karatel.utils.json_manager import json_hero_loader, json_hero_saver
 from karatel.utils.settings import JSON_SAVES_PATH, XML_SAVES_PATH
-from karatel.utils.sqlite_manager import sqlite_hero_loader, sqlite_hero_saver
+from karatel.utils.sqlite_manager import (
+    delete_row_by_id,
+    sqlite_hero_loader,
+    sqlite_hero_saver,
+)
 from karatel.utils.xml_manager import xml_hero_loader, xml_hero_saver
 
 if TYPE_CHECKING:
@@ -32,14 +36,14 @@ class SaveHero(ABC):
 class SQLiteHeroSaver(SaveHero):
     """Збереження в SQLite"""
 
-    def __init__(self):
-        self._path = JSON_SAVES_PATH
-
     def save(self, *args, hero: Hero, **kwargs) -> None:
         sqlite_hero_saver(*args, hero=hero, **kwargs)
 
     def load(self, *args, **kwargs) -> Hero:
         return sqlite_hero_loader(*args, **kwargs)
+
+    def delete(self, *args, **kwargs) -> bool:
+        return delete_row_by_id(*args, **kwargs)
 
 
 class JSONHeroSaver(SaveHero):

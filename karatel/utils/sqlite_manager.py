@@ -174,10 +174,6 @@ def insert_hero(hero: Hero, table_name: str) -> None:
                         f"Герой '{hero.name}' збережений з ID: {hero_id}", log=DEBUG
                     )
                 else:
-                    # cursor.execute(
-                    #     f"UPDATE {table_name} SET data = ? WHERE name = ?",
-                    #     (json_data, hero.name),
-                    # )
                     cursor.execute(
                         f"""UPDATE {table_name}
                         SET data = ? 
@@ -198,6 +194,41 @@ def insert_hero(hero: Hero, table_name: str) -> None:
 
     except sqlite3.Error as e:
         hero.output.write(f"Помилка SQLite: {e}", log=DEBUG)
+
+
+def delete_row_by_id(output: OutputSpace, table_name: str, row_id: int) -> bool:
+    """Видалення запису по ID"""
+
+    table_name = sanitize_word(table_name)
+    if not table_name:
+        return False
+
+    try:
+        with sqlite3.connect(SQLITE_PATH) as connection:
+
+            if not table_exists(output, connection, table_name):
+                return False
+
+            cursor = connection.cursor()
+            try:
+                cursor.execute(f"DELETE FROM {table_name} WHERE id = ?;", (row_id,))
+                if cursor.rowcount == 0:
+                    output.write(
+                        f"Запис з №{row_id} не знайдено у таблиці '{table_name}'.",
+                        log=DEBUG,
+                    )
+                    return False
+            finally:
+                cursor.close()
+            output.write(
+                f"Запис з №{row_id} успішно видалено з таблиці '{table_name}'",
+                log=DEBUG,
+            )
+            return True
+
+    except sqlite3.Error as e:
+        output.write(f"Помилка SQLite: '{e}'", log=DEBUG)
+        return False
 
 
 def sqlite_hero_saver(hero: Hero, log: bool = LOG) -> None:

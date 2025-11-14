@@ -88,7 +88,7 @@ def navigation() -> None:
         match st.session_state.game_state:
             case GameState.HERO.value:
                 dungeon_button()
-            case GameState.ON_MAP.value | None:
+            case GameState.ON_MAP.value | GameState.LOAD_HERO.value | None:
                 hero_button()
     with col2:
         if (
