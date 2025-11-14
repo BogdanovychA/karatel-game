@@ -42,7 +42,7 @@ def load_button() -> None:
         "Завантажити", icon=Emoji.MOVE_W.value, type="secondary", width=BUTTON_WIDTH
     ):
         st.session_state.hero = st.session_state.gsm.saver.load(
-            output=st.session_state.gsm.output, log=LOG
+            output=st.session_state.gsm.output, name=st.session_state.hero.name, log=LOG
         )
         if 'game_map' in st.session_state and st.session_state.game_map:
             y, x = find_hero(st.session_state.game_map)
