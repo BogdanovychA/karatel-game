@@ -4,6 +4,7 @@ import streamlit as st
 
 from karatel.core.items import Shield, Weapon
 from karatel.logic.map_logic import find_hero, move_hero
+from karatel.ui.abstract import JSONHeroSaver, SQLiteHeroSaver, XMLHeroSaver
 from karatel.ui.web_constants import BUTTON_WIDTH, GameState
 from karatel.utils.constants import Emoji
 from karatel.utils.settings import LOG
@@ -36,17 +37,36 @@ def hero_button() -> None:
         st.rerun()
 
 
+def select_load_button() -> None:
+    match st.session_state.gsm.saver:
+        case SQLiteHeroSaver():
+            load_hero_button()
+        case JSONHeroSaver() | XMLHeroSaver():
+            load_button()
+        case _:
+            pass
+
+
 def load_button() -> None:
-    """Кнопка завантаження героя з XML-файлу"""
+    """Кнопка завантаження героя"""
     if st.button(
         "Завантажити", icon=Emoji.MOVE_W.value, type="secondary", width=BUTTON_WIDTH
     ):
         st.session_state.hero = st.session_state.gsm.saver.load(
-            output=st.session_state.gsm.output, name=st.session_state.hero.name, log=LOG
+            output=st.session_state.gsm.output, log=LOG
         )
         if 'game_map' in st.session_state and st.session_state.game_map:
             y, x = find_hero(st.session_state.game_map)
             st.session_state.game_map[y][x].obj = st.session_state.hero
+        st.rerun()
+
+
+def load_hero_button() -> None:
+    """Кнопка екрану завантажень героя"""
+    if st.button(
+        "Відновити", icon=Emoji.MOVE_W.value, type="secondary", width=BUTTON_WIDTH
+    ):
+        st.session_state.game_state = GameState.LOAD_HERO.value
         st.rerun()
 
 
@@ -114,7 +134,7 @@ def respawn() -> None:
         if st.session_state.hero.alive:
             save_button()
     with col3:
-        load_button()
+        select_load_button()
     with col4:
         if st.button(
             "Знищити", icon=Emoji.TOMB.value, type="primary", width=BUTTON_WIDTH

@@ -86,6 +86,7 @@ def select_heroes(
     output: OutputSpace,
     table_name: str,
     hero_name: str | None = None,
+    hero_id: int | None = None,
     conn: sqlite3.Connection | None = None,
 ) -> list:
     """
@@ -103,6 +104,8 @@ def select_heroes(
 
     if hero_name is not None:
         sql_where = " WHERE name = ?"
+    elif hero_id is not None:
+        sql_where = " WHERE id = ?"
 
     sql = f"SELECT id, name, data FROM {table_name}{sql_where} ORDER BY id"
 
@@ -111,8 +114,10 @@ def select_heroes(
 
         cursor = connection.cursor()
         try:
-            if sql_where:
+            if hero_name is not None:
                 cursor.execute(sql, (hero_name,))
+            elif hero_id is not None:
+                cursor.execute(sql, (hero_id,))
             else:
                 cursor.execute(sql)
             return cursor.fetchall()
@@ -203,16 +208,33 @@ def sqlite_hero_saver(hero: Hero, log: bool = LOG) -> None:
     )
 
 
-def sqlite_hero_loader(
+def sqlite_hero_loader_by_id(
     output: OutputSpace,
-    name: str,
+    hero_id: int,
+    log: bool = LOG,
+) -> Hero:
+
+    sql_data = select_heroes(output, HERO_SQL_TABLE, hero_id=hero_id)
+    json_data = sql_data[0][2]
+    data = json.loads(json_data)
+
+    output.write(
+        f"Героя {data["name"]} завантажено.",
+        log=log,
+    )
+    return HeroFactory.dict_to_hero(output, data)
+
+
+def sqlite_hero_loader_by_name(
+    output: OutputSpace,
+    hero_name: str,
     log: bool = LOG,
 ) -> Hero:
     """Завантаження героя"""
 
     # Робимо вибірку по імені героя. Якщо декілька -- беремо перший запис
     # З нех беремо третю комірку, саме там дані в форматі JSON
-    sql_data = select_heroes(output, HERO_SQL_TABLE, name)
+    sql_data = select_heroes(output, HERO_SQL_TABLE, hero_name=hero_name)
     json_data = sql_data[0][2]
     data = json.loads(json_data)
 

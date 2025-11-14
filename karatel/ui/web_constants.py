@@ -10,3 +10,4 @@ class GameState(Enum):
 
     HERO = "hero"
     ON_MAP = "on_map"
+    LOAD_HERO = "load_hero"

@@ -33,7 +33,7 @@ def json_hero_loader(output: OutputSpace, path: str, log: bool = LOG) -> Hero | 
     try:
         with open(path, 'r', encoding='utf-8') as file:
             the_dict = json.load(file)
-        return HeroFactory.dict_to_hero(output, the_dict, log=log)
+        return HeroFactory.dict_to_hero(output, the_dict)
 
     except FileNotFoundError:
         output.write(f"Помилка: Файл '{path}' не знайдено.", log=DEBUG)

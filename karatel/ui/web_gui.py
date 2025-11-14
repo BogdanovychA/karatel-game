@@ -1,11 +1,14 @@
 # -*- coding: utf-8 -*-
 
+import json
+
 import streamlit as st
 
 from karatel.core.game_state_manager import GameStateManager
 from karatel.core.hero import HeroFactory
 from karatel.core.map_model import generate_map, render_map
 from karatel.core.professions import PROFESSIONS, Profession, show_professions
+from karatel.logic.map_logic import find_hero
 from karatel.ui.abstract import (
     BufferedOutput,
     JSONHeroSaver,
@@ -16,15 +19,16 @@ from karatel.ui.web_constants import BUTTON_WIDTH, TITLE, GameState
 from karatel.ui.web_elements import (
     equipment,
     legend,
-    load_button,
     movement_controls,
     navigation,
     respawn,
+    select_load_button,
     show_hero,
     show_log,
 )
 from karatel.utils.constants import Emoji
-from karatel.utils.settings import HERO_LIVES, MAX_LEVEL, MIN_LEVEL
+from karatel.utils.settings import HERO_LIVES, HERO_SQL_TABLE, LOG, MAX_LEVEL, MIN_LEVEL
+from karatel.utils.sqlite_manager import select_heroes
 
 
 def init_session_state():
@@ -65,6 +69,8 @@ def check_game_state() -> None:
             hero()
         case GameState.ON_MAP.value:
             on_map()
+        case GameState.LOAD_HERO.value:
+            load_hero()
         case _:
             st.title(f"{Emoji.X.value} Відсутній пункт меню")
             st.write(f"game_state: {st.session_state.game_state.value}")
@@ -145,7 +151,7 @@ def hero() -> None:
                     st.session_state.hero.lives = HERO_LIVES
                     st.rerun()
             with col2:
-                load_button()
+                select_load_button()
             with col3:
                 pass
             with col4:
@@ -193,4 +199,50 @@ def on_map() -> None:
                             f"{Emoji.TOMB.value} {st.session_state.hero.display.show()}"
                         )
                         respawn()
+    navigation()
+
+
+def load_hero() -> None:
+    st.title(TITLE)
+    st.header(f"{Emoji.LOG.value} Список збережених {Emoji.HERO.value} Героїв")
+    all_saved_heroes = select_heroes(st.session_state.gsm.output, HERO_SQL_TABLE)
+
+    col1, col2, col3, col4 = st.columns([1, 5, 5, 5])
+    with col1:
+        st.text("№")
+    with col2:
+        st.text("Ім'я")
+    with col3:
+        st.text("Професія")
+    with col4:
+        pass
+
+    for saved_hero in all_saved_heroes:
+        hero_id, hero_name, json_data = saved_hero
+        col1, col2, col3, col4 = st.columns([1, 5, 5, 5])
+        with col1:
+            st.text(hero_id)
+        with col2:
+            st.text(hero_name)
+        with col3:
+            st.text(json.loads(json_data)["profession"])
+        with col4:
+            if st.button(
+                "Відновити",
+                icon=Emoji.HERO.value,
+                type="secondary",
+                width=BUTTON_WIDTH,
+                key=f"respawn{hero_id}",
+            ):
+                st.session_state.hero = st.session_state.gsm.saver.load(
+                    output=st.session_state.gsm.output, hero_id=hero_id, log=LOG
+                )
+                if 'game_map' in st.session_state and st.session_state.game_map:
+                    y, x = find_hero(st.session_state.game_map)
+                    st.session_state.game_map[y][x].obj = st.session_state.hero
+
+                st.session_state.game_state = GameState.HERO.value
+                st.rerun()
+
+    st.write()
     navigation()
