@@ -9,8 +9,11 @@ if TYPE_CHECKING:
     from karatel.ui.abstract import OutputSpace
 
 from karatel.core.items import (
+    ITEMS,
     JUST_HAND,
+    SHIELDS,
     UNARMED_STRIKE,
+    WEAPONS,
     Item,
     Shield,
     Weapon,
@@ -28,7 +31,7 @@ from karatel.utils.settings import (
     MAX_LEVEL,
     MIN_LEVEL,
 )
-from karatel.utils.utils import clamp_value, get_modifier
+from karatel.utils.utils import clamp_value, get_modifier, obj_finder, sanitize_word
 
 
 class Hero:
@@ -41,7 +44,7 @@ class Hero:
         profession: Profession,
         experience: int = 0,
     ) -> None:
-        self.name = name
+        self.name = sanitize_word(name)
         self.profession = profession
         self._level = MIN_LEVEL
         self._experience = 0
@@ -525,6 +528,34 @@ class HeroFactory:
         else:
             hero.equipment.equip_weapon(right_hand, log=DEBUG)
 
+        return hero
+
+    @staticmethod
+    def create_from_dict(output: OutputSpace, the_dict: dict, log: bool = LOG) -> Hero:
+        """Створення героя передаючи словник.
+        Використовується при завантаженнях зі збереження"""
+
+        def _create_list(input_list: list, base: tuple) -> list:
+            """Допоміжна функція для забезпечення DRY"""
+            the_list = []
+            for item in input_list:
+                the_list.append(obj_finder(item, base))
+            return the_list
+
+        hero = Hero(
+            output=output,
+            name=the_dict["name"],
+            profession=obj_finder(the_dict["profession"], PROFESSIONS),
+            experience=int(the_dict["experience"] or "0"),
+        )
+        hero.lives = int(the_dict["lives"] or "1")
+        hero.money = int(the_dict["money"] or "0")
+        hero.right_hand = obj_finder(the_dict["right_hand"], WEAPONS)
+        hero.left_hand = obj_finder(the_dict["left_hand"], SHIELDS)
+        hero.inventory = _create_list(the_dict["inventory"], ITEMS)
+        hero.skills = _create_list(the_dict["skills"], SKILLS)
+
+        output.write(f"Героя {hero.name} завантажено", log=log)
         return hero
 
     @staticmethod
