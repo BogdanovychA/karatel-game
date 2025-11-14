@@ -154,7 +154,9 @@ def insert_hero(hero: Hero, table_name: str) -> None:
     try:
         with sqlite3.connect(SQLITE_PATH) as connection:
 
-            old_data = select_heroes(hero.output, table_name, hero.name, connection)
+            old_data = select_heroes(
+                hero.output, table_name, hero_name=hero.name, conn=connection
+            )
             if not old_data:
                 insert = True
 
@@ -208,33 +210,21 @@ def sqlite_hero_saver(hero: Hero, log: bool = LOG) -> None:
     )
 
 
-def sqlite_hero_loader_by_id(
+def sqlite_hero_loader(
     output: OutputSpace,
-    hero_id: int,
+    hero_name: str | None = None,
+    hero_id: int | None = None,
     log: bool = LOG,
-) -> Hero:
-
-    sql_data = select_heroes(output, HERO_SQL_TABLE, hero_id=hero_id)
-    json_data = sql_data[0][2]
-    data = json.loads(json_data)
-
-    output.write(
-        f"Героя {data["name"]} завантажено.",
-        log=log,
-    )
-    return HeroFactory.dict_to_hero(output, data)
-
-
-def sqlite_hero_loader_by_name(
-    output: OutputSpace,
-    hero_name: str,
-    log: bool = LOG,
-) -> Hero:
+) -> Hero | None:
     """Завантаження героя"""
 
-    # Робимо вибірку по імені героя. Якщо декілька -- беремо перший запис
-    # З нех беремо третю комірку, саме там дані в форматі JSON
-    sql_data = select_heroes(output, HERO_SQL_TABLE, hero_name=hero_name)
+    if hero_name:
+        sql_data = select_heroes(output, HERO_SQL_TABLE, hero_name=hero_name)
+    elif hero_id:
+        sql_data = select_heroes(output, HERO_SQL_TABLE, hero_id=hero_id)
+    else:
+        sql_data = select_heroes(output, HERO_SQL_TABLE)
+
     json_data = sql_data[0][2]
     data = json.loads(json_data)
 

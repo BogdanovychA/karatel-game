@@ -207,7 +207,7 @@ def load_hero() -> None:
     st.header(f"{Emoji.LOG.value} Список збережених {Emoji.HERO.value} Героїв")
     all_saved_heroes = select_heroes(st.session_state.gsm.output, HERO_SQL_TABLE)
 
-    col1, col2, col3, col4 = st.columns([1, 5, 5, 5])
+    col1, col2, col3, col4, col5 = st.columns([1, 5, 5, 5, 5])
     with col1:
         st.text("№")
     with col2:
@@ -216,10 +216,12 @@ def load_hero() -> None:
         st.text("Професія")
     with col4:
         pass
+    with col5:
+        pass
 
     for saved_hero in all_saved_heroes:
         hero_id, hero_name, json_data = saved_hero
-        col1, col2, col3, col4 = st.columns([1, 5, 5, 5])
+        col1, col2, col3, col4, col5 = st.columns([1, 5, 5, 5, 5])
         with col1:
             st.text(hero_id)
         with col2:
@@ -243,6 +245,15 @@ def load_hero() -> None:
 
                 st.session_state.game_state = GameState.HERO.value
                 st.rerun()
+        with col5:
+            if st.button(
+                "Видалити",
+                icon=Emoji.X.value,
+                type="primary",
+                width=BUTTON_WIDTH,
+                key=f"del{hero_id}",
+            ):
+                pass
 
     st.write()
     navigation()

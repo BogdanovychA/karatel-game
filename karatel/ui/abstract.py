@@ -8,7 +8,7 @@ from typing import TYPE_CHECKING
 
 from karatel.utils.json_manager import json_hero_loader, json_hero_saver
 from karatel.utils.settings import JSON_SAVES_PATH, XML_SAVES_PATH
-from karatel.utils.sqlite_manager import sqlite_hero_loader_by_id, sqlite_hero_saver
+from karatel.utils.sqlite_manager import sqlite_hero_loader, sqlite_hero_saver
 from karatel.utils.xml_manager import xml_hero_loader, xml_hero_saver
 
 if TYPE_CHECKING:
@@ -39,7 +39,7 @@ class SQLiteHeroSaver(SaveHero):
         sqlite_hero_saver(*args, hero=hero, **kwargs)
 
     def load(self, *args, **kwargs) -> Hero:
-        return sqlite_hero_loader_by_id(*args, **kwargs)
+        return sqlite_hero_loader(*args, **kwargs)
 
 
 class JSONHeroSaver(SaveHero):
