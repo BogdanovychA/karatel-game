@@ -531,7 +531,7 @@ class HeroFactory:
         return hero
 
     @staticmethod
-    def dict_to_hero(output: OutputSpace, the_dict: dict, log: bool = LOG) -> Hero:
+    def dict_to_hero(output: OutputSpace, the_dict: dict) -> Hero:
         """Створення героя передаючи словник.
         Використовується при завантаженнях зі збереження"""
 
@@ -559,6 +559,7 @@ class HeroFactory:
 
     @staticmethod
     def hero_to_dict(hero: Hero) -> dict:
+        """Конвертація героя в словник -- для збереження"""
         the_dict: dict = {
             "name": hero.name,
             "profession": hero.profession.name,
