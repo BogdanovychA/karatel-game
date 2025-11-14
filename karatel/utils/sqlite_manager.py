@@ -9,11 +9,6 @@ from karatel.core.hero import HeroFactory
 from karatel.utils.settings import DEBUG, LOG, SQLITE_PATH
 from karatel.utils.utils import sanitize_word
 
-# from karatel.core.items import ITEMS, SHIELDS, WEAPONS
-# from karatel.core.professions import PROFESSIONS
-# from karatel.core.skills import SKILLS
-
-
 if TYPE_CHECKING:
     from karatel.core.hero import Hero
     from karatel.ui.abstract import OutputSpace
