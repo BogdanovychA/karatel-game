@@ -260,7 +260,7 @@ def sqlite_hero_loader(
     data = json.loads(json_data)
 
     output.write(
-        f"Героя {data["name"]} завантажено.",
+        f"Героя {data['name']} завантажено.",
         log=log,
     )
     return HeroFactory.dict_to_hero(output, data)
