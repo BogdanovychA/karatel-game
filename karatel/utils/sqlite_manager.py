@@ -5,9 +5,9 @@ import json
 import sqlite3
 from typing import TYPE_CHECKING
 
-from karatel.core.hero import Hero
+from karatel.core.hero import HeroFactory
 from karatel.utils.settings import DEBUG, LOG, SQLITE_PATH
-from karatel.utils.utils import hero_to_dict, obj_finder, sanitize_word
+from karatel.utils.utils import sanitize_word
 
 # from karatel.core.items import ITEMS, SHIELDS, WEAPONS
 # from karatel.core.professions import PROFESSIONS
@@ -15,6 +15,7 @@ from karatel.utils.utils import hero_to_dict, obj_finder, sanitize_word
 
 
 if TYPE_CHECKING:
+    from karatel.core.hero import Hero
     from karatel.ui.abstract import OutputSpace
 
 DEBUG = True  # На час розробки модуля
@@ -67,7 +68,7 @@ def insert_hero(hero: Hero, table_name: str) -> None:
     if not table_name:
         return
 
-    json_data = json.dumps(hero_to_dict(hero), ensure_ascii=False)
+    json_data = json.dumps(HeroFactory.hero_to_dict(hero), ensure_ascii=False)
     insert = False
 
     try:
