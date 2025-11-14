@@ -9,12 +9,9 @@ from karatel.core.hero import HeroFactory
 from karatel.core.map_model import generate_map, render_map
 from karatel.core.professions import PROFESSIONS, Profession, show_professions
 from karatel.logic.map_logic import find_hero
-from karatel.ui.abstract import (
-    BufferedOutput,
-    JSONHeroSaver,
-    SQLiteHeroSaver,
-    XMLHeroSaver,
-)
+from karatel.storage.abstract import SQLiteHeroSaver
+from karatel.storage.sqlite_manager import select_heroes
+from karatel.ui.abstract import BufferedOutput
 from karatel.ui.web_constants import BUTTON_WIDTH, TITLE, GameState
 from karatel.ui.web_elements import (
     equipment,
@@ -28,7 +25,6 @@ from karatel.ui.web_elements import (
 )
 from karatel.utils.constants import Emoji
 from karatel.utils.settings import HERO_LIVES, HERO_SQL_TABLE, LOG, MAX_LEVEL, MIN_LEVEL
-from karatel.utils.sqlite_manager import select_heroes
 
 
 def init_session_state():

@@ -6,7 +6,7 @@ import sqlite3
 from typing import TYPE_CHECKING
 
 from karatel.core.hero import HeroFactory
-from karatel.utils.settings import DEBUG, HERO_SQL_TABLE, LOG, SQLITE_PATH
+from karatel.utils.settings import DEBUG, LOG, SQLITE_PATH
 from karatel.utils.utils import sanitize_word
 
 if TYPE_CHECKING:

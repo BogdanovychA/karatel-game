@@ -27,7 +27,7 @@ def json_hero_saver(hero: Hero, path: str, log: bool = LOG) -> None:
         hero.output.write(f"Сталася помилка при збереженні файлу: {e}", log=log)
 
 
-def json_hero_loader(output: OutputSpace, path: str, log: bool = LOG) -> Hero | None:
+def json_hero_loader(output: OutputSpace, path: str) -> Hero | None:
     """Завантаження героя"""
 
     try:

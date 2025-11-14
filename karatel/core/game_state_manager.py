@@ -2,7 +2,8 @@
 
 from dataclasses import dataclass
 
-from karatel.ui.abstract import ConsoleOutput, OutputSpace, SaveHero, XMLHeroSaver
+from karatel.storage.abstract import SaveHero
+from karatel.ui.abstract import OutputSpace
 
 
 @dataclass
@@ -14,7 +15,6 @@ class GameStateManager:
     can_generate_map: bool
 
 
-#
 # gsm = GameStateManager(
 #     output=ConsoleOutput(),
 #     saver=XMLHeroSaver(),
