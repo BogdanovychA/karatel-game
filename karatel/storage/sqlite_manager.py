@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import json
+import pickle
 import sqlite3
 from typing import TYPE_CHECKING
 
@@ -12,6 +13,8 @@ from karatel.utils.utils import sanitize_word
 if TYPE_CHECKING:
     from karatel.core.hero import Hero
     from karatel.ui.abstract import OutputSpace
+
+DEBUG = True
 
 
 def table_exists(
@@ -91,8 +94,8 @@ def select_heroes(
 ) -> list:
     """
     Універсальна функція вибірки.
-    Якщо hero_name надано, шукає героя за іменем.
-    Якщо hero_name = None, повертає список усіх героїв.
+    Якщо hero_name | hero_id надано, шукає героя за іменем | id.
+    Якщо hero_name and hero_id = None, повертає список усіх героїв.
     """
 
     if not conn:
@@ -265,3 +268,106 @@ def sqlite_hero_loader(
         log=log,
     )
     return HeroFactory.dict_to_hero(output, data)
+
+
+def create_map_table(
+    output: OutputSpace, conn: sqlite3.Connection, table_name: str
+) -> None:
+    """Створення таблиці для зберігання героя"""
+
+    if table_exists(output, conn, table_name):
+        output.write(f"Таблиця '{table_name}' вже існує", log=DEBUG)
+    else:
+        cursor = conn.cursor()
+        try:
+            sql = f"""CREATE TABLE {table_name} (
+        id INTEGER PRIMARY KEY,
+        map BLOB NOT NULL
+            )"""
+            cursor.execute(sql)
+        finally:
+            cursor.close()
+        output.write(f"Таблицю '{table_name}' успішно створено", log=DEBUG)
+
+
+def insert_map(output: OutputSpace, the_map: list | None, table_name: str) -> None:
+    """Вставка карти в БД -- новий запис або перезапис"""
+
+    table_name = sanitize_word(table_name)
+    if not table_name:
+        return
+
+    pickled_the_map = pickle.dumps(the_map)
+
+    try:
+        with sqlite3.connect(SQLITE_PATH) as connection:
+
+            create_map_table(output, connection, table_name)
+
+            cursor = connection.cursor()
+            try:
+                cursor.execute(
+                    f"INSERT INTO {table_name} (map) VALUES (?)",
+                    (pickled_the_map,),
+                )
+                map_id = cursor.lastrowid
+                output.write(f"Мапа збережена з ID: {map_id}", log=DEBUG)
+            finally:
+                cursor.close()
+
+    except sqlite3.Error as e:
+        output.write(f"Помилка SQLite: {e}", log=DEBUG)
+
+
+def select_maps(
+    output: OutputSpace,
+    table_name: str,
+    map_id: int | None = None,
+    conn: sqlite3.Connection | None = None,
+) -> list:
+    """
+    Універсальна функція вибірки.
+    Якщо map_id надано, шукає героя за іменем.
+    Якщо map_id = None, повертає список усіх мап.
+    """
+
+    if not conn:
+        table_name = sanitize_word(table_name)
+        if not table_name:
+            return []
+
+    sql_where = ""
+
+    if map_id is not None:
+        sql_where = " WHERE id = ?"
+
+    sql = f"SELECT id, map FROM {table_name}{sql_where} ORDER BY id"
+
+    def _select():
+        """Допоміжна функція для забезпечення DRY"""
+
+        cursor = connection.cursor()
+        try:
+            if map_id is not None:
+                cursor.execute(sql, (map_id,))
+            else:
+                cursor.execute(sql)
+            return cursor.fetchall()
+        finally:
+            cursor.close()
+
+    try:
+        if not conn:
+            with sqlite3.connect(SQLITE_PATH) as connection:
+                if not table_exists(output, connection, table_name):
+                    return []
+                return _select()
+        else:
+            connection = conn
+            if not table_exists(output, connection, table_name):
+                return []
+            return _select()
+
+    except sqlite3.Error as e:
+        output.write(f"Помилка SQLite: '{e}'", log=DEBUG)
+        return []
