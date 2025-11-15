@@ -65,10 +65,10 @@ class Hero:
         }
         # Менеджери
         self.output = output
-        self.leveling = LevelSystem(self, output=self.output)
-        self.equipment = EquipmentManager(self, output=self.output)
+        self.leveling = LevelSystem(self)
+        self.equipment = EquipmentManager(self)
         self.display = HeroDisplay(self)
-        self.skill_manager = SkillSystem(self, output=self.output)
+        self.skill_manager = SkillSystem(self)
 
         self.skills = []
 
@@ -268,9 +268,8 @@ class HeroDisplay:
 class LevelSystem:
     """Управління рівнями та досвідом"""
 
-    def __init__(self, hero: Hero, output: OutputSpace) -> None:
+    def __init__(self, hero: Hero) -> None:
         self.hero = hero
-        self.output = output
 
     def set_hp(self) -> None:
         """Встановлює HP на основі Constitution."""
@@ -301,16 +300,16 @@ class LevelSystem:
         if not amount:
             return
         self.hero.experience += amount
-        self.output.write(f"{self.hero.name} отримує {amount} досвіду", log=log)
+        self.hero.output.write(f"{self.hero.name} отримує {amount} досвіду", log=log)
         if self.hero.experience == EXPERIENCE_FOR_LEVEL[-1]:
-            self.output.write(
+            self.hero.output.write(
                 f"{self.hero.name} досяг максимального досвіду: "
                 + f"{EXPERIENCE_FOR_LEVEL[-1]}",
                 log=log,
             )
 
         if self.hero.level == MAX_LEVEL:
-            self.output.write(
+            self.hero.output.write(
                 f"{self.hero.name} досяг максимального рівня: " + f"{self.hero.level}",
                 log=log,
             )
@@ -322,12 +321,12 @@ class LevelSystem:
         ):
             self.hero.level += 1
             self.level_up(log=log)
-            self.output.write(
+            self.hero.output.write(
                 f"Рівень {self.hero.name} підвищено: {self.hero.level}", log=log
             )
 
         if self.hero.level < MAX_LEVEL:
-            self.output.write(
+            self.hero.output.write(
                 (
                     f"У {self.hero.name} досвіду: {self.hero.experience}. "
                     f"До наступного рівня: "
@@ -340,27 +339,34 @@ class LevelSystem:
 class SkillSystem:
     """Управління скілами"""
 
-    def __init__(self, hero: Hero, output: OutputSpace) -> None:
+    def __init__(self, hero: Hero) -> None:
         self.hero = hero
-        self.output = output
 
     def learn_skill(self, skill: Skill, log: bool = LOG) -> None:
         """Вивчення будь-якої навички"""
 
         if skill not in self.hero.skills:
             self.hero.skills.append(skill)
-            self.output.write(f"{self.hero.name} отримує навичку {skill.name}", log=log)
+            self.hero.output.write(
+                f"{self.hero.name} отримує навичку {skill.name}", log=log
+            )
         else:
-            self.output.write(f"{self.hero.name} вже має навичку {skill.name}", log=log)
+            self.hero.output.write(
+                f"{self.hero.name} вже має навичку {skill.name}", log=log
+            )
 
     def forget_skill(self, skill: Skill, log: bool = LOG) -> None:
         """Забування будь-якої навички"""
 
         if skill in self.hero.skills:
             self.hero.skills.remove(skill)
-            self.output.write(f"{self.hero.name} забуває навичку {skill.name}", log=log)
+            self.hero.output.write(
+                f"{self.hero.name} забуває навичку {skill.name}", log=log
+            )
         else:
-            self.output.write(f"{self.hero.name} не має навички {skill.name}", log=log)
+            self.hero.output.write(
+                f"{self.hero.name} не має навички {skill.name}", log=log
+            )
 
     def can_learn_skill(self, log: bool = LOG) -> None:
         """Видавання базових навичок залежно від рівня персонажа
@@ -392,9 +398,8 @@ class SkillSystem:
 class EquipmentManager:
     """Управління екіпіровкою"""
 
-    def __init__(self, hero: Hero, output: OutputSpace) -> None:
+    def __init__(self, hero: Hero) -> None:
         self.hero = hero
-        self.output = output
 
     def equip_item(
         self,
@@ -413,12 +418,12 @@ class EquipmentManager:
         if current_hand != default_item:
             self.hero.inventory.append(current_hand)
         if item != default_item:
-            self.output.write(f"Екіпіруємо {item.name}", log=log)
+            self.hero.output.write(f"Екіпіруємо {item.name}", log=log)
         else:
             if current_hand != default_item:
-                self.output.write(f"{current_hand.name} Знято!", log=log)
+                self.hero.output.write(f"{current_hand.name} Знято!", log=log)
             else:
-                self.output.write(f"В руках пусто!", log=log)
+                self.hero.output.write(f"В руках пусто!", log=log)
 
     def equip_weapon(self, weapon: Weapon | None = None, log: bool = LOG) -> None:
         """Екіпірує зброю."""
@@ -430,13 +435,13 @@ class EquipmentManager:
             if weapon.two_handed:
                 if self.hero.left_hand != JUST_HAND:
                     self.hero.inventory.append(self.hero.left_hand)
-                    self.output.write(f"{weapon.name} потребує обох рук!", log=log)
-                    self.output.write(
+                    self.hero.output.write(f"{weapon.name} потребує обох рук!", log=log)
+                    self.hero.output.write(
                         f"{self.hero.left_hand.name} автоматично знято", log=log
                     )
                 self.hero.left_hand = JUST_HAND
         else:
-            self.output.write(f"{weapon.name} не є зброєю", log=log)
+            self.hero.output.write(f"{weapon.name} не є зброєю", log=log)
 
     def equip_shield(self, shield: Shield | None = None, log: bool = LOG) -> None:
         """Екіпірує щит."""
@@ -449,15 +454,15 @@ class EquipmentManager:
             if shield != JUST_HAND:
                 if self.hero.right_hand.two_handed:
                     self.hero.inventory.append(self.hero.right_hand)
-                    self.output.write(
+                    self.hero.output.write(
                         f"{self.hero.right_hand.name} потребує обох рук!", log=log
                     )
-                    self.output.write(
+                    self.hero.output.write(
                         f"{self.hero.right_hand.name} автоматично знято", log=log
                     )
                     self.hero.right_hand = UNARMED_STRIKE
         else:
-            self.output.write(f"{shield.name} не є щитом", log=log)
+            self.hero.output.write(f"{shield.name} не є щитом", log=log)
 
     def add_item(self, item: Item, log: bool = LOG) -> None:
         """Додавання предметів в інвентар"""
@@ -465,11 +470,11 @@ class EquipmentManager:
         if isinstance(item, Item):
             if item != UNARMED_STRIKE and item != JUST_HAND:
                 self.hero.inventory.append(item)
-                self.output.write(f"{self.hero.name} підбирає: {item}", log=log)
+                self.hero.output.write(f"{self.hero.name} підбирає: {item}", log=log)
             else:
-                self.output.write(f"Не можна підібрати {item.name}", log=log)
+                self.hero.output.write(f"Не можна підібрати {item.name}", log=log)
         else:
-            self.output.write(f"{item} не є предметом", log=log)
+            self.hero.output.write(f"{item} не є предметом", log=log)
 
     def select_item(self, item_class: Type | None = None) -> Item | None:
         """Повертає перший предмет з інвентаря, заданого типу"""
