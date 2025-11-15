@@ -108,7 +108,6 @@ def select_heroes(
     elif hero_id is not None:
         sql_where = " WHERE id = ?"
 
-    # sql = f"SELECT id, name, data FROM {table_name}{sql_where} ORDER BY id"
     sql = f"SELECT * FROM {table_name}{sql_where} ORDER BY id"
 
     def _select():

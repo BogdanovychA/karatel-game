@@ -16,13 +16,12 @@ if TYPE_CHECKING:
 
 
 def output_setter(the_map: list, output: OutputSpace) -> None:
-    """Встановлює переданий output всім об'єктам на переданій мапі
+    """Встановлює переданий output всім об'єктам на переданій мапі.
     Використовується після завантаження мапи з БД"""
     for y in range(len(the_map)):
         for x in range(len(the_map[y])):
-            if the_map[y][x].obj is not None:
-                if hasattr(the_map[y][x].obj, "output"):
-                    the_map[y][x].obj.output = output
+            if the_map[y][x].obj is not None and hasattr(the_map[y][x].obj, "output"):
+                the_map[y][x].obj.output = output
 
 
 def find_hero(the_map: list) -> Tuple[int | None, int | None]:
