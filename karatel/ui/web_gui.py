@@ -5,7 +5,7 @@ import pickle
 import streamlit as st
 
 from karatel.core.game_state_manager import GameStateManager
-from karatel.core.hero import HeroFactory
+from karatel.core.hero import Hero, HeroFactory
 from karatel.core.map_model import generate_map, render_map
 from karatel.core.professions import PROFESSIONS, Profession, show_professions
 from karatel.logic.map_logic import find_hero
@@ -25,6 +25,17 @@ from karatel.ui.web_elements import (
 )
 from karatel.utils.constants import Emoji
 from karatel.utils.settings import HERO_LIVES, HERO_SQL_TABLE, LOG, MAX_LEVEL, MIN_LEVEL
+
+
+def output_setter(the_map: list) -> None:
+    """Шукає героя на карті. Повертає координати Y та X"""
+    for y in range(len(the_map)):
+        for x in range(len(the_map[y])):
+            if the_map[y][x].obj is not None:
+                if isinstance(the_map[y][x].obj, Hero):
+                    print(the_map[y][x].obj.output)
+                    the_map[y][x].obj.output = st.session_state.gsm.output
+                    print(the_map[y][x].obj.output)
 
 
 def init_session_state():
@@ -240,10 +251,11 @@ def load_hero() -> None:
                         output=st.session_state.gsm.output, hero_id=hero_id, log=LOG
                     )
                 )
-                st.session_state.hero.output = st.session_state.gsm.output
+                # st.session_state.hero.output = st.session_state.gsm.output
                 if st.session_state.game_map:
                     y, x = find_hero(st.session_state.game_map)
                     st.session_state.game_map[y][x].obj = st.session_state.hero
+                    output_setter(st.session_state.game_map)
                 st.session_state.game_state = GameState.HERO.value
                 st.rerun()
         with col5:
