@@ -55,7 +55,7 @@ def load_button() -> None:
         st.session_state.hero = st.session_state.gsm.saver.load(
             output=st.session_state.gsm.output, log=LOG
         )
-        if 'game_map' in st.session_state and st.session_state.game_map:
+        if st.session_state.game_map:
             y, x = find_hero(st.session_state.game_map)
             st.session_state.game_map[y][x].obj = st.session_state.hero
         st.rerun()

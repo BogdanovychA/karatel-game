@@ -8,7 +8,7 @@ from karatel.core.game_state_manager import GameStateManager
 from karatel.core.hero import HeroFactory
 from karatel.core.map_model import generate_map, render_map
 from karatel.core.professions import PROFESSIONS, Profession, show_professions
-from karatel.logic.map_logic import find_hero
+from karatel.logic.map_logic import find_hero, output_setter
 from karatel.storage.abstract import SQLiteHeroSaver
 from karatel.storage.sqlite_manager import select_heroes
 from karatel.ui.abstract import BufferedOutput
@@ -25,15 +25,6 @@ from karatel.ui.web_elements import (
 )
 from karatel.utils.constants import Emoji
 from karatel.utils.settings import HERO_LIVES, HERO_SQL_TABLE, LOG, MAX_LEVEL, MIN_LEVEL
-
-
-def output_setter(the_map: list, output) -> None:
-    """Шукає героя на карті. Повертає координати Y та X"""
-    for y in range(len(the_map)):
-        for x in range(len(the_map[y])):
-            if the_map[y][x].obj is not None:
-                if hasattr(the_map[y][x].obj, "output"):
-                    the_map[y][x].obj.output = output
 
 
 def init_session_state():
