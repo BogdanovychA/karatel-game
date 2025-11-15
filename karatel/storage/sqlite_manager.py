@@ -14,8 +14,6 @@ if TYPE_CHECKING:
     from karatel.core.hero import Hero
     from karatel.ui.abstract import OutputSpace
 
-DEBUG = True
-
 
 def table_exists(
     output: OutputSpace, conn: sqlite3.Connection, table_name: str
@@ -110,7 +108,8 @@ def select_heroes(
     elif hero_id is not None:
         sql_where = " WHERE id = ?"
 
-    sql = f"SELECT id, name, data FROM {table_name}{sql_where} ORDER BY id"
+    # sql = f"SELECT id, name, data FROM {table_name}{sql_where} ORDER BY id"
+    sql = f"SELECT * FROM {table_name}{sql_where} ORDER BY id"
 
     def _select():
         """Допоміжна функція для забезпечення DRY"""
@@ -371,3 +370,115 @@ def select_maps(
     except sqlite3.Error as e:
         output.write(f"Помилка SQLite: '{e}'", log=DEBUG)
         return []
+
+
+def create_hero_and_map_table(
+    output: OutputSpace, conn: sqlite3.Connection, table_name: str
+) -> None:
+    """Створення таблиці для зберігання героя та мапи"""
+
+    if table_exists(output, conn, table_name):
+        output.write(f"Таблиця '{table_name}' вже існує", log=DEBUG)
+    else:
+        cursor = conn.cursor()
+        try:
+            sql = f"""CREATE TABLE {table_name} (
+        id INTEGER PRIMARY KEY,
+        name TEXT NOT NULL,
+        hero BLOB NOT NULL,
+        map BLOB NOT NULL
+            )"""
+            cursor.execute(sql)
+        finally:
+            cursor.close()
+        output.write(f"Таблицю '{table_name}' успішно створено", log=DEBUG)
+
+
+def insert_hero_and_map(hero: Hero, game_map: list | None, table_name: str) -> None:
+    """Вставка героя в БД -- новий запис або перезапис"""
+
+    table_name = sanitize_word(table_name)
+    if not table_name:
+        return
+
+    pickled_hero = pickle.dumps(hero)
+    pickled_map = pickle.dumps(game_map)
+
+    insert = False
+
+    try:
+        with sqlite3.connect(SQLITE_PATH) as connection:
+
+            old_data = select_heroes(
+                hero.output, table_name, hero_name=hero.name, conn=connection
+            )
+            if not old_data:
+                insert = True
+
+            create_hero_and_map_table(hero.output, connection, table_name)
+
+            cursor = connection.cursor()
+            try:
+                if insert:
+                    cursor.execute(
+                        f"INSERT INTO {table_name} (name, hero, map) VALUES (?, ?, ?)",
+                        (hero.name, pickled_hero, pickled_map),
+                    )
+                    hero_id = cursor.lastrowid
+                    hero.output.write(
+                        f"Герой '{hero.name}' збережений з ID: {hero_id}", log=DEBUG
+                    )
+                else:
+                    cursor.execute(
+                        f"""UPDATE {table_name}
+                        SET hero = ?,
+                            map = ? 
+                        WHERE id = (
+                            SELECT MIN(id) 
+                            FROM {table_name} 
+                            WHERE name = ?
+                        );
+                        """,
+                        (pickled_hero, pickled_map, hero.name),
+                    )
+                    hero.output.write(
+                        f"Герой '{hero.name}' оновлений. ID: {old_data[0][0]}",
+                        log=DEBUG,
+                    )
+            finally:
+                cursor.close()
+
+    except sqlite3.Error as e:
+        hero.output.write(f"Помилка SQLite: {e}", log=DEBUG)
+
+
+def sqlite_hero_and_map_loader(
+    output: OutputSpace,
+    table_name: str,
+    hero_id: int,
+    log: bool = LOG,
+):
+    """Завантаження героя"""
+
+    sql_data = select_heroes(output, table_name, hero_id=hero_id)
+
+    hero = pickle.loads(sql_data[0][2])
+    the_map = pickle.loads(sql_data[0][3])
+
+    output.write(
+        f"Героя {hero.name} завантажено.",
+        log=log,
+    )
+    return hero, the_map
+
+
+def sqlite_hero_and_map_saver(
+    hero: Hero, game_map: list, table_name, log: bool = LOG
+) -> None:
+    """Збереження героя"""
+
+    insert_hero_and_map(hero, game_map, table_name)
+    hero.output.write(
+        f"Героя {hero.name} збережено.",
+        log=log,
+    )

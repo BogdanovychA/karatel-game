@@ -1,13 +1,14 @@
 # -*- coding: utf-8 -*-
 
 SQLITE_PATH = "./karatel/saves/karatel.db"
-HERO_SQL_TABLE = "heroes"
+HERO_SQL_TABLE = "saves"
 
 XML_SAVES_PATH = "./karatel/saves/hero.xml"
 JSON_SAVES_PATH = "./karatel/saves/hero.json"
 
 LOG = True
 
+# DEBUG = True
 DEBUG = False
 
 HERO_LIVES = 3

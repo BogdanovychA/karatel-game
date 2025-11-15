@@ -31,6 +31,7 @@ class Emoji(Enum):
     MOVE_S = "⬇️"
     MOVE_C = "↘️"
     CTRL = "🎮"
+    CHECK = "✅"
 
 
 TRANSLATIONS = {

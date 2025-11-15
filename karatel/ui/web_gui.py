@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-import json
+import pickle
 
 import streamlit as st
 
@@ -203,27 +203,30 @@ def load_hero() -> None:
     st.header(f"{Emoji.LOG.value} Список збережених {Emoji.HERO.value} Героїв")
     all_saved_heroes = select_heroes(st.session_state.gsm.output, HERO_SQL_TABLE)
 
-    col1, col2, col3, col4, col5 = st.columns([1, 5, 5, 5, 5])
+    col1, col2, col3, col4, col5 = st.columns([1, 7, 2, 4, 4])
     with col1:
         st.html("<b>ID</b>")
     with col2:
         st.html("<b>Ім'я</b>")
     with col3:
-        st.html("<b>Професія</b>")
+        st.html("<b>Мапа</b>")
     with col4:
         pass
     with col5:
         pass
 
     for saved_hero in all_saved_heroes:
-        hero_id, hero_name, json_data = saved_hero
-        col1, col2, col3, col4, col5 = st.columns([1, 5, 5, 5, 5])
+        hero_id, hero_name, pickled_hero, pickled_map = saved_hero
+        col1, col2, col3, col4, col5 = st.columns([1, 7, 2, 4, 4])
         with col1:
             st.text(hero_id)
         with col2:
             st.text(hero_name)
         with col3:
-            st.text(json.loads(json_data)["profession"])
+            if pickle.loads(pickled_map) is not None:
+                st.text(Emoji.CHECK.value)
+            else:
+                st.text(Emoji.X.value)
         with col4:
             if st.button(
                 "Відновити",
@@ -232,13 +235,15 @@ def load_hero() -> None:
                 width=BUTTON_WIDTH,
                 key=f"respawn{hero_id}",
             ):
-                st.session_state.hero = st.session_state.gsm.saver.load(
-                    output=st.session_state.gsm.output, hero_id=hero_id, log=LOG
+                st.session_state.hero, st.session_state.game_map = (
+                    st.session_state.gsm.saver.load(
+                        output=st.session_state.gsm.output, hero_id=hero_id, log=LOG
+                    )
                 )
-                if 'game_map' in st.session_state and st.session_state.game_map:
+                st.session_state.hero.output = st.session_state.gsm.output
+                if st.session_state.game_map:
                     y, x = find_hero(st.session_state.game_map)
                     st.session_state.game_map[y][x].obj = st.session_state.hero
-
                 st.session_state.game_state = GameState.HERO.value
                 st.rerun()
         with col5:

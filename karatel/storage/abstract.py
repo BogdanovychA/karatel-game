@@ -9,8 +9,8 @@ from typing import TYPE_CHECKING
 from karatel.storage.json_manager import json_hero_loader, json_hero_saver
 from karatel.storage.sqlite_manager import (
     delete_row_by_id,
-    sqlite_hero_loader,
-    sqlite_hero_saver,
+    sqlite_hero_and_map_loader,
+    sqlite_hero_and_map_saver,
 )
 from karatel.storage.xml_manager import xml_hero_loader, xml_hero_saver
 from karatel.utils.settings import HERO_SQL_TABLE, JSON_SAVES_PATH, XML_SAVES_PATH
@@ -40,11 +40,11 @@ class SQLiteHeroSaver(SaveHero):
         # self._path = SQLITE_PATH
         self._hero_table = HERO_SQL_TABLE
 
-    def save(self, *args, hero: Hero, **kwargs) -> None:
-        sqlite_hero_saver(*args, hero=hero, table_name=self._hero_table, **kwargs)
+    def save(self, *args, **kwargs) -> None:
+        sqlite_hero_and_map_saver(*args, table_name=self._hero_table, **kwargs)
 
     def load(self, *args, **kwargs) -> Hero:
-        return sqlite_hero_loader(*args, table_name=self._hero_table, **kwargs)
+        return sqlite_hero_and_map_loader(*args, table_name=self._hero_table, **kwargs)
 
     def delete(self, *args, **kwargs) -> bool:
         return delete_row_by_id(*args, table_name=self._hero_table, **kwargs)
