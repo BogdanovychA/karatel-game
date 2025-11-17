@@ -318,6 +318,15 @@ WEAPONS = CHARISMA_WEAPONS + DEXTERITY_WEAPONS + INTELLIGENCE_WEAPONS + STRENGTH
 
 ITEMS = WEAPONS + SHIELDS
 
+WEAPONS_LIST = [
+    CHARISMA_WEAPONS,
+    DEXTERITY_WEAPONS,
+    INTELLIGENCE_WEAPONS,
+    STRENGTH_WEAPONS,
+]
+
+ITEMS_LIST = [*WEAPONS_LIST, SHIELDS]
+
 
 def match_level(level: int = 1) -> int:
     """Підбирає предмет під рівень персонажа в залежності

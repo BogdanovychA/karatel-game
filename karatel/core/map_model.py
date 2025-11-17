@@ -6,16 +6,7 @@ from enum import Enum, IntEnum
 from typing import TYPE_CHECKING
 
 from karatel.core.hero import Hero, HeroFactory
-from karatel.core.items import (
-    CHARISMA_WEAPONS,
-    DEXTERITY_WEAPONS,
-    INTELLIGENCE_WEAPONS,
-    JUST_HAND,
-    SHIELDS,
-    STRENGTH_WEAPONS,
-    UNARMED_STRIKE,
-    Item,
-)
+from karatel.core.items import ITEMS_LIST, JUST_HAND, UNARMED_STRIKE, Item, match_level
 from karatel.utils.constants import Emoji
 
 if TYPE_CHECKING:
@@ -165,15 +156,24 @@ def select_obj(
     def _generate_item() -> Cell:
         """Створення клітинки з предметом"""
 
-        all_items = list(
-            STRENGTH_WEAPONS
-            + SHIELDS
-            + DEXTERITY_WEAPONS
-            + INTELLIGENCE_WEAPONS
-            + CHARISMA_WEAPONS
-        )
+        all_items: list = []
+
+        # Метчимо рівень ворога (що в свою чергу відповідає рівню героя)
+        # З рівнем предметів, які випадають на мапі
+        max_index = match_level(enemy_level) + EnemyLine.MULTIPLIER
+
+        # Створюємо список предметів, який приблизно відповідає рівню ворога,
+        # який в свою чергу відповідає рівню героя
+        for a_list in ITEMS_LIST:
+            for index, item in enumerate(a_list):
+                all_items.append(item)
+                if index == max_index:
+                    break
+
+        # Видаляємо дефолтні предмети
         all_items.remove(UNARMED_STRIKE)
         all_items.remove(JUST_HAND)
+
         item_cell = Cell(
             cell_type=CellType.ITEM,
             obj=random.choice(all_items),
