@@ -56,7 +56,7 @@ class GoldLimits(IntEnum):
 class ExpLimits(IntEnum):
     """Ліміти досвіду при генерації клітинок з книжками"""
 
-    MIN = 300
+    MIN = 100
     MAX = 500
 
 
@@ -73,9 +73,9 @@ class EnemyLine(IntEnum):
     """Кількість рядів монстрів перед виходом
     та бонус до їх рівня"""
 
-    X = 3
-    Y = 3
-    MULTIPLIER = 5
+    X = 5
+    Y = 5
+    MULTIPLIER = 3
 
 
 class CellMultiplier(IntEnum):
@@ -84,7 +84,7 @@ class CellMultiplier(IntEnum):
 
     EMPTY = 10
     ENEMY = 5
-    ITEM = 5
+    ITEM = 3
     GOLD = 1
     BOOK = 1
     HEART = 1
@@ -186,7 +186,7 @@ def select_obj(
         gold_cell = Cell(
             cell_type=CellType.GOLD,
             obj=None,
-            gold=random.randint(GoldLimits.MIN, GoldLimits.MAX),
+            gold=random.randint(GoldLimits.MIN, GoldLimits.MAX) * enemy_level,
         )
         return gold_cell
 
@@ -196,7 +196,7 @@ def select_obj(
         book_cell = Cell(
             cell_type=CellType.BOOK,
             obj=None,
-            experience=random.randint(ExpLimits.MIN, ExpLimits.MAX),
+            experience=random.randint(ExpLimits.MIN, ExpLimits.MAX) * enemy_level,
         )
         return book_cell
 
