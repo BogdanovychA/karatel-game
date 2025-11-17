@@ -14,13 +14,11 @@ from karatel.storage.postgresql_config import (
     PSQL_PORT,
     PSQL_USER,
 )
+from karatel.utils.settings import DEBUG
 from karatel.utils.utils import sanitize_word
 
-# from karatel.utils.settings import DEBUG
 if TYPE_CHECKING:
     from karatel.core.hero import Hero
-
-DEBUG = True
 
 
 def connect():
