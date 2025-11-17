@@ -96,9 +96,15 @@ def move_hero(
 
             # Якщо там предмет
             case CellType.ITEM:
-                the_map[pos_y][pos_x].obj.equipment.add_item(
-                    the_map[new_y][new_x].obj, log=log
-                )
+                if the_map[new_y][new_x].obj is not None:
+                    the_map[pos_y][pos_x].obj.equipment.add_item(
+                        the_map[new_y][new_x].obj, log=log
+                    )
+                else:
+                    the_map[pos_y][pos_x].obj.output.write(
+                        f"{the_map[pos_y][pos_x].obj.name} на жаль, нічого не знаходить.",
+                        log=log,
+                    )
                 _step()
 
             # Якщо там життя

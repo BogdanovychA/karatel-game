@@ -137,6 +137,7 @@ EMPTY_CELL = Cell(CellType.EMPTY, None)  # Пуста клітинка
 
 def select_obj(
     output: OutputSpace,
+    all_items: list,
     cell_type: CellType | None = None,
     enemy_level: int | None = None,
 ) -> Cell:
@@ -156,27 +157,15 @@ def select_obj(
     def _generate_item() -> Cell:
         """Створення клітинки з предметом"""
 
-        all_items: list = []
-
-        # Метчимо рівень ворога (що в свою чергу відповідає рівню героя)
-        # З рівнем предметів, які випадають на мапі
-        max_index = match_level(enemy_level) + EnemyLine.MULTIPLIER
-
-        # Створюємо список предметів, який приблизно відповідає рівню ворога,
-        # який в свою чергу відповідає рівню героя
-        for a_list in ITEMS_LIST:
-            for index, item in enumerate(a_list):
-                all_items.append(item)
-                if index == max_index:
-                    break
-
-        # Видаляємо дефолтні предмети
-        all_items.remove(UNARMED_STRIKE)
-        all_items.remove(JUST_HAND)
+        if all_items:
+            item = random.choice(all_items)
+            all_items.remove(item)
+        else:
+            item = None
 
         item_cell = Cell(
             cell_type=CellType.ITEM,
-            obj=random.choice(all_items),
+            obj=item,
         )
         return item_cell
 
@@ -239,6 +228,25 @@ def generate_map(hero: Hero) -> list[list[Cell]]:
     start_hero_position_y = random.randint(0, StartHeroPosition.Y)
     start_hero_position_x = random.randint(0, StartHeroPosition.X)
 
+    #######################
+    all_items: list = []
+
+    # Метчимо рівень героя з рівнем предметів, які випадають на мапі
+    # та додаємо мультиплікатор
+    max_index = match_level(hero.level) + EnemyLine.MULTIPLIER
+
+    # Створюємо список предметів, який приблизно відповідає рівню героя
+    for a_list in ITEMS_LIST:
+        for index, item in enumerate(a_list):
+            all_items.append(item)
+            if index == max_index:
+                break
+
+    # Видаляємо дефолтні предмети
+    all_items.remove(UNARMED_STRIKE)
+    all_items.remove(JUST_HAND)
+    #######################
+
     line_y: list[list] = []
     for coordinate_y in range(MapSize.Y):
         line_x: list[Cell] = []
@@ -258,6 +266,7 @@ def generate_map(hero: Hero) -> list[list[Cell]]:
             ) and (coordinate_y != MapSize.Y - 1 or coordinate_x != MapSize.X - 1):
                 cell = select_obj(
                     output=hero.output,
+                    all_items=all_items,
                     cell_type=CellType.ENEMY,
                     enemy_level=hero.level + EnemyLine.MULTIPLIER,
                 )
@@ -272,7 +281,9 @@ def generate_map(hero: Hero) -> list[list[Cell]]:
 
             # Генеруємо випадкові клітинки мапи
             else:
-                cell = select_obj(output=hero.output, enemy_level=hero.level)
+                cell = select_obj(
+                    output=hero.output, all_items=all_items, enemy_level=hero.level
+                )
 
             line_x.append(cell)
         line_y.append(line_x)
