@@ -5,6 +5,7 @@ import pickle
 from typing import TYPE_CHECKING
 
 import psycopg
+from psycopg.sql import SQL, Identifier
 
 from karatel.storage.postgresql_config import (
     PSQL_DB,
@@ -47,7 +48,6 @@ def table_exists(
 ) -> bool | None:
     """Перевіряє, чи таблиця з такою назвою вже існує в PostgreSQL."""
 
-    # cursor = None
     try:
         with connection.cursor() as cursor:
             sql_query = """
@@ -90,7 +90,11 @@ def delete_table(table_name: str) -> bool:
                 return False
 
             with connection.cursor() as cursor:
-                cursor.execute(f"DROP TABLE {table_name}")
+
+                sql_template = SQL("DROP TABLE {}")
+                sql_query = sql_template.format(Identifier(table_name))
+
+                cursor.execute(sql_query)
                 if DEBUG:
                     print(f"Таблицю '{table_name}' успішно видалено")
                 return True
@@ -121,13 +125,17 @@ def create_hero_table(connection: psycopg.Connection, table_name: str) -> None:
     else:
         try:
             with connection.cursor() as cursor:
-                sql = f"""CREATE TABLE {table_name} (
+                sql_template = SQL(
+                    """CREATE TABLE {} (
                     id SERIAL PRIMARY KEY,
                     name TEXT NOT NULL,
                     hero BYTEA NOT NULL,
                     map BYTEA NOT NULL
-                )"""
-                cursor.execute(sql)
+                    )"""
+                )
+                sql_query = sql_template.format(Identifier(table_name))
+
+                cursor.execute(sql_query)
                 if DEBUG:
                     print(f"Таблицю '{table_name}' успішно створено")
 
@@ -153,25 +161,31 @@ def select_heroes(
         if not table_name:
             return []
 
-    sql_where = ""
+    sql_where = SQL("")
 
     if hero_name is not None:
-        sql_where = " WHERE name = %s"
+        sql_where = SQL(" WHERE name = %s")
     elif hero_id is not None:
-        sql_where = " WHERE id = %s"
+        sql_where = SQL(" WHERE id = %s")
 
-    sql = f"SELECT * FROM {table_name}{sql_where} ORDER BY id"
+    sql_query = SQL(" ").join(
+        [
+            SQL("SELECT * FROM {}").format(Identifier(table_name)),
+            sql_where,
+            SQL("ORDER BY id"),
+        ]
+    )
 
     def _select():
         """Допоміжна функція для забезпечення DRY"""
 
         with connection.cursor() as cursor:
             if hero_name is not None:
-                cursor.execute(sql, (hero_name,))
+                cursor.execute(sql_query, (hero_name,))
             elif hero_id is not None:
-                cursor.execute(sql, (hero_id,))
+                cursor.execute(sql_query, (hero_id,))
             else:
-                cursor.execute(sql)
+                cursor.execute(sql_query)
             return cursor.fetchall()
 
     try:
@@ -232,26 +246,35 @@ def insert_hero_and_map(hero: Hero, game_map: list | None, table_name: str) -> N
 
             with connection.cursor() as cursor:
                 if insert:
-                    cursor.execute(
-                        f"INSERT INTO {table_name} (name, hero, map) VALUES (%s, %s, %s) RETURNING id;",
-                        (hero.name, pickled_hero, pickled_map),
+
+                    sql_template = SQL(
+                        "INSERT INTO {} (name, hero, map) VALUES (%s, %s, %s) RETURNING id;"
                     )
+                    sql_query = sql_template.format(Identifier(table_name))
+
+                    cursor.execute(sql_query, (hero.name, pickled_hero, pickled_map))
+
                     hero_id = cursor.fetchone()[0]
                     if DEBUG:
                         print(f"Герой '{hero.name}' збережений з ID: {hero_id}")
                 else:
-                    cursor.execute(
-                        f"""UPDATE {table_name}
+                    sql_template = SQL(
+                        """UPDATE {}
                         SET hero = %s,
                             map = %s 
                         WHERE id = (
                             SELECT MIN(id) 
-                            FROM {table_name} 
+                            FROM {} 
                             WHERE name = %s
                         );
-                        """,
-                        (pickled_hero, pickled_map, hero.name),
+                        """
                     )
+                    sql_query = sql_template.format(
+                        Identifier(table_name), Identifier(table_name)
+                    )
+
+                    cursor.execute(sql_query, (pickled_hero, pickled_map, hero.name))
+
                     if DEBUG:
                         print(f"Герой '{hero.name}' оновлений. ID: {old_data[0][0]}")
 
@@ -281,7 +304,12 @@ def delete_row_by_id(table_name: str, row_id: int) -> bool:
                 return False
 
             with connection.cursor() as cursor:
-                cursor.execute(f"DELETE FROM {table_name} WHERE id = %s;", (row_id,))
+
+                sql_template = SQL("DELETE FROM {} WHERE id = %s;")
+                sql_query = sql_template.format(Identifier(table_name))
+
+                cursor.execute(sql_query, (row_id,))
+
                 if cursor.rowcount == 0:
                     if DEBUG:
                         print(
