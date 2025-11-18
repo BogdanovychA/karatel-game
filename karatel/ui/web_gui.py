@@ -107,7 +107,7 @@ def authenticate_user():
             st.rerun()
         return uname and pwd
 
-    st.image("./karatel/images/logo.png")
+    st.image("./karatel/images/logo.png", width=500)
     st.subheader(
         "КАРАТЄЛЬ — рольова гра, де ти створюєш героя, "
         + "обираєш професію і намагаєшся вижити у тактичних боях. "
