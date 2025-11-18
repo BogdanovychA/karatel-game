@@ -62,10 +62,11 @@ def check_game_state() -> None:
     """Перевіряє статус гри й направляє на відповідний екран
     (викликає відповідну функцію)"""
 
-    if st.session_state.gsm.username is not None:
+    if (
+        st.session_state.gsm.username is not None
+        and st.session_state.game_state is not None
+    ):
         match st.session_state.game_state:
-            case None:
-                hello()
             case GameState.HERO.value:
                 hero()
             case GameState.ON_MAP.value:
@@ -74,20 +75,24 @@ def check_game_state() -> None:
                 load_hero()
             case _:
                 st.title(f"{Emoji.X.value} Відсутній пункт меню")
-                st.write(f"game_state: {st.session_state.game_state.value}")
+                st.write(f"game_state: {st.session_state.game_state}")
     else:
         authenticate_user()
 
 
 def authenticate_user():
 
+    def _start() -> None:
+        st.session_state.gsm.username = username
+        st.session_state.game_state = GameState.HERO.value
+
     def _check_username_and_password() -> bool:
         uname = True
         pwd = True
         if not validate_username(username):
             st.session_state.gsm.output.write(
-                "Ім'я користувача не може бути пустим, "
-                + "може містити лише літери латинського алфавіту, "
+                "Ім'я користувача має містити мінімум 2 символи, "
+                + "може мати лише літери латинського алфавіту, "
                 + "цифри та знак підкреслення."
             )
             uname = False
@@ -102,8 +107,24 @@ def authenticate_user():
             st.rerun()
         return uname and pwd
 
-    st.title(TITLE)
-    st.header(f"Створіть користувача або авторизуйтеся")
+    st.image("./karatel/images/logo.png")
+    st.subheader(
+        "КАРАТЄЛЬ — рольова гра, де ти створюєш героя, "
+        + "обираєш професію і намагаєшся вижити у тактичних боях. "
+    )
+    st.write(
+        "Гра використовує спрощену систему D&D 5e з унікальними українськими "
+        + "професіями."
+    )
+    st.write(
+        "Створіть собі героя та вирушайте в захопливі пригоди у підземелля. "
+        + "Вбивайте ворогів, знаходьте зброю та засоби захисту. "
+        + "Знайдіть вихід -- дійдіть до дверей."
+    )
+    st.write("Гітхаб: https://github.com/BogdanovychA/karatel-game")
+    st.write("Автор: https://www.bogdanovych.org/")
+
+    st.subheader(f"Створіть користувача або авторизуйтеся")
 
     col1, col2 = st.columns(2)
     with col1:
@@ -130,7 +151,7 @@ def authenticate_user():
                     if all_data:
                         user_id, hashed_password = all_data
                         if check_pass(password, hashed_password):
-                            st.session_state.gsm.username = username
+                            _start()
                         else:
                             st.session_state.gsm.output.write("Пароль не коректний")
                 st.rerun()
@@ -149,34 +170,11 @@ def authenticate_user():
                         hashed_password=hash_pass(password),
                         log=LOG,
                     ):
-                        st.session_state.gsm.username = username
+                        _start()
                     st.rerun()
 
     with colum2:
         pass
-
-
-def hello() -> None:
-    """Перший екран, який бачить користувач"""
-
-    st.image("./karatel/images/logo.png")
-    st.header(
-        "КАРАТЄЛЬ — рольова гра, де ти створюєш героя, "
-        + "обираєш професію і намагаєшся вижити у тактичних боях. "
-    )
-    st.subheader(
-        "Гра використовує спрощену систему D&D 5e з унікальними українськими "
-        + "професіями."
-    )
-    st.subheader(
-        "Створіть собі героя та вирушайте в захопливі пригоди у підземелля. "
-        + "Вбивайте ворогів, знаходьте зброю та засоби захисту. "
-        + "Знайдіть вихід -- дійдіть до дверей."
-    )
-    st.write("Гітхаб: https://github.com/BogdanovychA/karatel-game")
-    st.write("Автор: https://www.bogdanovych.org/")
-
-    navigation()
 
 
 def hero() -> None:

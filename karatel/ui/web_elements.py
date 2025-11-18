@@ -13,8 +13,11 @@ from karatel.utils.settings import LOG
 def back_button() -> None:
     """Кнопка НАЗАД"""
 
-    if st.button("Назад", icon=Emoji.BACK.value, type="secondary", width=BUTTON_WIDTH):
+    if st.button(
+        "Вийти з гри", icon=Emoji.BACK.value, type="primary", width=BUTTON_WIDTH
+    ):
         st.session_state.game_state = None
+        st.session_state.gsm.username = None
         st.rerun()
 
 
