@@ -2,7 +2,7 @@
 
 from dataclasses import dataclass
 
-from karatel.storage.abstract import SaveHero
+from karatel.storage.abstract import SQLSaver
 from karatel.ui.abstract import OutputSpace
 
 
@@ -11,8 +11,9 @@ class GameStateManager:
     """Керує різними статусами гри"""
 
     output: OutputSpace
-    saver: SaveHero
+    saver: SQLSaver
     can_generate_map: bool
+    username: str | None
 
 
 # gsm = GameStateManager(

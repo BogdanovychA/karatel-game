@@ -4,7 +4,7 @@ import streamlit as st
 
 from karatel.core.items import Shield, Weapon
 from karatel.logic.map_logic import find_hero, move_hero
-from karatel.storage.abstract import JSONHeroSaver, SQLiteHeroSaver, XMLHeroSaver
+from karatel.storage.abstract import SQLiteSaver
 from karatel.ui.web_constants import BUTTON_WIDTH, GameState
 from karatel.utils.constants import Emoji
 from karatel.utils.settings import LOG
@@ -39,10 +39,10 @@ def hero_button() -> None:
 
 def select_load_button() -> None:
     match st.session_state.gsm.saver:
-        case SQLiteHeroSaver():
+        case SQLiteSaver():
             load_hero_button()
-        case JSONHeroSaver() | XMLHeroSaver():
-            load_button()
+        # case JSONHeroSaver() | XMLHeroSaver():
+        #     load_button()
         case _:
             pass
 
@@ -76,7 +76,10 @@ def save_button() -> None:
         "Зберегти", icon=Emoji.MOVE_S.value, type="secondary", width=BUTTON_WIDTH
     ):
         st.session_state.gsm.saver.save(
-            hero=st.session_state.hero, game_map=st.session_state.game_map, log=LOG
+            username=st.session_state.gsm.username,
+            hero=st.session_state.hero,
+            game_map=st.session_state.game_map,
+            log=LOG,
         )
         st.rerun()
 

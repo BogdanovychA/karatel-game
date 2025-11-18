@@ -9,8 +9,7 @@ from karatel.core.hero import HeroFactory
 from karatel.core.map_model import generate_map, render_map
 from karatel.core.professions import PROFESSIONS, Profession, show_professions
 from karatel.logic.map_logic import find_hero, output_setter
-from karatel.storage.abstract import SQLiteHeroSaver
-from karatel.storage.sqlite_manager import select_heroes
+from karatel.storage.abstract import SQLiteSaver
 from karatel.ui.abstract import BufferedOutput
 from karatel.ui.web_constants import BUTTON_WIDTH, TITLE, GameState
 from karatel.ui.web_elements import (
@@ -24,7 +23,13 @@ from karatel.ui.web_elements import (
     show_log,
 )
 from karatel.utils.constants import Emoji
-from karatel.utils.settings import HERO_LIVES, HERO_SQL_TABLE, LOG, MAX_LEVEL, MIN_LEVEL
+from karatel.utils.crypt import (
+    check_pass,
+    hash_pass,
+    is_password_valid,
+    validate_username,
+)
+from karatel.utils.settings import HERO_LIVES, LOG, MAX_LEVEL, MIN_LEVEL
 
 
 def init_session_state():
@@ -46,7 +51,8 @@ def init_session_state():
     if st.session_state.first_start:
         st.session_state.gsm = GameStateManager(
             output=BufferedOutput(),
-            saver=SQLiteHeroSaver(),
+            saver=SQLiteSaver(),
+            username=None,
             can_generate_map=False,
         )
         st.session_state.first_start = False
@@ -56,18 +62,98 @@ def check_game_state() -> None:
     """Перевіряє статус гри й направляє на відповідний екран
     (викликає відповідну функцію)"""
 
-    match st.session_state.game_state:
-        case None:
-            hello()
-        case GameState.HERO.value:
-            hero()
-        case GameState.ON_MAP.value:
-            on_map()
-        case GameState.LOAD_HERO.value:
-            load_hero()
-        case _:
-            st.title(f"{Emoji.X.value} Відсутній пункт меню")
-            st.write(f"game_state: {st.session_state.game_state.value}")
+    if st.session_state.gsm.username is not None:
+        match st.session_state.game_state:
+            case None:
+                hello()
+            case GameState.HERO.value:
+                hero()
+            case GameState.ON_MAP.value:
+                on_map()
+            case GameState.LOAD_HERO.value:
+                load_hero()
+            case _:
+                st.title(f"{Emoji.X.value} Відсутній пункт меню")
+                st.write(f"game_state: {st.session_state.game_state.value}")
+    else:
+        authenticate_user()
+
+
+def authenticate_user():
+
+    def _check_username_and_password() -> bool:
+        uname = True
+        pwd = True
+        if not validate_username(username):
+            st.session_state.gsm.output.write(
+                "Ім'я користувача не може бути пустим, "
+                + "може містити лише літери латинського алфавіту, "
+                + "цифри та знак підкреслення."
+            )
+            uname = False
+        if not is_password_valid(password):
+            st.session_state.gsm.output.write(
+                "Пароль має складатися з мінімум 8 символів латинського алфавіту, "
+                + "має містити мінімум одну велику та одну малу літеру і "
+                + "обов'язково має мати мінімум одну цифру і один спеціальний символ."
+            )
+            pwd = False
+        if not uname or not pwd:
+            st.rerun()
+        return uname and pwd
+
+    st.title(TITLE)
+    st.header(f"Створіть користувача або авторизуйтеся")
+
+    col1, col2 = st.columns(2)
+    with col1:
+        username = st.text_input("Користувач")
+        password = st.text_input("Пароль", type="password")
+    with col2:
+        st.text(st.session_state.gsm.output.read_buffer())
+
+    colum1, colum2 = st.columns(2)
+
+    with colum1:
+        col1, col2 = st.columns(2)
+        with col1:
+            if st.button(
+                "Вхід",
+                icon=Emoji.EXIT.value,
+                type="secondary",
+                width=BUTTON_WIDTH,
+            ):
+                if _check_username_and_password():
+                    all_data = st.session_state.gsm.saver.login(
+                        output=st.session_state.gsm.output, username=username, log=LOG
+                    )
+                    if all_data:
+                        user_id, hashed_password = all_data
+                        if check_pass(password, hashed_password):
+                            st.session_state.gsm.username = username
+                        else:
+                            st.session_state.gsm.output.write("Пароль не коректний")
+                st.rerun()
+
+        with col2:
+            if st.button(
+                "Реєстрація",
+                icon=Emoji.LOG.value,
+                type="secondary",
+                width=BUTTON_WIDTH,
+            ):
+                if _check_username_and_password():
+                    if st.session_state.gsm.saver.register(
+                        output=st.session_state.gsm.output,
+                        username=username,
+                        hashed_password=hash_pass(password),
+                        log=LOG,
+                    ):
+                        st.session_state.gsm.username = username
+                    st.rerun()
+
+    with colum2:
+        pass
 
 
 def hello() -> None:
@@ -199,7 +285,9 @@ def on_map() -> None:
 def load_hero() -> None:
     st.title(TITLE)
     st.header(f"{Emoji.LOG.value} Список збережених {Emoji.HERO.value} Героїв")
-    all_saved_heroes = select_heroes(st.session_state.gsm.output, HERO_SQL_TABLE)
+    all_saved_heroes = st.session_state.gsm.saver.list_hero(
+        output=st.session_state.gsm.output, username=st.session_state.gsm.username
+    )
 
     col1, col2, col3, col4, col5 = st.columns([1, 7, 2, 4, 4])
     with col1:
@@ -236,7 +324,10 @@ def load_hero() -> None:
                 # Відновлюємо героя та мапу
                 st.session_state.hero, st.session_state.game_map = (
                     st.session_state.gsm.saver.load(
-                        output=st.session_state.gsm.output, hero_id=hero_id, log=LOG
+                        username=st.session_state.gsm.username,
+                        output=st.session_state.gsm.output,
+                        hero_id=hero_id,
+                        log=LOG,
                     )
                 )
                 # Встановлюємо відновленому герою output поточної сесії
@@ -261,6 +352,7 @@ def load_hero() -> None:
             ):
                 st.session_state.gsm.saver.delete(
                     output=st.session_state.gsm.output,
+                    username=st.session_state.gsm.username,
                     row_id=hero_id,
                 )
                 st.rerun()

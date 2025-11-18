@@ -376,7 +376,7 @@ def insert_user(
 
 
 def select_user(
-    output: OutputSpace, username: str, table_name: str
+    output: OutputSpace, username: str, table_name: str, log=LOG
 ) -> tuple[int, bytes] | None:
 
     table_name = sanitize_word(table_name)
@@ -387,7 +387,10 @@ def select_user(
             try:
                 sql = f"SELECT id, hashed_password FROM {table_name} WHERE username = ?"
                 cursor.execute(sql, (username,))
-                return cursor.fetchone()
+                result = cursor.fetchone()
+                if result is None:
+                    output.write(f"Користувач {username} не знайдений", log=log)
+                return result
             finally:
                 cursor.close()
 
