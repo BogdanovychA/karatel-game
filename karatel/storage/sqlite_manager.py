@@ -1,12 +1,10 @@
 # -*- coding: utf-8 -*-
 from __future__ import annotations
 
-import json
 import pickle
 import sqlite3
 from typing import TYPE_CHECKING
 
-from karatel.core.hero import HeroFactory
 from karatel.utils.settings import DEBUG, LOG, SQLITE_PATH
 from karatel.utils.utils import sanitize_word
 
@@ -60,27 +58,6 @@ def delete_table(output: OutputSpace, table_name: str) -> bool:
     except sqlite3.Error as e:
         output.write(f"Помилка SQLite: '{e}'", log=DEBUG)
         return False
-
-
-def create_hero_table(
-    output: OutputSpace, conn: sqlite3.Connection, table_name: str
-) -> None:
-    """Створення таблиці для зберігання героя"""
-
-    if table_exists(output, conn, table_name):
-        output.write(f"Таблиця '{table_name}' вже існує", log=DEBUG)
-    else:
-        cursor = conn.cursor()
-        try:
-            sql = f"""CREATE TABLE {table_name} (
-                id INTEGER PRIMARY KEY,
-                name TEXT NOT NULL,
-                data TEXT NOT NULL
-            )"""
-            cursor.execute(sql)
-        finally:
-            cursor.close()
-        output.write(f"Таблицю '{table_name}' успішно створено", log=DEBUG)
 
 
 def select_heroes(
@@ -142,59 +119,59 @@ def select_heroes(
         return []
 
 
-def insert_hero(hero: Hero, table_name: str) -> None:
-    """Вставка героя в БД -- новий запис або перезапис"""
-
-    table_name = sanitize_word(table_name)
-    if not table_name:
-        return
-
-    json_data = json.dumps(HeroFactory.hero_to_dict(hero), ensure_ascii=False)
-    insert = False
-
-    try:
-        with sqlite3.connect(SQLITE_PATH) as connection:
-
-            old_data = select_heroes(
-                hero.output, table_name, hero_name=hero.name, conn=connection
-            )
-            if not old_data:
-                insert = True
-
-            create_hero_table(hero.output, connection, table_name)
-
-            cursor = connection.cursor()
-            try:
-                if insert:
-                    cursor.execute(
-                        f"INSERT INTO {table_name} (name, data) VALUES (?, ?)",
-                        (hero.name, json_data),
-                    )
-                    hero_id = cursor.lastrowid
-                    hero.output.write(
-                        f"Герой '{hero.name}' збережений з ID: {hero_id}", log=DEBUG
-                    )
-                else:
-                    cursor.execute(
-                        f"""UPDATE {table_name}
-                        SET data = ? 
-                        WHERE id = (
-                            SELECT MIN(id) 
-                            FROM {table_name} 
-                            WHERE name = ?
-                        );
-                        """,
-                        (json_data, hero.name),
-                    )
-                    hero.output.write(
-                        f"Герой '{hero.name}' оновлений. ID: {old_data[0][0]}",
-                        log=DEBUG,
-                    )
-            finally:
-                cursor.close()
-
-    except sqlite3.Error as e:
-        hero.output.write(f"Помилка SQLite: {e}", log=DEBUG)
+# def insert_hero(hero: Hero, table_name: str) -> None:
+#     """Вставка героя в БД -- новий запис або перезапис"""
+#
+#     table_name = sanitize_word(table_name)
+#     if not table_name:
+#         return
+#
+#     json_data = json.dumps(HeroFactory.hero_to_dict(hero), ensure_ascii=False)
+#     insert = False
+#
+#     try:
+#         with sqlite3.connect(SQLITE_PATH) as connection:
+#
+#             old_data = select_heroes(
+#                 hero.output, table_name, hero_name=hero.name, conn=connection
+#             )
+#             if not old_data:
+#                 insert = True
+#
+#             create_hero_table(hero.output, connection, table_name)
+#
+#             cursor = connection.cursor()
+#             try:
+#                 if insert:
+#                     cursor.execute(
+#                         f"INSERT INTO {table_name} (name, data) VALUES (?, ?)",
+#                         (hero.name, json_data),
+#                     )
+#                     hero_id = cursor.lastrowid
+#                     hero.output.write(
+#                         f"Герой '{hero.name}' збережений з ID: {hero_id}", log=DEBUG
+#                     )
+#                 else:
+#                     cursor.execute(
+#                         f"""UPDATE {table_name}
+#                         SET data = ?
+#                         WHERE id = (
+#                             SELECT MIN(id)
+#                             FROM {table_name}
+#                             WHERE name = ?
+#                         );
+#                         """,
+#                         (json_data, hero.name),
+#                     )
+#                     hero.output.write(
+#                         f"Герой '{hero.name}' оновлений. ID: {old_data[0][0]}",
+#                         log=DEBUG,
+#                     )
+#             finally:
+#                 cursor.close()
+#
+#     except sqlite3.Error as e:
+#         hero.output.write(f"Помилка SQLite: {e}", log=DEBUG)
 
 
 def delete_row_by_id(output: OutputSpace, table_name: str, row_id: int) -> bool:
@@ -230,145 +207,6 @@ def delete_row_by_id(output: OutputSpace, table_name: str, row_id: int) -> bool:
     except sqlite3.Error as e:
         output.write(f"Помилка SQLite: '{e}'", log=DEBUG)
         return False
-
-
-def sqlite_hero_saver(hero: Hero, table_name, log: bool = LOG) -> None:
-    """Збереження героя"""
-
-    insert_hero(hero, table_name)
-    hero.output.write(
-        f"Героя {hero.name} збережено.",
-        log=log,
-    )
-
-
-def sqlite_hero_loader(
-    output: OutputSpace,
-    table_name: str,
-    hero_name: str | None = None,
-    hero_id: int | None = None,
-    log: bool = LOG,
-) -> Hero | None:
-    """Завантаження героя"""
-
-    if hero_name:
-        sql_data = select_heroes(output, table_name, hero_name=hero_name)
-    elif hero_id:
-        sql_data = select_heroes(output, table_name, hero_id=hero_id)
-    else:
-        sql_data = select_heroes(output, table_name)
-
-    json_data = sql_data[0][2]
-    data = json.loads(json_data)
-
-    output.write(
-        f"Героя {data['name']} завантажено.",
-        log=log,
-    )
-    return HeroFactory.dict_to_hero(output, data)
-
-
-def create_map_table(
-    output: OutputSpace, conn: sqlite3.Connection, table_name: str
-) -> None:
-    """Створення таблиці для зберігання героя"""
-
-    if table_exists(output, conn, table_name):
-        output.write(f"Таблиця '{table_name}' вже існує", log=DEBUG)
-    else:
-        cursor = conn.cursor()
-        try:
-            sql = f"""CREATE TABLE {table_name} (
-        id INTEGER PRIMARY KEY,
-        map BLOB NOT NULL
-            )"""
-            cursor.execute(sql)
-        finally:
-            cursor.close()
-        output.write(f"Таблицю '{table_name}' успішно створено", log=DEBUG)
-
-
-def insert_map(output: OutputSpace, the_map: list | None, table_name: str) -> None:
-    """Вставка карти в БД -- новий запис або перезапис"""
-
-    table_name = sanitize_word(table_name)
-    if not table_name:
-        return
-
-    pickled_the_map = pickle.dumps(the_map)
-
-    try:
-        with sqlite3.connect(SQLITE_PATH) as connection:
-
-            create_map_table(output, connection, table_name)
-
-            cursor = connection.cursor()
-            try:
-                cursor.execute(
-                    f"INSERT INTO {table_name} (map) VALUES (?)",
-                    (pickled_the_map,),
-                )
-                map_id = cursor.lastrowid
-                output.write(f"Мапа збережена з ID: {map_id}", log=DEBUG)
-            finally:
-                cursor.close()
-
-    except sqlite3.Error as e:
-        output.write(f"Помилка SQLite: {e}", log=DEBUG)
-
-
-def select_maps(
-    output: OutputSpace,
-    table_name: str,
-    map_id: int | None = None,
-    conn: sqlite3.Connection | None = None,
-) -> list:
-    """
-    Універсальна функція вибірки.
-    Якщо map_id надано, шукає героя за іменем.
-    Якщо map_id = None, повертає список усіх мап.
-    """
-
-    if not conn:
-        table_name = sanitize_word(table_name)
-        if not table_name:
-            return []
-
-    sql_where = ""
-
-    if map_id is not None:
-        sql_where = " WHERE id = ?"
-
-    sql = f"SELECT id, map FROM {table_name}{sql_where} ORDER BY id"
-
-    def _select():
-        """Допоміжна функція для забезпечення DRY"""
-
-        cursor = connection.cursor()
-        try:
-            if map_id is not None:
-                cursor.execute(sql, (map_id,))
-            else:
-                cursor.execute(sql)
-            return cursor.fetchall()
-        finally:
-            cursor.close()
-
-    try:
-        if not conn:
-            with sqlite3.connect(SQLITE_PATH) as connection:
-                if not table_exists(output, connection, table_name):
-                    return []
-                return _select()
-        else:
-            connection = conn
-            if not table_exists(output, connection, table_name):
-                return []
-            return _select()
-
-    except sqlite3.Error as e:
-        output.write(f"Помилка SQLite: '{e}'", log=DEBUG)
-        return []
 
 
 def create_hero_and_map_table(
@@ -481,3 +319,78 @@ def sqlite_hero_and_map_saver(
         f"Героя {hero.name} збережено.",
         log=log,
     )
+
+
+def insert_user(
+    output: OutputSpace,
+    username: str,
+    hashed_password: bytes,
+    table_name: str,
+    log: bool = LOG,
+) -> bool:
+
+    def _create_users_table() -> None:
+        """Створення таблиці для користувачів"""
+        cur = connection.cursor()
+        try:
+            sql = f"""CREATE TABLE IF NOT EXISTS {table_name} (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                username TEXT NOT NULL UNIQUE,
+                hashed_password BLOB NOT NULL
+            )"""
+            cur.execute(sql)
+        finally:
+            cur.close()
+
+    table_name = sanitize_word(table_name)
+
+    try:
+        with sqlite3.connect(SQLITE_PATH) as connection:
+
+            _create_users_table()
+
+            cursor = connection.cursor()
+            try:
+                cursor.execute(
+                    f"INSERT INTO {table_name} (username, hashed_password) VALUES (?, ?)",
+                    (username, hashed_password),
+                )
+                if DEBUG:
+                    output.write(
+                        f"Користувача '{username}' збережено. ID: {cursor.lastrowid}",
+                        log=DEBUG,
+                    )
+                return True
+            finally:
+                cursor.close()
+
+    except sqlite3.IntegrityError:
+        output.write(
+            f"Користувач з іменем '{username}' вже існує. Виберіть інше ім'я.", log=log
+        )
+        return False
+
+    except sqlite3.Error as e:
+        output.write(f"Помилка SQLite: {e}", log=DEBUG)
+        return False
+
+
+def select_user(
+    output: OutputSpace, username: str, table_name: str
+) -> tuple[int, bytes] | None:
+
+    table_name = sanitize_word(table_name)
+
+    try:
+        with sqlite3.connect(SQLITE_PATH) as connection:
+            cursor = connection.cursor()
+            try:
+                sql = f"SELECT id, hashed_password FROM {table_name} WHERE username = ?"
+                cursor.execute(sql, (username,))
+                return cursor.fetchone()
+            finally:
+                cursor.close()
+
+    except sqlite3.Error as e:
+        output.write(f"Помилка SQLite під час пошуку користувача: {e}", log=DEBUG)
+        return None

@@ -8,7 +8,8 @@ JSON_SAVES_PATH = "./karatel/saves/hero.json"
 
 LOG = True
 
-DEBUG = False
+# DEBUG = False
+DEBUG = True
 
 HERO_LIVES = 3
 
