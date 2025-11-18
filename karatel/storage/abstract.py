@@ -61,21 +61,28 @@ class SQLiteSaver(SQLSaver):
         self._hero_table = HERO_SQL_TABLE
         self._users_table = USERS_SQL_TABLE
 
+    def _create_table_name(self, username: str) -> str:
+        return self._hero_table + "_" + username
+
     def list_hero(self, *args, username: str, **kwargs) -> list:
-        table_name = username + "_" + self._hero_table
-        return select_heroes(*args, table_name=table_name, **kwargs)
+        return select_heroes(
+            *args, table_name=self._create_table_name(username), **kwargs
+        )
 
     def save(self, *args, username: str, **kwargs) -> None:
-        table_name = username + "_" + self._hero_table
-        sqlite_hero_and_map_saver(*args, table_name=table_name, **kwargs)
+        sqlite_hero_and_map_saver(
+            *args, table_name=self._create_table_name(username), **kwargs
+        )
 
     def load(self, *args, username: str, **kwargs) -> Hero:
-        table_name = username + "_" + self._hero_table
-        return sqlite_hero_and_map_loader(*args, table_name=table_name, **kwargs)
+        return sqlite_hero_and_map_loader(
+            *args, table_name=self._create_table_name(username), **kwargs
+        )
 
     def delete(self, *args, username: str, **kwargs) -> bool:
-        table_name = username + "_" + self._hero_table
-        return delete_row_by_id(*args, table_name=table_name, **kwargs)
+        return delete_row_by_id(
+            *args, table_name=self._create_table_name(username), **kwargs
+        )
 
     def register(self, *args, **kwargs) -> bool:
         return insert_user(*args, table_name=self._users_table, **kwargs)

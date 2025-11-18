@@ -15,8 +15,8 @@ def check_pass(password: str, password_hash: bytes) -> bool:
 
 def validate_username(username: str) -> bool:
     """Перевіряє, чи ім'я користувача складається лише з латинських літер та цифр
-    і має довжину від 3 до 40 символів."""
-    pattern = r"^[a-zA-Z0-9\_]{3,40}$"
+    і має довжину від 2 до 40 символів."""
+    pattern = r"^[a-zA-Z0-9\_]{2,40}$"
     return bool(re.fullmatch(pattern, username))
 
 
