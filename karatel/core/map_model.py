@@ -225,27 +225,29 @@ def select_obj(
 def generate_map(hero: Hero) -> list[list[Cell]]:
     """Генерація мапи"""
 
+    def _crate_item_list() -> list:
+        item_list: list = []
+        # Метчимо рівень героя з рівнем предметів, які випадають на мапі
+        # та додаємо мультиплікатор
+        start_index = match_level(hero.level)
+        max_index = match_level(hero.level) + EnemyLine.MULTIPLIER
+        # Створюємо список предметів, який приблизно відповідає рівню героя
+        for a_list in ITEMS_LIST:
+            for index, item in enumerate(a_list[start_index:], start=start_index):
+                item_list.append(item)
+                if index == max_index:
+                    break
+        # Видаляємо дефолтні предмети, якщо вони є
+        if UNARMED_STRIKE in item_list:
+            item_list.remove(UNARMED_STRIKE)
+        if JUST_HAND in item_list:
+            item_list.remove(JUST_HAND)
+        return item_list
+
     start_hero_position_y = random.randint(0, StartHeroPosition.Y)
     start_hero_position_x = random.randint(0, StartHeroPosition.X)
 
-    #######################
-    all_items: list = []
-
-    # Метчимо рівень героя з рівнем предметів, які випадають на мапі
-    # та додаємо мультиплікатор
-    max_index = match_level(hero.level) + EnemyLine.MULTIPLIER
-
-    # Створюємо список предметів, який приблизно відповідає рівню героя
-    for a_list in ITEMS_LIST:
-        for index, item in enumerate(a_list):
-            all_items.append(item)
-            if index == max_index:
-                break
-
-    # Видаляємо дефолтні предмети
-    all_items.remove(UNARMED_STRIKE)
-    all_items.remove(JUST_HAND)
-    #######################
+    all_items = _crate_item_list()
 
     line_y: list[list] = []
     for coordinate_y in range(MapSize.Y):

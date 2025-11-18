@@ -35,7 +35,6 @@ def find_hero(the_map: list) -> Tuple[int | None, int | None]:
 
 def add_money(hero: Hero, cell: Cell, log=LOG) -> None:
     """Додавання грошей"""
-
     if cell.gold > 0:
         hero.money += cell.gold
         hero.output.write(f"{hero.name} отримує {cell.gold} грн", log=log)
@@ -43,7 +42,6 @@ def add_money(hero: Hero, cell: Cell, log=LOG) -> None:
 
 def add_lives(hero: Hero, value: int | None, log=LOG) -> None:
     """Додавання життів"""
-
     if value != 0 and value is not None:
         if value < 0 and abs(value) > hero.lives:
             value = hero.lives * -1

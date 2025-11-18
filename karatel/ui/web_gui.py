@@ -46,8 +46,6 @@ def init_session_state():
     if st.session_state.first_start:
         st.session_state.gsm = GameStateManager(
             output=BufferedOutput(),
-            # saver=XMLHeroSaver(),
-            # saver=JSONHeroSaver(),
             saver=SQLiteHeroSaver(),
             can_generate_map=False,
         )

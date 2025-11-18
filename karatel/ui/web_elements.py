@@ -64,7 +64,7 @@ def load_button() -> None:
 def load_hero_button() -> None:
     """Кнопка екрану завантажень героя"""
     if st.button(
-        "Відновити", icon=Emoji.MOVE_W.value, type="secondary", width=BUTTON_WIDTH
+        "Завантажити", icon=Emoji.MOVE_W.value, type="secondary", width=BUTTON_WIDTH
     ):
         st.session_state.game_state = GameState.LOAD_HERO.value
         st.rerun()
@@ -100,10 +100,10 @@ def navigation() -> None:
             and st.session_state.gsm.can_generate_map
         ):
             if st.button(
-                "Нове підземелля",
+                "Нова пригода",
                 icon=Emoji.DUNG.value,
                 type="primary",
-                width=BUTTON_WIDTH,
+                width=(BUTTON_WIDTH * 2),
             ):
                 st.session_state.game_map = None
                 st.session_state.gsm.can_generate_map = False
@@ -133,7 +133,10 @@ def respawn() -> None:
             else:
                 st.text(f"{Emoji.X.value} Ви програли!")
     with col2:
-        if st.session_state.hero.alive:
+        if (
+            st.session_state.hero.alive
+            and st.session_state.gsm.can_generate_map is False
+        ):
             save_button()
     with col3:
         select_load_button()
@@ -156,7 +159,7 @@ def equipment() -> None:
         col1, col2, col3, col4 = st.columns([1, 1, 1, 1])
         with col1:
             if st.button(
-                "Екіпірувати зброю",
+                "Взяти зброю",
                 icon=Emoji.WEAPON.value,
                 type="secondary",
                 width=BUTTON_WIDTH,
@@ -167,7 +170,7 @@ def equipment() -> None:
                 st.rerun()
         with col2:
             if st.button(
-                "Екіпірувати щит",
+                "Взяти щит",
                 icon=Emoji.SHIELD.value,
                 type="secondary",
                 width=BUTTON_WIDTH,
