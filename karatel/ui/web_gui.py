@@ -17,10 +17,12 @@ from karatel.ui.web_elements import (
     legend,
     movement_controls,
     navigation,
+    pass_input,
     respawn,
     select_load_button,
     show_hero,
     show_log,
+    username_input,
 )
 from karatel.utils.constants import Emoji
 from karatel.utils.crypt import (
@@ -73,6 +75,8 @@ def check_game_state() -> None:
                 on_map()
             case GameState.LOAD_HERO.value:
                 load_hero()
+            case GameState.PROFILE.value:
+                profile()
             case _:
                 st.title(f"{Emoji.X.value} Відсутній пункт меню")
                 st.write(f"game_state: {st.session_state.game_state}")
@@ -128,8 +132,8 @@ def authenticate_user():
 
     col1, col2 = st.columns(2)
     with col1:
-        username = st.text_input("Користувач")
-        password = st.text_input("Пароль", type="password")
+        username = username_input()
+        password = pass_input()
     with col2:
         st.text(st.session_state.gsm.output.read_buffer())
 
@@ -140,7 +144,7 @@ def authenticate_user():
         with col1:
             if st.button(
                 "Вхід",
-                icon=Emoji.EXIT.value,
+                icon=Emoji.LOGIN.value,
                 type="secondary",
                 width=BUTTON_WIDTH,
             ):
@@ -159,7 +163,7 @@ def authenticate_user():
         with col2:
             if st.button(
                 "Реєстрація",
-                icon=Emoji.LOG.value,
+                icon=Emoji.REG.value,
                 type="secondary",
                 width=BUTTON_WIDTH,
             ):
@@ -177,6 +181,14 @@ def authenticate_user():
         pass
 
 
+def profile() -> None:
+    """ "Екран з гравцем (героєм)"""
+    st.title(TITLE)
+    st.header(f"Профіль користувача '{st.session_state.gsm.username}'")
+
+    navigation()
+
+
 def hero() -> None:
     """ "Екран з гравцем (героєм)"""
 
@@ -185,7 +197,7 @@ def hero() -> None:
 
     if 'hero' in st.session_state:
         if not st.session_state.hero:
-            name = st.text_input("Ім'я", value="КАРАТЄЛЬ")
+            name = st.text_input("Ім'я", icon=Emoji.HERO.value, value="КАРАТЄЛЬ")
 
             professions_plus_none = {
                 None: Profession(
@@ -216,7 +228,7 @@ def hero() -> None:
             with col1:
                 if st.button(
                     "Створити",
-                    icon=Emoji.HERO.value,
+                    icon=Emoji.PLUS.value,
                     type="secondary",
                     width=BUTTON_WIDTH,
                 ):
@@ -314,7 +326,7 @@ def load_hero() -> None:
         with col4:
             if st.button(
                 "Відновити",
-                icon=Emoji.HERO.value,
+                icon=Emoji.LOAD.value,
                 type="secondary",
                 width=BUTTON_WIDTH,
                 key=f"respawn{hero_id}",
@@ -343,7 +355,7 @@ def load_hero() -> None:
         with col5:
             if st.button(
                 "Видалити",
-                icon=Emoji.TOMB.value,
+                icon=Emoji.TRASH.value,
                 type="primary",
                 width=BUTTON_WIDTH,
                 key=f"del{hero_id}",

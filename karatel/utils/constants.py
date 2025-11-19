@@ -32,6 +32,16 @@ class Emoji(Enum):
     MOVE_C = "↘️"
     CTRL = "🎮"
     CHECK = "✅"
+    TRASH = "🗑️"
+    SAVE = "💾"
+    LOAD = "📂"
+    REG = "📝"
+    LOGIN = "🔐"
+    PROFILE = "👤"
+    KEY = "🗝️"
+    PLUS = "➕"
+    LOGOUT = "🔚"
+    RELOAD = "↩️"
 
 
 TRANSLATIONS = {

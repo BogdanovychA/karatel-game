@@ -10,11 +10,22 @@ from karatel.utils.constants import Emoji
 from karatel.utils.settings import LOG
 
 
-def back_button() -> None:
-    """Кнопка НАЗАД"""
+def username_input():
+    return st.text_input(
+        "Користувач",
+        icon=Emoji.PROFILE.value,
+    )
+
+
+def pass_input():
+    return st.text_input("Пароль", icon=Emoji.KEY.value, type="password")
+
+
+def logout_button() -> None:
+    """Кнопка виходу з гри"""
 
     if st.button(
-        "Вийти з гри", icon=Emoji.BACK.value, type="primary", width=BUTTON_WIDTH
+        "Вийти з гри", icon=Emoji.LOGOUT.value, type="primary", width=BUTTON_WIDTH
     ):
         st.session_state.game_state = None
         st.session_state.gsm.username = None
@@ -50,33 +61,42 @@ def select_load_button() -> None:
             pass
 
 
-def load_button() -> None:
-    """Кнопка завантаження героя"""
-    if st.button(
-        "Завантажити", icon=Emoji.MOVE_W.value, type="secondary", width=BUTTON_WIDTH
-    ):
-        st.session_state.hero = st.session_state.gsm.saver.load_hero(
-            output=st.session_state.gsm.output, log=LOG
-        )
-        if st.session_state.game_map:
-            y, x = find_hero(st.session_state.game_map)
-            st.session_state.game_map[y][x].obj = st.session_state.hero
-        st.rerun()
+# def load_button() -> None:
+#     """Кнопка завантаження героя"""
+#     if st.button(
+#         "Завантажити", icon=Emoji.MOVE_W.value, type="secondary", width=BUTTON_WIDTH
+#     ):
+#         st.session_state.hero = st.session_state.gsm.saver.load_hero(
+#             output=st.session_state.gsm.output, log=LOG
+#         )
+#         if st.session_state.game_map:
+#             y, x = find_hero(st.session_state.game_map)
+#             st.session_state.game_map[y][x].obj = st.session_state.hero
+#         st.rerun()
 
 
 def load_hero_button() -> None:
     """Кнопка екрана завантажень героя"""
     if st.button(
-        "Завантажити", icon=Emoji.MOVE_W.value, type="secondary", width=BUTTON_WIDTH
+        "Завантажити", icon=Emoji.LOAD.value, type="secondary", width=BUTTON_WIDTH
     ):
         st.session_state.game_state = GameState.LOAD_HERO.value
+        st.rerun()
+
+
+def profile_button() -> None:
+    """Кнопка екрана профілю користувача"""
+    if st.button(
+        "Профіль", icon=Emoji.PROFILE.value, type="secondary", width=BUTTON_WIDTH
+    ):
+        st.session_state.game_state = GameState.PROFILE.value
         st.rerun()
 
 
 def save_button() -> None:
     """Кнопка збереження героя в XML-файл"""
     if st.button(
-        "Зберегти", icon=Emoji.MOVE_S.value, type="secondary", width=BUTTON_WIDTH
+        "Зберегти", icon=Emoji.SAVE.value, type="secondary", width=BUTTON_WIDTH
     ):
         st.session_state.gsm.saver.save_hero(
             username=st.session_state.gsm.username,
@@ -96,7 +116,12 @@ def navigation() -> None:
         match st.session_state.game_state:
             case GameState.HERO.value:
                 dungeon_button()
-            case GameState.ON_MAP.value | GameState.LOAD_HERO.value | None:
+            case (
+                GameState.ON_MAP.value
+                | GameState.LOAD_HERO.value
+                | GameState.PROFILE.value
+                | None
+            ):
                 hero_button()
     with col2:
         if (
@@ -117,8 +142,13 @@ def navigation() -> None:
     with col3:
         pass
     with col4:
-        if st.session_state.game_state is not None:
-            back_button()
+        if (
+            st.session_state.gsm.username is not None
+            and st.session_state.game_state != GameState.PROFILE.value
+        ):
+            profile_button()
+        elif st.session_state.game_state == GameState.PROFILE.value:
+            logout_button()
 
 
 def respawn() -> None:
