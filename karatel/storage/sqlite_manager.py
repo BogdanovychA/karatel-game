@@ -439,9 +439,9 @@ def update_user_data(
                     and username is not None
                 ):
                     try:
-                        # Якщо користувач ще не зберіг героя, то спроба перейменування   <-+
-                        # таблиці із збереженнями викличе помилку OperationalError,      <-+
-                        # яку перехопить виняток.                                        <-+
+                        # Якщо користувач ще не зберіг героя, то спроба перейменування
+                        # таблиці із збереженнями викличе помилку OperationalError,
+                        # яку перехопить виняток.
                         cursor.execute(
                             f"ALTER TABLE {old_username_table} RENAME TO {new_username_table};"
                         )
