@@ -2,6 +2,13 @@
 from enum import Enum
 
 
+class Sex(Enum):
+    """Enum-клас для зберігання статі"""
+
+    MAN = "Чоловік"
+    WOMAN = "Жінка"
+
+
 class Emoji(Enum):
     """Enum-клас для зберігання емоджі"""
 

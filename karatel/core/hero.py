@@ -22,7 +22,7 @@ from karatel.core.items import (
 )
 from karatel.core.professions import PROFESSIONS, Profession
 from karatel.core.skills import SKILLS, Skill, SkillTiming
-from karatel.utils.constants import FEMALE_NAMES, MALE_NAMES, TRANSLATIONS
+from karatel.utils.constants import FEMALE_NAMES, MALE_NAMES, TRANSLATIONS, Sex
 from karatel.utils.settings import (
     BASE_SKILL_LEVELS,
     DEBUG,
@@ -41,10 +41,12 @@ class Hero:
         self,
         output: OutputSpace,
         name: str,
+        sex: Sex,
         profession: Profession,
         experience: int = 0,
     ) -> None:
         self.name = sanitize_word(name)
+        self._sex = sex
         self.profession = profession
         self._level = MIN_LEVEL
         self._experience = 0
@@ -173,6 +175,18 @@ class Hero:
     def lives(self, value: int) -> None:
         """Сеттер життів героя"""
         self._lives = math.floor(clamp_value(value, 0, MAX_LEVEL))
+
+    @property
+    def sex(self) -> str:
+        return self._sex.value
+
+    @property
+    def man(self) -> bool:
+        return self._sex == Sex.MAN
+
+    @property
+    def woman(self) -> bool:
+        return self._sex == Sex.WOMAN
 
 
 class HeroDisplay:
@@ -496,6 +510,7 @@ class HeroFactory:
         level: int | None = None,
         profession: str | None = None,
         name: str | None = None,
+        sex: Sex | None = None,
         right_hand: Weapon | None = None,
         left_hand: Shield | None = None,
     ) -> Hero:
@@ -504,6 +519,8 @@ class HeroFactory:
 
         if name is None:
             name = HeroFactory.select_name()
+        if sex is None:
+            sex = Sex.MAN
         if profession is None:
             profession = random.choice(list(PROFESSIONS.values()))
         else:
@@ -516,6 +533,7 @@ class HeroFactory:
 
         hero = Hero(
             name=name,
+            sex=sex,
             profession=profession,
             experience=experience,
             output=output,
@@ -535,60 +553,60 @@ class HeroFactory:
 
         return hero
 
+    # @staticmethod
+    # def dict_to_hero(output: OutputSpace, the_dict: dict) -> Hero:
+    #     """Створення героя передаючи словник.
+    #     Використовується при завантаженнях зі збереження"""
+    #
+    #     def _create_list(input_list: list, base: tuple) -> list:
+    #         """Допоміжна функція для забезпечення DRY"""
+    #         the_list = []
+    #         for item in input_list:
+    #             the_list.append(obj_finder(item, base))
+    #         return the_list
+    #
+    #     hero = Hero(
+    #         output=output,
+    #         name=the_dict["name"],
+    #         profession=obj_finder(the_dict["profession"], PROFESSIONS),
+    #         experience=int(the_dict["experience"] or "0"),
+    #     )
+    #     hero.lives = int(the_dict["lives"] or "1")
+    #     hero.money = int(the_dict["money"] or "0")
+    #     hero.right_hand = obj_finder(the_dict["right_hand"], WEAPONS)
+    #     hero.left_hand = obj_finder(the_dict["left_hand"], SHIELDS)
+    #     hero.inventory = _create_list(the_dict["inventory"], ITEMS)
+    #     hero.skills = _create_list(the_dict["skills"], SKILLS)
+    #
+    #     return hero
+    #
+    # @staticmethod
+    # def hero_to_dict(hero: Hero) -> dict:
+    #     """Конвертація героя в словник -- для збереження"""
+    #     the_dict: dict = {
+    #         "name": hero.name,
+    #         "profession": hero.profession.name,
+    #         "experience": hero.experience,
+    #         "lives": hero.lives,
+    #         "money": hero.money,
+    #         "left_hand": hero.left_hand.name,
+    #         "right_hand": hero.right_hand.name,
+    #         "skills": [],
+    #         "inventory": [],
+    #     }
+    #     for skill in hero.skills:
+    #         the_dict["skills"].append(skill.name)
+    #     for item in hero.inventory:
+    #         the_dict["inventory"].append(item.name)
+    #
+    #     return the_dict
+
     @staticmethod
-    def dict_to_hero(output: OutputSpace, the_dict: dict) -> Hero:
-        """Створення героя передаючи словник.
-        Використовується при завантаженнях зі збереження"""
-
-        def _create_list(input_list: list, base: tuple) -> list:
-            """Допоміжна функція для забезпечення DRY"""
-            the_list = []
-            for item in input_list:
-                the_list.append(obj_finder(item, base))
-            return the_list
-
-        hero = Hero(
-            output=output,
-            name=the_dict["name"],
-            profession=obj_finder(the_dict["profession"], PROFESSIONS),
-            experience=int(the_dict["experience"] or "0"),
-        )
-        hero.lives = int(the_dict["lives"] or "1")
-        hero.money = int(the_dict["money"] or "0")
-        hero.right_hand = obj_finder(the_dict["right_hand"], WEAPONS)
-        hero.left_hand = obj_finder(the_dict["left_hand"], SHIELDS)
-        hero.inventory = _create_list(the_dict["inventory"], ITEMS)
-        hero.skills = _create_list(the_dict["skills"], SKILLS)
-
-        return hero
-
-    @staticmethod
-    def hero_to_dict(hero: Hero) -> dict:
-        """Конвертація героя в словник -- для збереження"""
-        the_dict: dict = {
-            "name": hero.name,
-            "profession": hero.profession.name,
-            "experience": hero.experience,
-            "lives": hero.lives,
-            "money": hero.money,
-            "left_hand": hero.left_hand.name,
-            "right_hand": hero.right_hand.name,
-            "skills": [],
-            "inventory": [],
-        }
-        for skill in hero.skills:
-            the_dict["skills"].append(skill.name)
-        for item in hero.inventory:
-            the_dict["inventory"].append(item.name)
-
-        return the_dict
-
-    @staticmethod
-    def select_name(sex: str | None = None) -> str:
+    def select_name(sex: Sex | None = None) -> str:
         """Допоміжна фун-ія для вибору імені героя при генерації"""
         if sex is None:
             return random.choice(MALE_NAMES + FEMALE_NAMES)
-        elif sex == "female":
+        elif sex == Sex.WOMAN:
             return random.choice(FEMALE_NAMES)
         else:
             return random.choice(MALE_NAMES)
