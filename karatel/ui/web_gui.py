@@ -214,15 +214,26 @@ def profile() -> None:
             width=BUTTON_WIDTH,
         ):
             if password:
-                all_data = st.session_state.gsm.saver.select_user(
-                    output=st.session_state.gsm.output, username=username, log=LOG
-                )
-                if all_data:
-                    user_id, hashed_password = all_data
-                    if validate_password(password, hashed_password):
-                        st.session_state.gsm.output.write("Пароль коректний")
-                    else:
-                        st.session_state.gsm.output.write("Пароль не коректний")
+                if check_username_and_password(username, password):
+                    all_data = st.session_state.gsm.saver.select_user(
+                        output=st.session_state.gsm.output,
+                        username=st.session_state.gsm.username,
+                        log=LOG,
+                    )
+                    if all_data:
+                        user_id, hashed_password = all_data
+                        if validate_password(password, hashed_password):
+                            if st.session_state.gsm.saver.update_username(
+                                output=st.session_state.gsm.output,
+                                user_id=user_id,
+                                old_username=st.session_state.gsm.username,
+                                new_username=username,
+                                log=LOG,
+                            ):
+                                st.session_state.gsm.username = username
+                        else:
+                            st.session_state.gsm.output.write("Пароль не коректний")
+
             else:
                 st.session_state.gsm.output.write(
                     "Для зміни імені користувача введіть діючий пароль", log=LOG
@@ -236,7 +247,19 @@ def profile() -> None:
             width=BUTTON_WIDTH,
         ):
             if check_password(password):
-                pass
+                all_data = st.session_state.gsm.saver.select_user(
+                    output=st.session_state.gsm.output,
+                    username=st.session_state.gsm.username,
+                    log=LOG,
+                )
+                if all_data:
+                    user_id, hashed_password = all_data
+                    st.session_state.gsm.saver.update_password(
+                        output=st.session_state.gsm.output,
+                        user_id=user_id,
+                        hashed_password=hash_pass(password),
+                        log=LOG,
+                    )
             st.rerun()
     with col3:
         pass
@@ -254,13 +277,13 @@ def profile() -> None:
                 if all_data:
                     user_id, hashed_password = all_data
                     if validate_password(password, hashed_password):
-                        st.session_state.gsm.saver.delete_user(
+                        if st.session_state.gsm.saver.delete_user(
                             output=st.session_state.gsm.output,
                             username=st.session_state.gsm.username,
                             row_id=user_id,
-                        )
-                        st.session_state.gsm.username = None
-                        st.session_state.game_state = None
+                        ):
+                            st.session_state.gsm.username = None
+                            st.session_state.game_state = None
                     else:
                         st.session_state.gsm.output.write("Пароль не коректний")
             else:

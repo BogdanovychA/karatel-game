@@ -13,6 +13,7 @@ from karatel.storage.sqlite_manager import (
     select_user,
     sqlite_hero_and_map_loader,
     sqlite_hero_and_map_saver,
+    update_user_data,
 )
 from karatel.utils.settings import HERO_SQL_TABLE, USERS_SQL_TABLE
 
@@ -51,12 +52,22 @@ class SQLSaver(ABC):
 
     @abstractmethod
     def select_user(self, *args, **kwargs) -> tuple[int, bytes] | None:
-        """Авторизація користувача через 'відкритий простір'"""
+        """Вибірка інформації про користувача через 'відкритий простір'"""
         pass
 
     @abstractmethod
     def delete_user(self, *args, **kwargs) -> bool:
-        """Авторизація користувача через 'відкритий простір'"""
+        """Видалення користувача через 'відкритий простір'"""
+        pass
+
+    @abstractmethod
+    def update_password(self, *args, **kwargs) -> bool:
+        """Оновлення пароля користувача через 'відкритий простір'"""
+        pass
+
+    @abstractmethod
+    def update_username(self, *args, **kwargs) -> bool:
+        """Оновлення імені користувача через 'відкритий простір'"""
         pass
 
 
@@ -98,13 +109,40 @@ class SQLiteSaver(SQLSaver):
         return select_user(*args, table_name=self._users_table, **kwargs)
 
     def delete_user(self, output: OutputSpace, username: str, row_id: int) -> bool:
-        table_deleted = delete_table(
-            output=output, table_name=self._create_table_name(username)
-        )
-        row_deleted = delete_row_by_id(
+        delete_table(output=output, table_name=self._create_table_name(username))
+        is_row_deleted = delete_row_by_id(
             output=output, table_name=self._users_table, row_id=row_id
         )
-        return table_deleted and row_deleted
+        return is_row_deleted
+
+    def update_password(
+        self, output: OutputSpace, user_id: int, hashed_password: bytes, log: bool
+    ) -> bool:
+        return update_user_data(
+            output=output,
+            user_id=user_id,
+            hashed_password=hashed_password,
+            table_name=self._users_table,
+            log=log,
+        )
+
+    def update_username(
+        self,
+        output: OutputSpace,
+        user_id: int,
+        new_username: str,
+        old_username: str,
+        log: bool,
+    ) -> bool:
+        return update_user_data(
+            output=output,
+            user_id=user_id,
+            username=new_username,
+            old_username_table=self._create_table_name(old_username),
+            new_username_table=self._create_table_name(new_username),
+            table_name=self._users_table,
+            log=log,
+        )
 
 
 #

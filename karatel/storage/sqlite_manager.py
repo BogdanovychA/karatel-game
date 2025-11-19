@@ -369,11 +369,10 @@ def insert_user(
                     f"INSERT INTO {table_name} (username, hashed_password) VALUES (?, ?)",
                     (username, hashed_password),
                 )
-                if DEBUG:
-                    output.write(
-                        f"Користувача '{username}' збережено. ID: {cursor.lastrowid}",
-                        log=DEBUG,
-                    )
+                output.write(
+                    f"Користувача '{username}' збережено. ID: {cursor.lastrowid}",
+                    log=DEBUG,
+                )
                 return True
             finally:
                 cursor.close()
@@ -386,6 +385,88 @@ def insert_user(
 
     except sqlite3.Error as e:
         output.write(f"Помилка SQLite: {e}", log=DEBUG)
+        return False
+
+
+def update_user_data(
+    output: OutputSpace,
+    user_id: int,
+    table_name: str,
+    hashed_password: bytes | None = None,
+    username: str | None = None,
+    old_username_table: str | None = None,
+    new_username_table: str | None = None,
+    log: bool = LOG,
+) -> bool:
+
+    table_name = sanitize_word(table_name)
+
+    if hashed_password is not None:
+        query = "SET hashed_password = ?"
+        data = hashed_password
+        output_text = "Пароль"
+    elif (
+        username is not None
+        and old_username_table is not None
+        and new_username_table is not None
+    ):
+        query = "SET username = ?"
+        data = username
+        output_text = "Ім'я"
+        old_username_table = sanitize_word(old_username_table)
+        new_username_table = sanitize_word(new_username_table)
+    else:
+        output.write("Не вказано жодного поля для оновлення.", log=DEBUG)
+        return False
+
+    try:
+        with sqlite3.connect(SQLITE_PATH) as connection:
+
+            cursor = connection.cursor()
+            try:
+                cursor.execute(
+                    f"""UPDATE {table_name}
+                {query}
+                WHERE id = ?;
+                """,
+                    (data, user_id),
+                )
+
+                if (
+                    hashed_password is None
+                    and old_username_table is not None
+                    and new_username_table is not None
+                    and username is not None
+                ):
+                    try:
+                        # Якщо користувач ще не зберіг героя, то спроба перейменування   <-+
+                        # таблиці із збереженнями викличе помилку OperationalError,      <-+
+                        # яку перехопить виняток.                                        <-+
+                        cursor.execute(
+                            f"ALTER TABLE {old_username_table} RENAME TO {new_username_table};"
+                        )
+                    except sqlite3.OperationalError:  # "З'їдаємо" помилку
+                        output.write(
+                            f"Таблиця збережень '{old_username_table}' не знайдена. Ігноруємо.",
+                            log=DEBUG,
+                        )
+
+                output.write(
+                    f"{output_text} користувача з ID '{user_id}' оновлено.",
+                    log=log,
+                )
+                return True
+            finally:
+                cursor.close()
+
+    except sqlite3.IntegrityError:
+        output.write(
+            f"Користувач з іменем '{username}' вже існує. Виберіть інше ім'я.", log=log
+        )
+        return False
+
+    except sqlite3.Error as e:
+        output.write(f"Помилка SQLite при оновленні даних користувача: '{e}.", log=log)
         return False
 
 
