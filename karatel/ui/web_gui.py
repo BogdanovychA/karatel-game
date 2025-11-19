@@ -308,7 +308,9 @@ def hero() -> None:
             professions_plus_none = {
                 None: Profession(
                     name="Оберіть професію",
+                    name_fem="Оберіть професію",
                     description="",
+                    description_fem="",
                     main_bonuses=("",),
                     secondary_bonuses=("",),
                     penalties=("",),
