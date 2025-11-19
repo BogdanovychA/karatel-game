@@ -56,6 +56,7 @@ def init_session_state():
             saver=SQLiteSaver(),
             username=None,
             can_generate_map=False,
+            sex="Чоловік",
         )
         st.session_state.first_start = False
 
@@ -303,12 +304,29 @@ def hero() -> None:
 
     if 'hero' in st.session_state:
         if not st.session_state.hero:
-            name = st.text_input("Ім'я", icon=Emoji.HERO.value, value="КАРАТЄЛЬ")
+
+            st.session_state.gsm.sex = st.radio(
+                "Оберіть стать",
+                key="sex_radio",
+                options=["Чоловік", "Жінка"],
+            )
+
+            if st.session_state.gsm.sex == "Жінка":
+                name_text = "КАРАТЄЛЬКА"
+            else:
+                name_text = "КАРАТЄЛЬ"
+
+            name = st.text_input("Ім'я", icon=Emoji.HERO.value, value=name_text)
+
+            if st.session_state.gsm.sex == "Жінка":
+                man = False
+            else:
+                man = True
 
             professions_plus_none = {
                 None: Profession(
                     name="Оберіть професію",
-                    name_fem="Оберіть професію",
+                    name_fem="",
                     description="",
                     description_fem="",
                     main_bonuses=("",),
@@ -321,13 +339,15 @@ def hero() -> None:
             profession = st.selectbox(
                 "Професія",
                 options=list(professions_plus_none.keys()),
-                format_func=lambda x: professions_plus_none[x].name,
+                format_func=lambda x: professions_plus_none[x].name
+                + " / "
+                + professions_plus_none[x].name_fem,
             )
             level = st.slider("Рівень", MIN_LEVEL, MAX_LEVEL, MIN_LEVEL)
 
             with st.expander("Професії", expanded=True):
                 show_professions(
-                    output=st.session_state.gsm.output, professions=profession
+                    output=st.session_state.gsm.output, professions=profession, man=man
                 )
                 st.text(st.session_state.gsm.output.read_buffer())
 

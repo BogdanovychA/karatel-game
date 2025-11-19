@@ -14,6 +14,7 @@ class GameStateManager:
     saver: SQLSaver
     can_generate_map: bool
     username: str | None
+    sex: str | None
 
 
 # gsm = GameStateManager(
