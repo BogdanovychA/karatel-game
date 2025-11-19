@@ -15,11 +15,11 @@ from karatel.ui.web_constants import BUTTON_WIDTH, TITLE, GameState
 from karatel.ui.web_elements import (
     equipment,
     legend,
+    load_hero_button,
     movement_controls,
     navigation,
     pass_input,
     respawn,
-    select_load_button,
     show_hero,
     show_log,
     username_input,
@@ -71,8 +71,8 @@ def check_game_state() -> None:
         match st.session_state.game_state:
             case GameState.HERO.value:
                 hero()
-            case GameState.ON_MAP.value:
-                on_map()
+            case GameState.MAP.value:
+                game_map()
             case GameState.LOAD_HERO.value:
                 load_hero()
             case GameState.PROFILE.value:
@@ -241,7 +241,7 @@ def hero() -> None:
                     st.session_state.hero.lives = HERO_LIVES
                     st.rerun()
             with col2:
-                select_load_button()
+                load_hero_button()
             with col3:
                 pass
             with col4:
@@ -255,7 +255,7 @@ def hero() -> None:
     navigation()
 
 
-def on_map() -> None:
+def game_map() -> None:
     """Карта (підземелля)"""
 
     st.title(TITLE)

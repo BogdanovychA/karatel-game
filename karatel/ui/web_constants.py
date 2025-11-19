@@ -9,6 +9,6 @@ BUTTON_WIDTH = 150
 class GameState(Enum):
 
     HERO = "hero"
-    ON_MAP = "on_map"
+    MAP = "map"
     LOAD_HERO = "load_hero"
     PROFILE = "profile"

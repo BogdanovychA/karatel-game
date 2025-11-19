@@ -3,7 +3,7 @@
 import streamlit as st
 
 from karatel.core.items import Shield, Weapon
-from karatel.logic.map_logic import find_hero, move_hero
+from karatel.logic.map_logic import move_hero
 from karatel.storage.abstract import SQLiteSaver
 from karatel.ui.web_constants import BUTTON_WIDTH, GameState
 from karatel.utils.constants import Emoji
@@ -39,7 +39,7 @@ def dungeon_button() -> None:
         if st.button(
             "Підземелля", icon=Emoji.DUNG.value, type="secondary", width=BUTTON_WIDTH
         ):
-            st.session_state.game_state = GameState.ON_MAP.value
+            st.session_state.game_state = GameState.MAP.value
             st.rerun()
 
 
@@ -51,16 +51,19 @@ def hero_button() -> None:
         st.rerun()
 
 
-def select_load_button() -> None:
-    match st.session_state.gsm.saver:
-        case SQLiteSaver():
-            load_hero_button()
-        # case JSONHeroSaver() | XMLHeroSaver():
-        #     load_button()
-        case _:
-            pass
+# Втратило актуальність
+#
+# def select_load_button() -> None:
+#     match st.session_state.gsm.saver:
+#         case SQLiteSaver():
+#             load_hero_button()
+#         # case JSONHeroSaver() | XMLHeroSaver():
+#         #     load_button()
+#         case _:
+#             pass
 
-
+# Втратило актуальність
+#
 # def load_button() -> None:
 #     """Кнопка завантаження героя"""
 #     if st.button(
@@ -117,7 +120,7 @@ def navigation() -> None:
             case GameState.HERO.value:
                 dungeon_button()
             case (
-                GameState.ON_MAP.value
+                GameState.MAP.value
                 | GameState.LOAD_HERO.value
                 | GameState.PROFILE.value
                 | None
@@ -127,7 +130,7 @@ def navigation() -> None:
         if (
             'game_map' in st.session_state
             and st.session_state.game_map
-            and st.session_state.game_state == GameState.ON_MAP.value
+            and st.session_state.game_state == GameState.MAP.value
             and st.session_state.gsm.can_generate_map
         ):
             if st.button(
@@ -175,7 +178,7 @@ def respawn() -> None:
         ):
             save_button()
     with col3:
-        select_load_button()
+        load_hero_button()
     with col4:
         if st.button(
             "Знищити", icon=Emoji.TOMB.value, type="primary", width=BUTTON_WIDTH
@@ -275,12 +278,28 @@ def movement_controls() -> None:
 
 def legend() -> None:
     st.html(f"{Emoji.LEGEND.value} <b>Легенда:</b>")
-    st.html(
-        f"{Emoji.HERO.value} — ти (герой) | {Emoji.ENEMY.value} — ворог | "
-        + f"{Emoji.EXIT.value} — вихід<br>{Emoji.BOOK.value} — досвід | "
-        + f"{Emoji.ITEM.value} — скарб | {Emoji.GOLD.value} — гроші<br>"
-        + f"{Emoji.EMPTY.value} — нічого"
-    )
+
+    col1, col2, col3, col4 = st.columns([1, 1, 1, 1])
+
+    with col1:
+        st.text(f"{Emoji.HERO.value} — ти (герой)")
+    with col2:
+        st.text(f"{Emoji.ENEMY.value} — ворог")
+    with col3:
+        st.text(f"{Emoji.EXIT.value} — вихід")
+    with col4:
+        st.text(f"{Emoji.BOOK.value} — досвід")
+
+    col1, col2, col3, col4 = st.columns([1, 1, 1, 1])
+
+    with col1:
+        st.text(f"{Emoji.ITEM.value} — скарб")
+    with col2:
+        st.text(f"{Emoji.GOLD.value} — гроші")
+    with col3:
+        st.text(f"{Emoji.EMPTY.value} — нічого")
+    with col4:
+        pass
 
 
 def show_log(expanded: bool = False) -> None:
