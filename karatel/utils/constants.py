@@ -42,6 +42,8 @@ class Emoji(Enum):
     PLUS = "➕"
     LOGOUT = "🔚"
     RELOAD = "↩️"
+    MAN = "🧑"
+    WOMEN = "👩"
 
 
 TRANSLATIONS = {

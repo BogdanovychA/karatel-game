@@ -26,10 +26,10 @@ from karatel.ui.web_elements import (
 )
 from karatel.utils.constants import Emoji
 from karatel.utils.crypt import (
-    check_pass,
     hash_pass,
     is_password_valid,
-    validate_username,
+    is_username_valid,
+    validate_password,
 )
 from karatel.utils.settings import HERO_LIVES, LOG, MAX_LEVEL, MIN_LEVEL
 
@@ -84,32 +84,41 @@ def check_game_state() -> None:
         authenticate_user()
 
 
+def check_username_and_password(username: str, password: str) -> bool:
+    uname = check_username(username)
+    pwd = check_password(password)
+    if not uname or not pwd:
+        st.rerun()
+    return uname and pwd
+
+
+def check_username(username: str) -> bool:
+    uname = is_username_valid(username)
+    if not uname:
+        st.session_state.gsm.output.write(
+            "Ім'я користувача має містити мінімум 2 символи, "
+            + "може мати лише літери латинського алфавіту, "
+            + "цифри та знак підкреслення."
+        )
+    return uname
+
+
+def check_password(password: str) -> bool:
+    pwd = is_password_valid(password)
+    if not pwd:
+        st.session_state.gsm.output.write(
+            "Пароль має складатися з мінімум 8 символів латинського алфавіту, "
+            + "має містити мінімум одну велику та одну малу літеру і "
+            + "обов'язково має мати мінімум одну цифру і один спеціальний символ."
+        )
+    return pwd
+
+
 def authenticate_user():
 
     def _start() -> None:
         st.session_state.gsm.username = username
         st.session_state.game_state = GameState.HERO.value
-
-    def _check_username_and_password() -> bool:
-        uname = True
-        pwd = True
-        if not validate_username(username):
-            st.session_state.gsm.output.write(
-                "Ім'я користувача має містити мінімум 2 символи, "
-                + "може мати лише літери латинського алфавіту, "
-                + "цифри та знак підкреслення."
-            )
-            uname = False
-        if not is_password_valid(password):
-            st.session_state.gsm.output.write(
-                "Пароль має складатися з мінімум 8 символів латинського алфавіту, "
-                + "має містити мінімум одну велику та одну малу літеру і "
-                + "обов'язково має мати мінімум одну цифру і один спеціальний символ."
-            )
-            pwd = False
-        if not uname or not pwd:
-            st.rerun()
-        return uname and pwd
 
     st.image("./karatel/images/logo.png", width=500)
     st.subheader(
@@ -148,13 +157,13 @@ def authenticate_user():
                 type="secondary",
                 width=BUTTON_WIDTH,
             ):
-                if _check_username_and_password():
-                    all_data = st.session_state.gsm.saver.login_user(
+                if check_username_and_password(username, password):
+                    all_data = st.session_state.gsm.saver.select_user(
                         output=st.session_state.gsm.output, username=username, log=LOG
                     )
                     if all_data:
                         user_id, hashed_password = all_data
-                        if check_pass(password, hashed_password):
+                        if validate_password(password, hashed_password):
                             _start()
                         else:
                             st.session_state.gsm.output.write("Пароль не коректний")
@@ -167,7 +176,7 @@ def authenticate_user():
                 type="secondary",
                 width=BUTTON_WIDTH,
             ):
-                if _check_username_and_password():
+                if check_username_and_password(username, password):
                     if st.session_state.gsm.saver.register_user(
                         output=st.session_state.gsm.output,
                         username=username,
@@ -184,7 +193,81 @@ def authenticate_user():
 def profile() -> None:
     """ "Екран з гравцем (героєм)"""
     st.title(TITLE)
-    st.header(f"Профіль користувача '{st.session_state.gsm.username}'")
+    st.header(
+        f"{Emoji.PROFILE.value} Профіль користувача '{st.session_state.gsm.username}'"
+    )
+
+    col1, col2 = st.columns(2)
+    with col1:
+        username = username_input()
+        password = pass_input()
+    with col2:
+        st.text(st.session_state.gsm.output.read_buffer())
+
+    col1, col2, col3, col4 = st.columns([1, 1, 1, 1])
+
+    with col1:
+        if st.button(
+            "Змінити логін",
+            icon=Emoji.LOGIN.value,
+            type="secondary",
+            width=BUTTON_WIDTH,
+        ):
+            if password:
+                all_data = st.session_state.gsm.saver.select_user(
+                    output=st.session_state.gsm.output, username=username, log=LOG
+                )
+                if all_data:
+                    user_id, hashed_password = all_data
+                    if validate_password(password, hashed_password):
+                        st.session_state.gsm.output.write("Пароль коректний")
+                    else:
+                        st.session_state.gsm.output.write("Пароль не коректний")
+            else:
+                st.session_state.gsm.output.write(
+                    "Для зміни імені користувача введіть діючий пароль", log=LOG
+                )
+            st.rerun()
+    with col2:
+        if st.button(
+            "Змінити пароль",
+            icon=Emoji.KEY.value,
+            type="secondary",
+            width=BUTTON_WIDTH,
+        ):
+            if check_password(password):
+                pass
+            st.rerun()
+    with col3:
+        pass
+    with col4:
+        if st.button(
+            "Видалити користувача",
+            icon=Emoji.TRASH.value,
+            type="primary",
+            width=BUTTON_WIDTH,
+        ):
+            if password:
+                all_data = st.session_state.gsm.saver.select_user(
+                    output=st.session_state.gsm.output, username=username, log=LOG
+                )
+                if all_data:
+                    user_id, hashed_password = all_data
+                    if validate_password(password, hashed_password):
+                        st.session_state.gsm.saver.delete_user(
+                            output=st.session_state.gsm.output,
+                            username=st.session_state.gsm.username,
+                            row_id=user_id,
+                        )
+                        st.session_state.gsm.username = None
+                        st.session_state.game_state = None
+                    else:
+                        st.session_state.gsm.output.write("Пароль не коректний")
+            else:
+                st.session_state.gsm.output.write(
+                    "Для видалення користувача введіть діючий пароль", log=LOG
+                )
+            st.rerun()
 
     navigation()
 

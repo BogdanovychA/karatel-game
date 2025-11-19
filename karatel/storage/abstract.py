@@ -7,6 +7,7 @@ from typing import TYPE_CHECKING
 
 from karatel.storage.sqlite_manager import (
     delete_row_by_id,
+    delete_table,
     insert_user,
     select_heroes,
     select_user,
@@ -17,6 +18,7 @@ from karatel.utils.settings import HERO_SQL_TABLE, USERS_SQL_TABLE
 
 if TYPE_CHECKING:
     from karatel.core.hero import Hero
+    from karatel.ui.abstract import OutputSpace
 
 
 class SQLSaver(ABC):
@@ -48,7 +50,12 @@ class SQLSaver(ABC):
         pass
 
     @abstractmethod
-    def login_user(self, *args, **kwargs) -> tuple[int, bytes] | None:
+    def select_user(self, *args, **kwargs) -> tuple[int, bytes] | None:
+        """Авторизація користувача через 'відкритий простір'"""
+        pass
+
+    @abstractmethod
+    def delete_user(self, *args, **kwargs) -> bool:
         """Авторизація користувача через 'відкритий простір'"""
         pass
 
@@ -87,8 +94,17 @@ class SQLiteSaver(SQLSaver):
     def register_user(self, *args, **kwargs) -> bool:
         return insert_user(*args, table_name=self._users_table, **kwargs)
 
-    def login_user(self, *args, **kwargs) -> tuple[int, bytes] | None:
+    def select_user(self, *args, **kwargs) -> tuple[int, bytes] | None:
         return select_user(*args, table_name=self._users_table, **kwargs)
+
+    def delete_user(self, output: OutputSpace, username: str, row_id: int) -> bool:
+        table_deleted = delete_table(
+            output=output, table_name=self._create_table_name(username)
+        )
+        row_deleted = delete_row_by_id(
+            output=output, table_name=self._users_table, row_id=row_id
+        )
+        return table_deleted and row_deleted
 
 
 #

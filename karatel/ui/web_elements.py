@@ -4,16 +4,20 @@ import streamlit as st
 
 from karatel.core.items import Shield, Weapon
 from karatel.logic.map_logic import move_hero
-from karatel.storage.abstract import SQLiteSaver
 from karatel.ui.web_constants import BUTTON_WIDTH, GameState
 from karatel.utils.constants import Emoji
 from karatel.utils.settings import LOG
 
 
 def username_input():
+    if st.session_state.gsm.username is not None:
+        value = st.session_state.gsm.username
+    else:
+        value = ""
     return st.text_input(
         "Користувач",
-        icon=Emoji.PROFILE.value,
+        icon=Emoji.MAN.value,
+        value=value,
     )
 
 

@@ -8,12 +8,12 @@ def hash_pass(password: str) -> bytes:
     return bcrypt.hashpw(password.encode("utf-8"), bcrypt.gensalt())
 
 
-def check_pass(password: str, password_hash: bytes) -> bool:
+def validate_password(password: str, password_hash: bytes) -> bool:
     """Перевірка паролю по хешу"""
     return bcrypt.checkpw(password.encode("utf-8"), password_hash)
 
 
-def validate_username(username: str) -> bool:
+def is_username_valid(username: str) -> bool:
     """Перевіряє, чи ім'я користувача складається лише з латинських літер та цифр
     і має довжину від 2 до 40 символів."""
     pattern = r"^[a-zA-Z0-9\_]{2,40}$"
