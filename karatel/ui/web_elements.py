@@ -55,7 +55,7 @@ def load_button() -> None:
     if st.button(
         "Завантажити", icon=Emoji.MOVE_W.value, type="secondary", width=BUTTON_WIDTH
     ):
-        st.session_state.hero = st.session_state.gsm.saver.load(
+        st.session_state.hero = st.session_state.gsm.saver.load_hero(
             output=st.session_state.gsm.output, log=LOG
         )
         if st.session_state.game_map:
@@ -65,7 +65,7 @@ def load_button() -> None:
 
 
 def load_hero_button() -> None:
-    """Кнопка екрану завантажень героя"""
+    """Кнопка екрана завантажень героя"""
     if st.button(
         "Завантажити", icon=Emoji.MOVE_W.value, type="secondary", width=BUTTON_WIDTH
     ):
@@ -78,7 +78,7 @@ def save_button() -> None:
     if st.button(
         "Зберегти", icon=Emoji.MOVE_S.value, type="secondary", width=BUTTON_WIDTH
     ):
-        st.session_state.gsm.saver.save(
+        st.session_state.gsm.saver.save_hero(
             username=st.session_state.gsm.username,
             hero=st.session_state.hero,
             game_map=st.session_state.game_map,
@@ -219,7 +219,7 @@ MOVE_BUTTONS = [
 
 
 def movement_controls() -> None:
-    """Рендерить кнопки керування 3x3"""
+    """Створення кнопок керування 3x3"""
 
     st.html(f"{Emoji.CTRL.value} <b>Керування:</b>")
 

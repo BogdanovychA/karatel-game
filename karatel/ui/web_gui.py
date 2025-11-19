@@ -145,7 +145,7 @@ def authenticate_user():
                 width=BUTTON_WIDTH,
             ):
                 if _check_username_and_password():
-                    all_data = st.session_state.gsm.saver.login(
+                    all_data = st.session_state.gsm.saver.login_user(
                         output=st.session_state.gsm.output, username=username, log=LOG
                     )
                     if all_data:
@@ -164,7 +164,7 @@ def authenticate_user():
                 width=BUTTON_WIDTH,
             ):
                 if _check_username_and_password():
-                    if st.session_state.gsm.saver.register(
+                    if st.session_state.gsm.saver.register_user(
                         output=st.session_state.gsm.output,
                         username=username,
                         hashed_password=hash_pass(password),
@@ -321,7 +321,7 @@ def load_hero() -> None:
             ):
                 # Відновлюємо героя та мапу
                 st.session_state.hero, st.session_state.game_map = (
-                    st.session_state.gsm.saver.load(
+                    st.session_state.gsm.saver.load_hero(
                         username=st.session_state.gsm.username,
                         output=st.session_state.gsm.output,
                         hero_id=hero_id,
@@ -348,7 +348,7 @@ def load_hero() -> None:
                 width=BUTTON_WIDTH,
                 key=f"del{hero_id}",
             ):
-                st.session_state.gsm.saver.delete(
+                st.session_state.gsm.saver.delete_hero(
                     output=st.session_state.gsm.output,
                     username=st.session_state.gsm.username,
                     row_id=hero_id,

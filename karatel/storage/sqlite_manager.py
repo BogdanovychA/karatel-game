@@ -209,30 +209,44 @@ def delete_row_by_id(output: OutputSpace, table_name: str, row_id: int) -> bool:
         return False
 
 
-def create_hero_and_map_table(
-    output: OutputSpace, conn: sqlite3.Connection, table_name: str
-) -> None:
-    """Створення таблиці для зберігання героя та мапи"""
+# def create_hero_and_map_table(
+#     output: OutputSpace, conn: sqlite3.Connection, table_name: str
+# ) -> None:
+#     """Створення таблиці для зберігання героя та мапи"""
+#
+#     if table_exists(output, conn, table_name):
+#         output.write(f"Таблиця '{table_name}' вже існує", log=DEBUG)
+#     else:
+#         cursor = conn.cursor()
+#         try:
+#             sql = f"""CREATE TABLE IF NOT EXISTS {table_name} (
+#         id INTEGER PRIMARY KEY,
+#         name TEXT NOT NULL,
+#         hero BLOB NOT NULL,
+#         map BLOB NOT NULL
+#             )"""
+#             cursor.execute(sql)
+#         finally:
+#             cursor.close()
+#         output.write(f"Таблицю '{table_name}' успішно створено", log=DEBUG)
 
-    if table_exists(output, conn, table_name):
-        output.write(f"Таблиця '{table_name}' вже існує", log=DEBUG)
-    else:
-        cursor = conn.cursor()
+
+def insert_hero_and_map(hero: Hero, game_map: list | None, table_name: str) -> None:
+    """Вставка героя в БД -- новий запис або перезапис"""
+
+    def _create_table() -> None:
+
+        cur = connection.cursor()
         try:
-            sql = f"""CREATE TABLE {table_name} (
+            sql = f"""CREATE TABLE IF NOT EXISTS {table_name} (
         id INTEGER PRIMARY KEY,
         name TEXT NOT NULL,
         hero BLOB NOT NULL,
         map BLOB NOT NULL
             )"""
-            cursor.execute(sql)
+            cur.execute(sql)
         finally:
-            cursor.close()
-        output.write(f"Таблицю '{table_name}' успішно створено", log=DEBUG)
-
-
-def insert_hero_and_map(hero: Hero, game_map: list | None, table_name: str) -> None:
-    """Вставка героя в БД -- новий запис або перезапис"""
+            cur.close()
 
     table_name = sanitize_word(table_name)
     if not table_name:
@@ -252,7 +266,7 @@ def insert_hero_and_map(hero: Hero, game_map: list | None, table_name: str) -> N
             if not old_data:
                 insert = True
 
-            create_hero_and_map_table(hero.output, connection, table_name)
+            _create_table()
 
             cursor = connection.cursor()
             try:
@@ -329,7 +343,7 @@ def insert_user(
     log: bool = LOG,
 ) -> bool:
 
-    def _create_users_table() -> None:
+    def _create_table() -> None:
         """Створення таблиці для користувачів"""
         cur = connection.cursor()
         try:
@@ -347,7 +361,7 @@ def insert_user(
     try:
         with sqlite3.connect(SQLITE_PATH) as connection:
 
-            _create_users_table()
+            _create_table()
 
             cursor = connection.cursor()
             try:

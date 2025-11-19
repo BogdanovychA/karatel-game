@@ -28,27 +28,27 @@ class SQLSaver(ABC):
         pass
 
     @abstractmethod
-    def save(self, *args, hero: Hero, **kwargs) -> None:
+    def save_hero(self, *args, hero: Hero, **kwargs) -> None:
         """Збереження героя через 'відкритий простір'"""
         pass
 
     @abstractmethod
-    def load(self, *args, **kwargs) -> Hero:
+    def load_hero(self, *args, **kwargs) -> Hero:
         """Завантаження героя через 'відкритий простір'"""
         pass
 
     @abstractmethod
-    def delete(self, *args, **kwargs) -> bool:
+    def delete_hero(self, *args, **kwargs) -> bool:
         """Видалення героя через 'відкритий простір'"""
         pass
 
     @abstractmethod
-    def register(self, *args, **kwargs) -> bool:
+    def register_user(self, *args, **kwargs) -> bool:
         """Реєстрація користувача через 'відкритий простір'"""
         pass
 
     @abstractmethod
-    def login(self, *args, **kwargs) -> tuple[int, bytes] | None:
+    def login_user(self, *args, **kwargs) -> tuple[int, bytes] | None:
         """Авторизація користувача через 'відкритий простір'"""
         pass
 
@@ -69,25 +69,25 @@ class SQLiteSaver(SQLSaver):
             *args, table_name=self._create_table_name(username), **kwargs
         )
 
-    def save(self, *args, username: str, **kwargs) -> None:
+    def save_hero(self, *args, username: str, **kwargs) -> None:
         sqlite_hero_and_map_saver(
             *args, table_name=self._create_table_name(username), **kwargs
         )
 
-    def load(self, *args, username: str, **kwargs) -> Hero:
+    def load_hero(self, *args, username: str, **kwargs) -> Hero:
         return sqlite_hero_and_map_loader(
             *args, table_name=self._create_table_name(username), **kwargs
         )
 
-    def delete(self, *args, username: str, **kwargs) -> bool:
+    def delete_hero(self, *args, username: str, **kwargs) -> bool:
         return delete_row_by_id(
             *args, table_name=self._create_table_name(username), **kwargs
         )
 
-    def register(self, *args, **kwargs) -> bool:
+    def register_user(self, *args, **kwargs) -> bool:
         return insert_user(*args, table_name=self._users_table, **kwargs)
 
-    def login(self, *args, **kwargs) -> tuple[int, bytes] | None:
+    def login_user(self, *args, **kwargs) -> tuple[int, bytes] | None:
         return select_user(*args, table_name=self._users_table, **kwargs)
 
 
