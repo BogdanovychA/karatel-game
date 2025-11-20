@@ -23,13 +23,10 @@ class ChatGPT:
         self._message_list.append({"role": "user", "content": message})
 
         answer = self.client.chat.completions.create(
-            model="gpt-4o",  # gpt-4o,  gpt-4-turbo,    gpt-3.5-turbo
+            model="gpt-4-turbo",  # gpt-4o,  gpt-4-turbo,    gpt-3.5-turbo
             messages=self._message_list,
-            max_tokens=1000,
+            max_tokens=2000,
             temperature=0.9,
             n=1,
         )
         return answer.choices[0].message.content
-
-
-chatgpt = ChatGPT()

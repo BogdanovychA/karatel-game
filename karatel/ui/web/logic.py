@@ -2,6 +2,7 @@
 
 import streamlit as st
 
+from karatel.ai.openai import ChatGPT
 from karatel.core.game_state_manager import GameStateManager
 from karatel.storage.abstract import SQLiteSaver
 from karatel.ui.abstract import BufferedOutput
@@ -17,6 +18,8 @@ def init_session_state():
         'game_state': None,
         'game_map': None,
         'gsm': None,
+        'AI_rewrite': None,
+        'AI_model': None,
         'first_start': True,
     }
 
@@ -31,6 +34,10 @@ def init_session_state():
             username=None,
             can_generate_map=False,
         )
+
+        st.session_state.AI_rewrite = False
+        st.session_state.AI_model = ChatGPT()
+
         st.session_state.first_start = False
 
 

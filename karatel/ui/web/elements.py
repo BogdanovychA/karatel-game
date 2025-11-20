@@ -6,7 +6,7 @@ from karatel.core.items import Shield, Weapon
 from karatel.logic.map import move_hero
 from karatel.ui.web.constants import BUTTON_WIDTH, GameState
 from karatel.utils.constants import Emoji
-from karatel.utils.settings import LOG
+from karatel.utils.settings import DEBUG, LOG
 
 
 def username_input():
@@ -308,13 +308,27 @@ def legend() -> None:
 
 def show_log(expanded: bool = False) -> None:
     """Експандер з логом гри"""
-
     with st.expander(f"{Emoji.LOG.value} Лог подій:", expanded=expanded):
         text = st.session_state.gsm.output.read_buffer()
-        if text:
-            st.text(text)
+        st.session_state.AI_rewrite = st.checkbox(
+            "Дозволити ШІ переписати події в художньому стилі (зменшує швидкість)",
+            value=st.session_state.AI_rewrite,
+        )
+        if not text:
+            text_value = "Подій поки не було..."
+        elif not st.session_state.AI_rewrite:
+            text_value = text
         else:
-            st.text(f"Подій поки не було...")
+            try:
+                with st.spinner("Штучний інтелект працює..."):
+                    result = st.session_state.AI_model.request(text)
+                text_value = result
+            except Exception as e:
+                st.session_state.gsm.output.write(f"Помилка: {e}", log=DEBUG)
+                text_value = (
+                    "Помилка при роботі ШІ. Виводимо оригінальний текст.\n\n" + text
+                )
+        st.text_area(" ", value=text_value, height=300)
 
 
 def show_hero() -> None:
