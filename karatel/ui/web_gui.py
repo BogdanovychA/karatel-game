@@ -118,10 +118,6 @@ def check_password(password: str) -> bool:
 
 def authenticate_user():
 
-    def _start() -> None:
-        st.session_state.gsm.username = username
-        st.session_state.game_state = GameState.HERO.value
-
     st.image("./karatel/images/logo.png", width=500)
     st.subheader(
         "КАРАТЄЛЬ — рольова гра, де ти створюєш героя, "
@@ -141,55 +137,63 @@ def authenticate_user():
 
     st.subheader(f"Створіть користувача або авторизуйтеся")
 
-    col1, col2 = st.columns(2)
-    with col1:
-        username = username_input()
-        password = pass_input()
-    with col2:
-        st.text(st.session_state.gsm.output.read_buffer())
+    with st.form(key='login_registration_form'):
 
-    colum1, colum2 = st.columns(2)
-
-    with colum1:
         col1, col2 = st.columns(2)
         with col1:
-            if st.button(
-                "Вхід",
-                icon=Emoji.LOGIN.value,
-                type="secondary",
-                width=BUTTON_WIDTH,
-            ):
-                if check_username_and_password(username, password):
-                    all_data = st.session_state.gsm.saver.select_user(
-                        output=st.session_state.gsm.output, username=username, log=LOG
-                    )
-                    if all_data:
-                        user_id, hashed_password = all_data
-                        if validate_password(password, hashed_password):
-                            _start()
-                        else:
-                            st.session_state.gsm.output.write("Пароль не коректний")
-                st.rerun()
-
+            username = username_input()
+            password = pass_input()
         with col2:
-            if st.button(
-                "Реєстрація",
-                icon=Emoji.REG.value,
-                type="secondary",
-                width=BUTTON_WIDTH,
-            ):
-                if check_username_and_password(username, password):
-                    if st.session_state.gsm.saver.register_user(
-                        output=st.session_state.gsm.output,
-                        username=username,
-                        hashed_password=hash_pass(password),
-                        log=LOG,
-                    ):
-                        _start()
-                    st.rerun()
+            st.text(st.session_state.gsm.output.read_buffer())
 
-    with colum2:
-        pass
+        colum1, colum2 = st.columns(2)
+        with colum1:
+            col1, col2 = st.columns(2)
+            with col1:
+                submitted_login = st.form_submit_button(
+                    "Вхід",
+                    icon=Emoji.LOGIN.value,
+                    type="secondary",
+                    width=BUTTON_WIDTH,
+                )
+            with col2:
+                submitted_registration = st.form_submit_button(
+                    "Реєстрація",
+                    icon=Emoji.REG.value,
+                    type="secondary",
+                    width=BUTTON_WIDTH,
+                )
+
+        with colum2:
+            pass
+
+    def _start_logic() -> None:
+        st.session_state.gsm.username = username
+        st.session_state.game_state = GameState.HERO.value
+
+    if submitted_login:
+        if check_username_and_password(username, password):
+            all_data = st.session_state.gsm.saver.select_user(
+                output=st.session_state.gsm.output, username=username, log=LOG
+            )
+            if all_data:
+                user_id, hashed_password = all_data
+                if validate_password(password, hashed_password):
+                    _start_logic()
+                else:
+                    st.session_state.gsm.output.write("Пароль не коректний")
+        st.rerun()
+
+    if submitted_registration:
+        if check_username_and_password(username, password):
+            if st.session_state.gsm.saver.register_user(
+                output=st.session_state.gsm.output,
+                username=username,
+                hashed_password=hash_pass(password),
+                log=LOG,
+            ):
+                _start_logic()
+            st.rerun()
 
 
 def profile() -> None:
