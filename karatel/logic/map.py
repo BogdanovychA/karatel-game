@@ -3,7 +3,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Tuple
 
-from karatel.core.map_model import EMPTY_CELL, CellType, MapSize
+from karatel.core.map import EMPTY_CELL, CellType, MapSize
 from karatel.logic.combat import fight
 from karatel.utils.settings import LOG
 from karatel.utils.utils import clamp_value
@@ -11,7 +11,7 @@ from karatel.utils.utils import clamp_value
 if TYPE_CHECKING:
     from karatel.core.game_state_manager import GameStateManager
     from karatel.core.hero import Hero
-    from karatel.core.map_model import Cell
+    from karatel.core.map import Cell
     from karatel.ui.abstract import OutputSpace
 
 

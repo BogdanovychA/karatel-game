@@ -5,9 +5,9 @@ import pickle
 import streamlit as st
 
 from karatel.core.hero import HeroFactory
-from karatel.core.map_model import generate_map, render_map
+from karatel.core.map import generate_map, render_map
 from karatel.core.professions import PROFESSIONS, Profession, show_professions
-from karatel.logic.map_logic import find_hero, output_setter
+from karatel.logic.map import find_hero, output_setter
 from karatel.ui.web.constants import BUTTON_WIDTH, TITLE, GameState
 from karatel.ui.web.elements import (
     equipment,
