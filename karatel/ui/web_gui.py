@@ -167,6 +167,7 @@ def authenticate_user():
         st.session_state.gsm.username = username
         st.session_state.game_state = GameState.HERO.value
 
+    # Логіка роботи кнопок
     if submitted_login:
         if check_username_and_password(username, password):
             all_data = st.session_state.gsm.saver.select_user(
@@ -179,8 +180,7 @@ def authenticate_user():
                 else:
                     st.session_state.gsm.output.write("Пароль не коректний")
         st.rerun()
-
-    if submitted_registration:
+    elif submitted_registration:
         if check_username_and_password(username, password):
             if st.session_state.gsm.saver.register_user(
                 output=st.session_state.gsm.output,
@@ -209,46 +209,37 @@ def profile() -> None:
     col1, col2, col3, col4 = st.columns([1, 1, 1, 1])
 
     with col1:
-        if st.button(
+        change_login = st.button(
             "Змінити логін",
             icon=Emoji.LOGIN.value,
             type="secondary",
             width=BUTTON_WIDTH,
-        ):
-            if password:
-                if check_username_and_password(username, password):
-                    all_data = st.session_state.gsm.saver.select_user(
-                        output=st.session_state.gsm.output,
-                        username=st.session_state.gsm.username,
-                        log=LOG,
-                    )
-                    if all_data:
-                        user_id, hashed_password = all_data
-                        if validate_password(password, hashed_password):
-                            if st.session_state.gsm.saver.update_username(
-                                output=st.session_state.gsm.output,
-                                user_id=user_id,
-                                old_username=st.session_state.gsm.username,
-                                new_username=username,
-                                log=LOG,
-                            ):
-                                st.session_state.gsm.username = username
-                        else:
-                            st.session_state.gsm.output.write("Пароль не коректний")
+        )
 
-            else:
-                st.session_state.gsm.output.write(
-                    "Для зміни імені користувача введіть діючий пароль", log=LOG
-                )
-            st.rerun()
     with col2:
-        if st.button(
+        change_password = st.button(
             "Змінити пароль",
             icon=Emoji.KEY.value,
             type="secondary",
             width=BUTTON_WIDTH,
-        ):
-            if check_password(password):
+        )
+
+    with col3:
+        pass
+    with col4:
+        delete_user = st.button(
+            "Видалити користувача",
+            icon=Emoji.TRASH.value,
+            type="primary",
+            width=BUTTON_WIDTH,
+        )
+
+    navigation()
+
+    # Логіка роботи кнопок
+    if change_login:
+        if password:
+            if check_username_and_password(username, password):
                 all_data = st.session_state.gsm.saver.select_user(
                     output=st.session_state.gsm.output,
                     username=st.session_state.gsm.username,
@@ -256,45 +247,63 @@ def profile() -> None:
                 )
                 if all_data:
                     user_id, hashed_password = all_data
-                    st.session_state.gsm.saver.update_password(
-                        output=st.session_state.gsm.output,
-                        user_id=user_id,
-                        hashed_password=hash_pass(password),
-                        log=LOG,
-                    )
-            st.rerun()
-    with col3:
-        pass
-    with col4:
-        if st.button(
-            "Видалити користувача",
-            icon=Emoji.TRASH.value,
-            type="primary",
-            width=BUTTON_WIDTH,
-        ):
-            if password:
-                all_data = st.session_state.gsm.saver.select_user(
-                    output=st.session_state.gsm.output, username=username, log=LOG
-                )
-                if all_data:
-                    user_id, hashed_password = all_data
                     if validate_password(password, hashed_password):
-                        if st.session_state.gsm.saver.delete_user(
+                        if st.session_state.gsm.saver.update_username(
                             output=st.session_state.gsm.output,
-                            username=st.session_state.gsm.username,
-                            row_id=user_id,
+                            user_id=user_id,
+                            old_username=st.session_state.gsm.username,
+                            new_username=username,
+                            log=LOG,
                         ):
-                            st.session_state.gsm.username = None
-                            st.session_state.game_state = None
+                            st.session_state.gsm.username = username
                     else:
                         st.session_state.gsm.output.write("Пароль не коректний")
-            else:
-                st.session_state.gsm.output.write(
-                    "Для видалення користувача введіть діючий пароль", log=LOG
-                )
-            st.rerun()
 
-    navigation()
+        else:
+            st.session_state.gsm.output.write(
+                "Для зміни імені користувача введіть діючий пароль", log=LOG
+            )
+        st.rerun()
+
+    elif change_password:
+        if check_password(password):
+            all_data = st.session_state.gsm.saver.select_user(
+                output=st.session_state.gsm.output,
+                username=st.session_state.gsm.username,
+                log=LOG,
+            )
+            if all_data:
+                user_id, hashed_password = all_data
+                st.session_state.gsm.saver.update_password(
+                    output=st.session_state.gsm.output,
+                    user_id=user_id,
+                    hashed_password=hash_pass(password),
+                    log=LOG,
+                )
+        st.rerun()
+
+    elif delete_user:
+        if password:
+            all_data = st.session_state.gsm.saver.select_user(
+                output=st.session_state.gsm.output, username=username, log=LOG
+            )
+            if all_data:
+                user_id, hashed_password = all_data
+                if validate_password(password, hashed_password):
+                    if st.session_state.gsm.saver.delete_user(
+                        output=st.session_state.gsm.output,
+                        username=st.session_state.gsm.username,
+                        row_id=user_id,
+                    ):
+                        st.session_state.gsm.username = None
+                        st.session_state.game_state = None
+                else:
+                    st.session_state.gsm.output.write("Пароль не коректний")
+        else:
+            st.session_state.gsm.output.write(
+                "Для видалення користувача введіть діючий пароль", log=LOG
+            )
+        st.rerun()
 
 
 def hero() -> None:
