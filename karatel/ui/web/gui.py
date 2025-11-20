@@ -1,19 +1,15 @@
 # -*- coding: utf-8 -*-
 
 import pickle
-import random
 
 import streamlit as st
 
-from karatel.core.game_state_manager import GameStateManager
 from karatel.core.hero import HeroFactory
 from karatel.core.map_model import generate_map, render_map
 from karatel.core.professions import PROFESSIONS, Profession, show_professions
 from karatel.logic.map_logic import find_hero, output_setter
-from karatel.storage.abstract import SQLiteSaver
-from karatel.ui.abstract import BufferedOutput
-from karatel.ui.web_constants import BUTTON_WIDTH, TITLE, GameState
-from karatel.ui.web_elements import (
+from karatel.ui.web.constants import BUTTON_WIDTH, TITLE, GameState
+from karatel.ui.web.elements import (
     equipment,
     legend,
     load_hero_button,
@@ -25,41 +21,10 @@ from karatel.ui.web_elements import (
     show_log,
     username_input,
 )
+from karatel.ui.web.logic import check_password, check_username_and_password
 from karatel.utils.constants import Emoji, Sex
-from karatel.utils.crypt import (
-    hash_pass,
-    is_password_valid,
-    is_username_valid,
-    validate_password,
-)
+from karatel.utils.crypt import hash_pass, validate_password
 from karatel.utils.settings import HERO_LIVES, LOG, MAX_LEVEL, MIN_LEVEL
-
-
-def init_session_state():
-    """Ініціалізує всі змінні сесії"""
-
-    defaults = {
-        'hero': None,
-        'enemy': None,
-        'game_state': None,
-        'game_map': None,
-        'gsm': None,
-        'first_start': True,
-    }
-
-    for key, value in defaults.items():
-        if key not in st.session_state:
-            st.session_state[key] = value
-
-    if st.session_state.first_start:
-        st.session_state.gsm = GameStateManager(
-            output=BufferedOutput(),
-            saver=SQLiteSaver(),
-            username=None,
-            can_generate_map=False,
-            # sex=Sex.M,
-        )
-        st.session_state.first_start = False
 
 
 def check_game_state() -> None:
@@ -84,36 +49,6 @@ def check_game_state() -> None:
                 st.write(f"game_state: {st.session_state.game_state}")
     else:
         authenticate_user()
-
-
-def check_username_and_password(username: str, password: str) -> bool:
-    uname = check_username(username)
-    pwd = check_password(password)
-    if not uname or not pwd:
-        st.rerun()
-    return uname and pwd
-
-
-def check_username(username: str) -> bool:
-    uname = is_username_valid(username)
-    if not uname:
-        st.session_state.gsm.output.write(
-            "Ім'я користувача має містити мінімум 2 символи, "
-            + "може мати лише літери латинського алфавіту, "
-            + "цифри та знак підкреслення."
-        )
-    return uname
-
-
-def check_password(password: str) -> bool:
-    pwd = is_password_valid(password)
-    if not pwd:
-        st.session_state.gsm.output.write(
-            "Пароль має складатися з мінімум 8 символів латинського алфавіту, "
-            + "має містити мінімум одну велику та одну малу літеру і "
-            + "обов'язково має мати мінімум одну цифру і один спеціальний символ."
-        )
-    return pwd
 
 
 def authenticate_user():
@@ -343,7 +278,7 @@ def hero() -> None:
                 **PROFESSIONS,  # Об'єднуємо зі словником наявних професій
             }
 
-            def _format_profession_name(profession_key: str) -> str:
+            def _format_profession_name(profession_key: str | None) -> str:
                 """Повертає назву професії для відображення за ключем."""
                 if display_sex == Sex.F.value:
                     return professions_plus_none[profession_key].name_fem

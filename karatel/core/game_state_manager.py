@@ -14,11 +14,3 @@ class GameStateManager:
     saver: SQLSaver
     can_generate_map: bool
     username: str | None
-    # sex: Sex | None
-
-
-# gsm = GameStateManager(
-#     output=ConsoleOutput(),
-#     saver=XMLHeroSaver(),
-#     can_generate_map=False,
-# )

@@ -4,7 +4,7 @@ import streamlit as st
 
 from karatel.core.items import Shield, Weapon
 from karatel.logic.map_logic import move_hero
-from karatel.ui.web_constants import BUTTON_WIDTH, GameState
+from karatel.ui.web.constants import BUTTON_WIDTH, GameState
 from karatel.utils.constants import Emoji
 from karatel.utils.settings import LOG
 
