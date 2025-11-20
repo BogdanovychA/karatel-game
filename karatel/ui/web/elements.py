@@ -243,9 +243,9 @@ MOVE_BUTTONS = [
         (Emoji.MOVE_E.value, "move_e", -1, 1, "Вправо-вгору"),
     ],
     [
-        (Emoji.MOVE_A.value, "move_a", 0, -1, "Вліво"),
+        (Emoji.MOVE_A.value, "move_a", 0, -1, "Ліворуч"),
         None,  # Центр
-        (Emoji.MOVE_D.value, "move_d", 0, 1, "Вправо"),
+        (Emoji.MOVE_D.value, "move_d", 0, 1, "Праворуч"),
     ],
     [
         (Emoji.MOVE_Z.value, "move_z", 1, -1, "Вліво-вниз"),
