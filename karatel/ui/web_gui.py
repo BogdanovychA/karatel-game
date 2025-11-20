@@ -324,7 +324,7 @@ def hero() -> None:
             professions_plus_none = {
                 None: Profession(
                     name="Оберіть професію",
-                    name_fem="",
+                    name_fem="Оберіть професію",
                     description="",
                     description_fem="",
                     main_bonuses=("",),
@@ -334,12 +334,17 @@ def hero() -> None:
                 **PROFESSIONS,  # Об'єднуємо зі словником наявних професій
             }
 
+            def _format_profession_name(profession_key: str) -> str:
+                """Повертає назву професії для відображення за ключем."""
+                if display_sex == Sex.F.value:
+                    return professions_plus_none[profession_key].name_fem
+                else:
+                    return professions_plus_none[profession_key].name
+
             profession = st.selectbox(
                 "Професія",
                 options=list(professions_plus_none.keys()),
-                format_func=lambda x: professions_plus_none[x].name
-                + " / "
-                + professions_plus_none[x].name_fem,
+                format_func=_format_profession_name,
             )
             level = st.slider("Рівень", MIN_LEVEL, MAX_LEVEL, MIN_LEVEL)
 
