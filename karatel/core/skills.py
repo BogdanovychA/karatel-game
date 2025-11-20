@@ -14,21 +14,9 @@ class SkillTiming(Enum):
     """Enum-клас для зберігання змінних, що
     відповідають за час використання скілів"""
 
-    PRE_BATTLE = "pre_battle"
-    IN_BATTLE = "in_battle"
-    POST_BATTLE = "post_battle"
-
-
-def check_skill_timing(timing: SkillTiming) -> str | None:
-    """Перевірка що виводити в описі скіла"""
-
-    match timing:
-        case SkillTiming.PRE_BATTLE:
-            return "перед боєм"
-        case SkillTiming.IN_BATTLE:
-            return "в бою"
-        case SkillTiming.POST_BATTLE:
-            return "після бою"
+    PRE_BATTLE = "перед боєм"
+    IN_BATTLE = "в бою"
+    POST_BATTLE = "після бою"
 
 
 class Skill:
@@ -56,12 +44,10 @@ class HealSelfSkill(Skill):
     def __str__(self) -> str:
         """Повертає текстове представлення героя для print()."""
 
-        skill_timing = check_skill_timing(self.skill_timing)
-
         return (
             f"{self.name.upper()}. {self.description}. "
             + f"Сила ефекту: {self.power}. "
-            + f"Застосовується: {skill_timing}."
+            + f"Застосовується: {self.skill_timing.value}."
         )
 
     def use(self, hero: Hero, log: bool = True) -> None:
@@ -77,7 +63,7 @@ class HealSelfSkill(Skill):
             # Обмеження максимального здоров'я реалізовано через сеттер Hero.hp
             hero.hp += power
             hero.output.write(
-                f"{hero.name} Відновлює {power} здоров'я за допомогою {self.name}",
+                f"{hero.name} Відновлює {power} здоров'я за допомогою '{self.name}'",
                 log=log,
             )
 

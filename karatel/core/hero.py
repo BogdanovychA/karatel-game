@@ -247,8 +247,8 @@ class HeroDisplay:
     def modifiers(self) -> str:
         """Виводить клас броні героя"""
         return (
-            f"Модифікатори: [Ініціатива: {self.hero.initiative}, "
-            f"Атака: {self.hero.attack_modifier}]."
+            f"Модифікатори: [Ініціатива: {self.hero.initiative:+d}, "
+            f"Атака: {self.hero.attack_modifier:+d}]."
         )
 
     def stats(self) -> str:

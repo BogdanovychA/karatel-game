@@ -17,14 +17,14 @@ class CellType(Enum):
     """Enum-клас для зберігання змінних, що
     відповідають за типи наповнення клітинок"""
 
-    EMPTY = "empty"
-    ENEMY = "enemy"
-    ITEM = "item"
-    HERO = "hero"
-    EXIT = "exit"
-    GOLD = "gold"
-    BOOK = "book"
-    HEART = "heart"
+    EMPTY = "Пусто"
+    ENEMY = "Ворог"
+    ITEM = "Предмет"
+    HERO = "Герой"
+    EXIT = "Вихід"
+    GOLD = "Гроші"
+    BOOK = "Досвід"
+    HEART = "Життя"
 
 
 class MapSize(IntEnum):
