@@ -7,3 +7,4 @@ karatel/tests/
 karatel/saves/*
 !karatel/saves/.gitkeep
 karatel/storage/postgresql_config.py
+karatel/ai/openai_config.py
