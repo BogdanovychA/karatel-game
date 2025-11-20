@@ -15,7 +15,7 @@ def username_input():
     else:
         value = ""
     return st.text_input(
-        "Користувач",
+        "Ім'я користувача",
         icon=Emoji.MAN.value,
         value=value,
     )

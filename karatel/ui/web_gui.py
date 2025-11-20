@@ -143,20 +143,16 @@ def authenticate_user():
         with col1:
             username = username_input()
             password = pass_input()
-        with col2:
-            st.text(st.session_state.gsm.output.read_buffer())
 
-        colum1, colum2 = st.columns(2)
-        with colum1:
-            col1, col2 = st.columns(2)
-            with col1:
+            colum1, colum2 = st.columns(2)
+            with colum1:
                 submitted_login = st.form_submit_button(
                     "Вхід",
                     icon=Emoji.LOGIN.value,
                     type="secondary",
                     width=BUTTON_WIDTH,
                 )
-            with col2:
+            with colum2:
                 submitted_registration = st.form_submit_button(
                     "Реєстрація",
                     icon=Emoji.REG.value,
@@ -164,8 +160,8 @@ def authenticate_user():
                     width=BUTTON_WIDTH,
                 )
 
-        with colum2:
-            pass
+        with col2:
+            st.text(st.session_state.gsm.output.read_buffer())
 
     def _start_logic() -> None:
         st.session_state.gsm.username = username
