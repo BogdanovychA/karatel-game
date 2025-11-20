@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import pickle
+import random
 
 import streamlit as st
 
@@ -24,7 +25,7 @@ from karatel.ui.web_elements import (
     show_log,
     username_input,
 )
-from karatel.utils.constants import Emoji
+from karatel.utils.constants import Emoji, Sex
 from karatel.utils.crypt import (
     hash_pass,
     is_password_valid,
@@ -56,7 +57,7 @@ def init_session_state():
             saver=SQLiteSaver(),
             username=None,
             can_generate_map=False,
-            sex="Чоловік",
+            # sex=Sex.M,
         )
         st.session_state.first_start = False
 
@@ -305,23 +306,20 @@ def hero() -> None:
     if 'hero' in st.session_state:
         if not st.session_state.hero:
 
-            st.session_state.gsm.sex = st.radio(
+            display_sex = st.radio(
                 "Оберіть стать",
                 key="sex_radio",
-                options=["Чоловік", "Жінка"],
+                options=[Sex.M.value, Sex.F.value],
             )
 
-            if st.session_state.gsm.sex == "Жінка":
+            if display_sex == Sex.F.value:
                 name_text = "КАРАТЄЛЬКА"
+                sex = Sex.F
             else:
                 name_text = "КАРАТЄЛЬ"
+                sex = Sex.M
 
             name = st.text_input("Ім'я", icon=Emoji.HERO.value, value=name_text)
-
-            if st.session_state.gsm.sex == "Жінка":
-                man = False
-            else:
-                man = True
 
             professions_plus_none = {
                 None: Profession(
@@ -347,7 +345,7 @@ def hero() -> None:
 
             with st.expander("Професії", expanded=True):
                 show_professions(
-                    output=st.session_state.gsm.output, professions=profession, man=man
+                    output=st.session_state.gsm.output, professions=profession, sex=sex
                 )
                 st.text(st.session_state.gsm.output.read_buffer())
 
@@ -365,6 +363,7 @@ def hero() -> None:
                         level=level,
                         profession=profession,
                         name=name,
+                        sex=sex,
                     )
                     st.session_state.hero.lives = HERO_LIVES
                     st.rerun()

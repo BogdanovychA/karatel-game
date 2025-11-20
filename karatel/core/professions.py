@@ -5,7 +5,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import TYPE_CHECKING
 
-from karatel.utils.constants import TRANSLATIONS
+from karatel.utils.constants import TRANSLATIONS, Sex
 from karatel.utils.settings import LOG
 
 if TYPE_CHECKING:
@@ -80,7 +80,7 @@ PROFESSIONS = {
 def show_professions(
     output: OutputSpace,
     professions: str | list[str] | None = None,
-    man: bool | None = True,
+    sex: Sex | None = Sex.M,
     log: bool = LOG,
 ) -> None:
     """Виводить одну або кілька професій. Якщо аргумент відсутній — виводить всі."""
@@ -96,13 +96,13 @@ def show_professions(
     for profession in professions:
         prof = PROFESSIONS[profession]
 
-        if man:
-            sex = f"{prof.name.upper()}.\n{prof.description}\n"
+        if sex.value == Sex.M.value:
+            text = f"{prof.name.upper()}.\n{prof.description}\n"
         else:
-            sex = f"{prof.name_fem.upper()}.\n{prof.description_fem}\n"
+            text = f"{prof.name_fem.upper()}.\n{prof.description_fem}\n"
 
         output.write(
-            sex
+            text
             + f"Основні бонуси: "
             + f"{', '.join(TRANSLATIONS.get(bonus, bonus) for bonus in prof.main_bonuses)}. "
             + f"Вторинні бонуси: "

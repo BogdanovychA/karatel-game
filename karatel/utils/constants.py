@@ -5,8 +5,8 @@ from enum import Enum
 class Sex(Enum):
     """Enum-клас для зберігання статі"""
 
-    MAN = "Чоловік"
-    WOMAN = "Жінка"
+    M = "Чоловік"
+    F = "Жінка"
 
 
 class Emoji(Enum):

@@ -8,12 +8,9 @@ from typing import TYPE_CHECKING, Type
 if TYPE_CHECKING:
     from karatel.ui.abstract import OutputSpace
 
-from karatel.core.items import (
-    ITEMS,
+from karatel.core.items import (  # ITEMS,; SHIELDS,; WEAPONS,
     JUST_HAND,
-    SHIELDS,
     UNARMED_STRIKE,
-    WEAPONS,
     Item,
     Shield,
     Weapon,
@@ -93,11 +90,20 @@ class Hero:
         """Повертає текстове представлення героя для print()."""
 
         if self.alive:
-            return f"Ім'я: [{self.name}]. Професія: [{self.profession.name}]."
+            if self.man:
+                return f"Ім'я: [{self.name}]. Стать: [{self.sex}]. Професія: [{self.profession.name}]."
+            else:
+                return f"Ім'я: [{self.name}]. Стать: [{self.sex}]. Професія: [{self.profession.name_fem}]."
         elif self.lives > 0:
-            return f"{self.name} - мертвий. Залишилося життів: {self.lives}"
+            if self.man:
+                return f"{self.name} - мертвий. Залишилося життів: {self.lives}"
+            else:
+                return f"{self.name} - мертва. Залишилося життів: {self.lives}"
         else:
-            return f"{self.name} помер остаточно."
+            if self.man:
+                return f"{self.name} помер остаточно."
+            else:
+                return f"{self.name} померла остаточно."
 
     @property
     def hp(self) -> int:
@@ -180,13 +186,17 @@ class Hero:
     def sex(self) -> str:
         return self._sex.value
 
+    @sex.setter
+    def sex(self, sex: Sex) -> None:
+        self._sex = sex
+
     @property
     def man(self) -> bool:
-        return self._sex == Sex.MAN
+        return self._sex.value == Sex.M.value
 
     @property
     def woman(self) -> bool:
-        return self._sex == Sex.WOMAN
+        return self._sex.value == Sex.F.value
 
 
 class HeroDisplay:
@@ -517,10 +527,10 @@ class HeroFactory:
         """Генерація рандомного героя, або героя з
         конкретними характеристиками"""
 
-        if name is None:
-            name = HeroFactory.select_name()
         if sex is None:
-            sex = Sex.MAN
+            sex = random.choice((Sex.M, Sex.F))
+        if name is None:
+            name = HeroFactory.select_name(sex=sex)
         if profession is None:
             profession = random.choice(list(PROFESSIONS.values()))
         else:
@@ -605,8 +615,9 @@ class HeroFactory:
     def select_name(sex: Sex | None = None) -> str:
         """Допоміжна фун-ія для вибору імені героя при генерації"""
         if sex is None:
-            return random.choice(MALE_NAMES + FEMALE_NAMES)
-        elif sex == Sex.WOMAN:
+            sex = random.choice((Sex.M, Sex.F))
+
+        if sex == Sex.F:
             return random.choice(FEMALE_NAMES)
         else:
             return random.choice(MALE_NAMES)
