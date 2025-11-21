@@ -4,22 +4,17 @@ import openai
 
 from karatel.ai.openai_config import OPENAI_TOKEN, OPENAI_URL
 
-SYSTEM_PROMPT = (
-    "Перепиши текст в художньому стилі. Залиш числа і зміст незмінними. "
-    "Не згадуй дату свого навчання або обмеження знань."
-)
-
 
 class ChatGPT:
 
-    def __init__(self):
+    def __init__(self) -> None:
         self.client = openai.OpenAI(base_url=OPENAI_URL, api_key=OPENAI_TOKEN)
-        self._prompt = SYSTEM_PROMPT
         self._message_list = []
 
-    def request(self, message: str) -> str:
+    def request(self, prompt: str, message: str) -> str:
+        """Відправка промпта та тексту, отримання відповіді"""
         self._message_list.clear()
-        self._message_list.append({"role": "system", "content": self._prompt})
+        self._message_list.append({"role": "system", "content": prompt})
         self._message_list.append({"role": "user", "content": message})
 
         answer = self.client.chat.completions.create(
@@ -27,6 +22,6 @@ class ChatGPT:
             messages=self._message_list,
             max_tokens=2000,
             temperature=0.9,
-            n=1,
+            n=1,  # Кількість варіантів відповідей
         )
         return answer.choices[0].message.content

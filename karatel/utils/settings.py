@@ -4,9 +4,8 @@ SQLITE_PATH = "./karatel/saves/karatel.db"
 USERS_SQL_TABLE = "users"
 HERO_SQL_TABLE = "saves"
 
-
-XML_SAVES_PATH = "./karatel/saves/hero.xml"
-JSON_SAVES_PATH = "./karatel/saves/hero.json"
+# XML_SAVES_PATH = "./karatel/saves/hero.xml"
+# JSON_SAVES_PATH = "./karatel/saves/hero.json"
 
 LOG = True
 
