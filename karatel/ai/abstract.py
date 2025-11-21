@@ -23,9 +23,11 @@ class AIModel(ABC):
 class OpenAI(AIModel):
     """Робота з ChatGPT"""
 
-    def __init__(self):
-        self.on = False  # Використовується в зовнішній логіці -- чи застосовувати AI
+    def __init__(self, on: bool | None = None):
         self.model = ChatGPT()
+        self.on = (
+            on or False
+        )  # Використовується в зовнішній логіці -- чи застосовувати AI
 
     def rewrite(self, text: str) -> str:
         prompt = (
