@@ -16,11 +16,11 @@ class ChatGPT:
             {"role": "system", "content": prompt},
             {"role": "user", "content": message},
         ]
-        answer = self.client.chat.completions.create(
+        response = self.client.chat.completions.create(
             model="gpt-4-turbo",  # gpt-4o,  gpt-4-turbo,    gpt-3.5-turbo
             messages=message_list,
             max_tokens=2000,
             temperature=0.9,
             n=1,  # Кількість варіантів відповідей
         )
-        return answer.choices[0].message.content.strip()
+        return response.choices[0].message.content.strip()

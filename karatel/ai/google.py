@@ -14,7 +14,7 @@ class Gemini:
     def request(self, prompt: str, message: str) -> str | None:
         """Відправка промпта та тексту, отримання відповіді"""
 
-        answer = self.client.models.generate_content(
+        response = self.client.models.generate_content(
             model="gemini-2.5-flash",  # gemini-2.5-flash, gemini-2.5-pro
             config=types.GenerateContentConfig(
                 system_instruction=prompt,
@@ -24,4 +24,4 @@ class Gemini:
             contents=message,
         )
 
-        return answer.text.strip()
+        return response.text.strip()

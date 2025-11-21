@@ -9,8 +9,8 @@ HERO_SQL_TABLE = "saves"
 
 LOG = True
 
-DEBUG = False
-# DEBUG = True
+# DEBUG = False
+DEBUG = True
 
 HERO_LIVES = 3
 

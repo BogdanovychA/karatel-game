@@ -1,15 +1,10 @@
 # -*- coding: utf-8 -*-
 
-from __future__ import annotations
-
 from abc import ABC, abstractmethod
-from typing import TYPE_CHECKING
 
+from karatel.ai.anthropic import Claude
 from karatel.ai.google import Gemini
 from karatel.ai.openai import ChatGPT
-
-if TYPE_CHECKING:
-    pass
 
 
 class AIModel(ABC):
@@ -57,5 +52,24 @@ class Google(AIModel):
             "але в сучасному сеттінгу. "
             "Залиш числа, імена і інший зміст незмінними. "
             "Видай лише один варіант рерайту і без супровідного тексту."
+        )
+        return self.model.request(prompt, text)
+
+
+class Anthropic(AIModel):
+    """Робота з Claude"""
+
+    def __init__(self, on: bool | None = None):
+        self.model = Claude()
+        self.name = "Claude"  # Використовується в зовнішній логіці
+        self.on = (
+            on or False
+        )  # Використовується в зовнішній логіці -- чи застосовувати AI
+
+    def rewrite(self, text: str) -> str:
+        prompt = (
+            "Перепиши текст в художньому стилі всесвіту Dungeons & Dragons, "
+            "але в сучасному сеттінгу. "
+            "Залиш числа, імена і інший зміст незмінними. "
         )
         return self.model.request(prompt, text)
