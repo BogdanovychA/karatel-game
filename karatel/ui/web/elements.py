@@ -238,9 +238,9 @@ def equipment() -> None:
 
 MOVE_BUTTONS = [
     [
-        (Emoji.MOVE_Q.value, "move_q", -1, -1, "Вліво-вгору"),
+        (Emoji.MOVE_Q.value, "move_q", -1, -1, "Ліворуч-вгору"),
         (Emoji.MOVE_W.value, "move_w", -1, 0, "Вгору"),
-        (Emoji.MOVE_E.value, "move_e", -1, 1, "Вправо-вгору"),
+        (Emoji.MOVE_E.value, "move_e", -1, 1, "Праворуч-вгору"),
     ],
     [
         (Emoji.MOVE_A.value, "move_a", 0, -1, "Ліворуч"),
@@ -248,9 +248,9 @@ MOVE_BUTTONS = [
         (Emoji.MOVE_D.value, "move_d", 0, 1, "Праворуч"),
     ],
     [
-        (Emoji.MOVE_Z.value, "move_z", 1, -1, "Вліво-вниз"),
+        (Emoji.MOVE_Z.value, "move_z", 1, -1, "Ліворуч-вниз"),
         (Emoji.MOVE_S.value, "move_s", 1, 0, "Вниз"),
-        (Emoji.MOVE_C.value, "move_c", 1, 1, "Вправо-вниз"),
+        (Emoji.MOVE_C.value, "move_c", 1, 1, "Праворуч-вниз"),
     ],
 ]
 
