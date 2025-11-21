@@ -104,7 +104,11 @@ def fight(hero_a: Hero, hero_b: Hero) -> None:
 
 def roll_initiative(comb_a: Hero, comb_b: Hero) -> tuple[Hero, Hero]:
     """Визначає порядок ходів. Повертає пару (перший, другий)."""
-    comb_a.output.write(f"Готуємося до бою між {comb_a.name} та {comb_b.name}", log=LOG)
+    comb_a.output.write(
+        f"Готуємося до бою між {comb_a.name} ({comb_a.sex}) та "
+        + f"{comb_b.name} ({comb_b.sex})",
+        log=LOG,
+    )
 
     init_a = Dice.roll(output=comb_a.output, dice_string="1d20")
     total_a = init_a + comb_a.initiative

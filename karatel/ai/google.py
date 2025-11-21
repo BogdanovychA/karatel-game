@@ -15,7 +15,7 @@ class Gemini:
         """Відправка промпта та тексту, отримання відповіді"""
 
         answer = self.client.models.generate_content(
-            model="gemini-2.5-flash",
+            model="gemini-2.5-flash",  # gemini-2.5-flash, gemini-2.5-pro
             config=types.GenerateContentConfig(
                 system_instruction=prompt,
                 temperature=0.9,

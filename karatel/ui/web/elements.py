@@ -310,13 +310,20 @@ def show_log(expanded: bool = False) -> None:
     """Експандер з логом гри"""
     with st.expander(f"{Emoji.LOG.value} Лог подій:", expanded=expanded):
         text = st.session_state.gsm.output.read_buffer()
-        st.session_state.ai.on = st.checkbox(
-            "Дозволити ШІ переписати події в художньому стилі (зменшує швидкість)",
-            value=st.session_state.ai.on,
-        )
+
+        # Безпечна перевірка, якщо не використовуємо AI. Відповідно, якщо
+        # в def init_session_state() не ініціалізовано st.session_state.ai
+        ai = st.session_state.get("ai")
+        if ai:
+            st.session_state.ai.on = st.checkbox(
+                f"Дозволити {st.session_state.ai.name} переписати події "
+                + f"в художньому стилі (зменшує швидкість)",
+                # value=st.session_state.ai.on,
+            )
+
         if not text:
             text_value = "Подій поки не було..."
-        elif not st.session_state.ai.on:
+        elif not ai or not ai.on:
             text_value = text
         else:
             try:
