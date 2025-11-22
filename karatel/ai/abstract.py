@@ -13,8 +13,8 @@ class AIModel(ABC):
 
     BASE_REWRITE_PROMPT = (
         "Перепиши текст в художньому стилі всесвіту Dungeons & Dragons, "
-        "але в сучасному сеттінгу. "
-        "Залиш числа, імена і інший зміст незмінними. "
+        "але в сучасному сеттінгу. Залиш числа, імена і інший зміст незмінними. "
+        "Не видавай супровідний текст."
     )
 
     def __init__(self):
@@ -24,8 +24,7 @@ class AIModel(ABC):
         )
         self.rewrite_prompt_model_anthropic = self.BASE_REWRITE_PROMPT
         self.rewrite_prompt_google = (
-            self.BASE_REWRITE_PROMPT
-            + "Видай лише один варіант рерайту і без супровідного тексту."
+            self.BASE_REWRITE_PROMPT + "Видай лише один варіант рерайту."
         )
 
     @abstractmethod
@@ -42,7 +41,7 @@ class OpenAI(AIModel):
         self.model = ChatGPT()
         self.name = "ChatGPT"  # Використовується в зовнішній логіці
         self.on = (
-            on or False
+            on if on is not None else False
         )  # Використовується в зовнішній логіці -- чи застосовувати AI
 
     def rewrite(self, text: str) -> str:
@@ -57,7 +56,7 @@ class Google(AIModel):
         self.model = Gemini()
         self.name = "Gemini"  # Використовується в зовнішній логіці
         self.on = (
-            on or False
+            on if on is not None else False
         )  # Використовується в зовнішній логіці -- чи застосовувати AI
 
     def rewrite(self, text: str) -> str:
@@ -72,7 +71,7 @@ class Anthropic(AIModel):
         self.model = Claude()
         self.name = "Claude"  # Використовується в зовнішній логіці
         self.on = (
-            on or False
+            on if on is not None else False
         )  # Використовується в зовнішній логіці -- чи застосовувати AI
 
     def rewrite(self, text: str) -> str:
@@ -89,7 +88,7 @@ class MasterAI(AIModel):
         self.model_google = Gemini()
         self.name = "MasterAI"  # Використовується в зовнішній логіці
         self.on = (
-            on or False
+            on if on is not None else False
         )  # Використовується в зовнішній логіці -- чи застосовувати AI
         # Створюємо та зберігаємо loop
         self.loop = asyncio.new_event_loop()
@@ -126,3 +125,12 @@ class MasterAI(AIModel):
             self.close()
         except Exception:
             pass
+
+
+if __name__ == "__main__":
+    master = MasterAI()
+    try:
+        result = master.rewrite("Привіт, гравець в цю чудову гру!")
+        print(result)
+    finally:
+        master.close()
