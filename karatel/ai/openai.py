@@ -9,6 +9,7 @@ class ChatGPT:
 
     def __init__(self) -> None:
         self.client = openai.OpenAI(base_url=OPENAI_URL, api_key=OPENAI_TOKEN)
+        self.aclient = openai.AsyncOpenAI(base_url=OPENAI_URL, api_key=OPENAI_TOKEN)
 
     def request(self, prompt: str, message: str) -> str:
         """Відправка промпта та тексту, отримання відповіді"""
@@ -22,5 +23,21 @@ class ChatGPT:
             max_tokens=2000,
             temperature=0.9,
             n=1,  # Кількість варіантів відповідей
+        )
+        return response.choices[0].message.content.strip()
+
+    async def request_async(self, prompt: str, message: str) -> str:
+        """Відправка промпта та тексту, отримання відповіді (асинхронно)"""
+
+        message_list = [
+            {"role": "system", "content": prompt},
+            {"role": "user", "content": message},
+        ]
+        response = await self.aclient.chat.completions.create(
+            model="gpt-4-turbo",
+            messages=message_list,
+            max_tokens=2000,
+            temperature=0.9,
+            n=1,
         )
         return response.choices[0].message.content.strip()

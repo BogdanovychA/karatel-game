@@ -25,3 +25,18 @@ class Gemini:
         )
 
         return response.text.strip()
+
+    async def request_async(self, prompt: str, message: str) -> str | None:
+        """Відправка промпта та тексту, отримання відповіді (асинхронно)"""
+
+        response = await self.client.aio.models.generate_content(
+            model="gemini-2.5-flash",  # gemini-2.5-flash, gemini-2.5-pro
+            config=types.GenerateContentConfig(
+                system_instruction=prompt,
+                temperature=0.9,
+                # max_output_tokens=3000,
+            ),
+            contents=message,
+        )
+
+        return response.text.strip()

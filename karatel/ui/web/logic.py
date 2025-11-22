@@ -2,7 +2,7 @@
 
 import streamlit as st
 
-from karatel.ai.abstract import Anthropic, Google, OpenAI
+from karatel.ai.abstract import Anthropic, Google, MasterAI, OpenAI
 from karatel.core.game_state_manager import GameStateManager
 from karatel.storage.abstract import SQLiteSaver
 from karatel.ui.abstract import BufferedOutput
@@ -33,6 +33,7 @@ def init_session_state():
             username=None,
             can_generate_map=False,
         )
+        # st.session_state.ai = MasterAI()
         st.session_state.ai = OpenAI()
         # st.session_state.ai = Google()
         # st.session_state.ai = Anthropic()
