@@ -17,11 +17,11 @@ def ai_master() -> None:
         pass
     else:
         AI_CLASSES = {
+            AIName.NONE.value: None,
             AIName.OPENAI.value: OpenAI,
             AIName.GOOGLE.value: Google,
             AIName.ANTHROPIC.value: Anthropic,
             AIName.MASTERAI.value: MasterAI,
-            AIName.NONE.value: None,
         }
         ai_options = list(AI_CLASSES.keys())
         if hasattr(st.session_state, 'ai') and hasattr(st.session_state.ai, 'name'):
@@ -34,7 +34,7 @@ def ai_master() -> None:
             default_index = ai_options.index(AIName.NONE.value)
 
         new_model = st.selectbox(
-            f"Модель ШІ",
+            "Дозволити ШІ переписати події " + "в художньому стилі (зменшує швидкість)",
             key="ai_model_radio",
             index=default_index,
             options=ai_options,
@@ -359,19 +359,14 @@ def legend() -> None:
 def show_log(expanded: bool = False) -> None:
     """Експандер з логом гри"""
     with st.expander(f"{Emoji.LOG.value} Лог подій:", expanded=expanded):
-        text = st.session_state.gsm.output.read_buffer()
 
-        # Безпечна перевірка, якщо не використовуємо AI. Відповідно, якщо
-        # в def init_session_state() не ініціалізовано st.session_state.ai
-        if 'ai' in st.session_state and st.session_state.ai:
-            st.session_state.ai.on = st.checkbox(
-                f"Дозволити {st.session_state.ai.name} переписати події "
-                + f"в художньому стилі (зменшує швидкість)",
-            )
+        ai_master()
+
+        text = st.session_state.gsm.output.read_buffer()
 
         if not text:
             text_value = "Подій поки не було..."
-        elif not 'ai' in st.session_state or not st.session_state.ai.on:
+        elif not 'ai' in st.session_state or st.session_state.ai is None:
             text_value = text
         else:
             try:

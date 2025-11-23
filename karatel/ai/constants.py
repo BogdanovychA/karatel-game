@@ -4,8 +4,8 @@ from enum import Enum
 
 class AIName(Enum):
 
+    NONE = "Вимкнено"
     ANTHROPIC = "Claude"
     GOOGLE = "Gemini"
     OPENAI = "ChatGPT"
     MASTERAI = "MasterAI"
-    NONE = "Вимкнути ШІ"

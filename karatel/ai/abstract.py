@@ -47,9 +47,6 @@ class OpenAI(AIModel):
         super().__init__()
         self.model = ChatGPT()
         self.name = AIName.OPENAI.value  # Використовується в зовнішній логіці
-        self.on = (
-            on if on is not None else False
-        )  # Використовується в зовнішній логіці -- чи застосовувати AI
 
     def rewrite(self, text: str) -> str:
         return asyncio.run(self.model.request(self.rewrite_prompt_openai, text))
@@ -62,9 +59,6 @@ class Google(AIModel):
         super().__init__()
         self.model = Gemini()
         self.name = AIName.GOOGLE.value  # Використовується в зовнішній логіці
-        self.on = (
-            on if on is not None else False
-        )  # Використовується в зовнішній логіці -- чи застосовувати AI
 
         # Створюємо та зберігаємо loop -- реалізовано такий варіант
         # а не з asyncio.run() через помилки при роботі з Gemini
@@ -96,9 +90,6 @@ class Anthropic(AIModel):
         super().__init__()
         self.model = Claude()
         self.name = AIName.ANTHROPIC.value  # Використовується в зовнішній логіці
-        self.on = (
-            on if on is not None else False
-        )  # Використовується в зовнішній логіці -- чи застосовувати AI
 
     def rewrite(self, text: str) -> str:
         return asyncio.run(
@@ -115,9 +106,6 @@ class MasterAI(AIModel):
         self.model_anthropic = Claude()
         self.model_google = Gemini()
         self.name = AIName.MASTERAI.value  # Використовується в зовнішній логіці
-        self.on = (
-            on if on is not None else False
-        )  # Використовується в зовнішній логіці -- чи застосовувати AI
 
         # Створюємо та зберігаємо loop -- реалізовано такий варіант
         # а не з asyncio.run() через помилки при роботі з Gemini
