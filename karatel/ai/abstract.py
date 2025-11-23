@@ -13,8 +13,8 @@ class AIModel(ABC):
 
     BASE_REWRITE_PROMPT = (
         "Перепиши текст в художньому стилі всесвіту Dungeons & Dragons, "
-        "але в сучасному сеттінгу. Залиш числа, імена і інший зміст незмінними. "
-        "Не видавай супровідний текст."
+        + "але в сучасному сеттінгу. Залиш числа, імена і інший зміст незмінними. "
+        + "Не видавай супровідний текст."
     )
 
     def __init__(self):
@@ -22,9 +22,14 @@ class AIModel(ABC):
             self.BASE_REWRITE_PROMPT
             + "Не згадуй дату свого навчання або обмеження знань."
         )
-        self.rewrite_prompt_model_anthropic = self.BASE_REWRITE_PROMPT
         self.rewrite_prompt_google = (
-            self.BASE_REWRITE_PROMPT + "Видай лише один варіант рерайту."
+            self.BASE_REWRITE_PROMPT
+            + "Видай лише один варіант рерайту. "
+            + "Не використовуй знаки пунктуації для розмітки тексту."
+        )
+        self.rewrite_prompt_model_anthropic = (
+            self.BASE_REWRITE_PROMPT
+            + "Не використовуй знаки пунктуації для розмітки тексту."
         )
 
     @abstractmethod
@@ -45,7 +50,7 @@ class OpenAI(AIModel):
         )  # Використовується в зовнішній логіці -- чи застосовувати AI
 
     def rewrite(self, text: str) -> str:
-        return self.model.request(self.rewrite_prompt_openai, text)
+        return asyncio.run(self.model.request(self.rewrite_prompt_openai, text))
 
 
 class Google(AIModel):
@@ -59,8 +64,27 @@ class Google(AIModel):
             on if on is not None else False
         )  # Використовується в зовнішній логіці -- чи застосовувати AI
 
+        # Створюємо та зберігаємо loop -- реалізовано такий варіант
+        # а не з asyncio.run() через помилки при роботі з Gemini
+        self.loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(self.loop)
+
     def rewrite(self, text: str) -> str:
-        return self.model.request(self.rewrite_prompt_google, text)
+        return self.loop.run_until_complete(
+            self.model.request(self.rewrite_prompt_google, text)
+        )
+
+    def close(self):
+        """Примусово закрити луп"""
+        if hasattr(self, 'loop') and self.loop and not self.loop.is_closed():
+            self.loop.close()
+
+    def __del__(self):
+        """Автоматичне закриття лупу при видаленні об'єкта"""
+        try:
+            self.close()
+        except Exception:
+            pass
 
 
 class Anthropic(AIModel):
@@ -75,11 +99,13 @@ class Anthropic(AIModel):
         )  # Використовується в зовнішній логіці -- чи застосовувати AI
 
     def rewrite(self, text: str) -> str:
-        return self.model.request(self.rewrite_prompt_model_anthropic, text)
+        return asyncio.run(
+            self.model.request(self.rewrite_prompt_model_anthropic, text)
+        )
 
 
 class MasterAI(AIModel):
-    """Асинхронна робота з API AIs"""
+    """Асинхронна робота з API ШІ"""
 
     def __init__(self, on: bool | None = None):
         super().__init__()
@@ -90,19 +116,17 @@ class MasterAI(AIModel):
         self.on = (
             on if on is not None else False
         )  # Використовується в зовнішній логіці -- чи застосовувати AI
-        # Створюємо та зберігаємо loop
+
+        # Створюємо та зберігаємо loop -- реалізовано такий варіант
+        # а не з asyncio.run() через помилки при роботі з Gemini
         self.loop = asyncio.new_event_loop()
         asyncio.set_event_loop(self.loop)
 
     def rewrite(self, text: str) -> str:
         async def _main() -> str:
-            task_openai = self.model_openai.request_async(
-                self.rewrite_prompt_openai, text
-            )
-            task_google = self.model_google.request_async(
-                self.rewrite_prompt_google, text
-            )
-            task_claude = self.model_anthropic.request_async(
+            task_openai = self.model_openai.request(self.rewrite_prompt_openai, text)
+            task_google = self.model_google.request(self.rewrite_prompt_google, text)
+            task_claude = self.model_anthropic.request(
                 self.rewrite_prompt_model_anthropic, text
             )
 

@@ -8,32 +8,17 @@ from karatel.ai.config import OPENAI_TOKEN, OPENAI_URL
 class ChatGPT:
 
     def __init__(self) -> None:
-        self.client = openai.OpenAI(base_url=OPENAI_URL, api_key=OPENAI_TOKEN)
-        self.aclient = openai.AsyncOpenAI(base_url=OPENAI_URL, api_key=OPENAI_TOKEN)
+        # self.client = openai.OpenAI(base_url=OPENAI_URL, api_key=OPENAI_TOKEN)
+        self.client = openai.AsyncOpenAI(base_url=OPENAI_URL, api_key=OPENAI_TOKEN)
 
-    def request(self, prompt: str, message: str) -> str:
-        """Відправка промпта та тексту, отримання відповіді"""
-        message_list = [
-            {"role": "system", "content": prompt},
-            {"role": "user", "content": message},
-        ]
-        response = self.client.chat.completions.create(
-            model="gpt-4-turbo",  # gpt-4o,  gpt-4-turbo,    gpt-3.5-turbo
-            messages=message_list,
-            max_tokens=2000,
-            temperature=0.9,
-            n=1,  # Кількість варіантів відповідей
-        )
-        return response.choices[0].message.content.strip()
-
-    async def request_async(self, prompt: str, message: str) -> str:
+    async def request(self, prompt: str, message: str) -> str:
         """Відправка промпта та тексту, отримання відповіді (асинхронно)"""
 
         message_list = [
             {"role": "system", "content": prompt},
             {"role": "user", "content": message},
         ]
-        response = await self.aclient.chat.completions.create(
+        response = await self.client.chat.completions.create(
             model="gpt-4-turbo",
             messages=message_list,
             max_tokens=2000,
@@ -41,3 +26,19 @@ class ChatGPT:
             n=1,
         )
         return response.choices[0].message.content.strip()
+
+    ## Синхронний варіант втратив актуальність
+    # def request(self, prompt: str, message: str) -> str:
+    #     """Відправка промпта та тексту, отримання відповіді"""
+    #     message_list = [
+    #         {"role": "system", "content": prompt},
+    #         {"role": "user", "content": message},
+    #     ]
+    #     response = self.client.chat.completions.create(
+    #         model="gpt-4-turbo",  # gpt-4o,  gpt-4-turbo,    gpt-3.5-turbo
+    #         messages=message_list,
+    #         max_tokens=2000,
+    #         temperature=0.9,
+    #         n=1,  # Кількість варіантів відповідей
+    #     )
+    #     return response.choices[0].message.content.strip()
