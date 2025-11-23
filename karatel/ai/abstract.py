@@ -31,6 +31,7 @@ class AIModel(ABC):
         self.rewrite_prompt_model_anthropic = (
             self.BASE_REWRITE_PROMPT
             + "Не використовуй знаки пунктуації для розмітки тексту."
+            + "Не роби забагато пропусків між строками. Компонуй речення у абзаци."
         )
 
     @abstractmethod
