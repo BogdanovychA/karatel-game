@@ -14,7 +14,6 @@ def init_session_state():
 
     defaults = {
         'hero': None,
-        'enemy': None,
         'game_state': None,
         'game_map': None,
         'gsm': None,
@@ -33,7 +32,6 @@ def init_session_state():
             username=None,
             can_generate_map=False,
         )
-
         st.session_state.ai = OpenAI()
         # st.session_state.ai = Google()
         # st.session_state.ai = Anthropic()

@@ -179,7 +179,7 @@ def profile() -> None:
             )
 
             ai_model = st.selectbox(
-                f"Оберіть мовну модель ШІ",
+                f"Модель ШІ",
                 key="ai_model_radio",
                 index=default_index,
                 options=ai_options,
