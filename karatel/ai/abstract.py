@@ -4,6 +4,7 @@ import asyncio
 from abc import ABC, abstractmethod
 
 from karatel.ai.anthropic import Claude
+from karatel.ai.constants import AIName
 from karatel.ai.google import Gemini
 from karatel.ai.openai import ChatGPT
 
@@ -44,7 +45,7 @@ class OpenAI(AIModel):
     def __init__(self, on: bool | None = None):
         super().__init__()
         self.model = ChatGPT()
-        self.name = "ChatGPT"  # Використовується в зовнішній логіці
+        self.name = AIName.OPENAI.value  # Використовується в зовнішній логіці
         self.on = (
             on if on is not None else False
         )  # Використовується в зовнішній логіці -- чи застосовувати AI
@@ -59,7 +60,7 @@ class Google(AIModel):
     def __init__(self, on: bool | None = None):
         super().__init__()
         self.model = Gemini()
-        self.name = "Gemini"  # Використовується в зовнішній логіці
+        self.name = AIName.GOOGLE.value  # Використовується в зовнішній логіці
         self.on = (
             on if on is not None else False
         )  # Використовується в зовнішній логіці -- чи застосовувати AI
@@ -93,7 +94,7 @@ class Anthropic(AIModel):
     def __init__(self, on: bool | None = None):
         super().__init__()
         self.model = Claude()
-        self.name = "Claude"  # Використовується в зовнішній логіці
+        self.name = AIName.ANTHROPIC.value  # Використовується в зовнішній логіці
         self.on = (
             on if on is not None else False
         )  # Використовується в зовнішній логіці -- чи застосовувати AI
@@ -112,7 +113,7 @@ class MasterAI(AIModel):
         self.model_openai = ChatGPT()
         self.model_anthropic = Claude()
         self.model_google = Gemini()
-        self.name = "MasterAI"  # Використовується в зовнішній логіці
+        self.name = AIName.MASTERAI.value  # Використовується в зовнішній логіці
         self.on = (
             on if on is not None else False
         )  # Використовується в зовнішній логіці -- чи застосовувати AI
