@@ -2,11 +2,61 @@
 
 import streamlit as st
 
+from karatel.ai.abstract import Anthropic, Google, MasterAI, OpenAI
+from karatel.ai.constants import AIName
 from karatel.core.items import Shield, Weapon
 from karatel.logic.map import move_hero
 from karatel.ui.web.constants import BUTTON_WIDTH, GameState
 from karatel.utils.constants import Emoji
 from karatel.utils.settings import DEBUG, LOG
+
+
+def ai_master() -> None:
+    """Перемикач моделей ШІ"""
+    if 'ai' not in st.session_state:
+        pass
+    else:
+        AI_CLASSES = {
+            AIName.OPENAI.value: OpenAI,
+            AIName.GOOGLE.value: Google,
+            AIName.ANTHROPIC.value: Anthropic,
+            AIName.MASTERAI.value: MasterAI,
+            AIName.NONE.value: None,
+        }
+        ai_options = list(AI_CLASSES.keys())
+        if hasattr(st.session_state, 'ai') and hasattr(st.session_state.ai, 'name'):
+            default_index = (
+                ai_options.index(st.session_state.ai.name)
+                if st.session_state.ai.name in ai_options
+                else 0
+            )
+        else:
+            default_index = ai_options.index(AIName.NONE.value)
+
+        new_model = st.selectbox(
+            f"Модель ШІ",
+            key="ai_model_radio",
+            index=default_index,
+            options=ai_options,
+        )
+        if hasattr(st.session_state, 'ai') and hasattr(st.session_state.ai, 'name'):
+            current_model = st.session_state.ai.name
+        else:
+            current_model = AIName.NONE.value
+        if new_model != current_model:
+            # Закриваємо старий loop перед створенням нового
+            if hasattr(st.session_state.ai, 'close'):
+                try:
+                    st.session_state.ai.close()
+                except Exception as e:
+                    st.session_state.gsm.output(
+                        f"Помилка при закритті попередньої моделі: {e}", log=DEBUG
+                    )
+            AIClass = AI_CLASSES[new_model]
+            if AIClass is not None:
+                st.session_state.ai = AIClass()
+            else:
+                st.session_state.ai = None
 
 
 def username_input():

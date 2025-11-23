@@ -4,14 +4,13 @@ import pickle
 
 import streamlit as st
 
-from karatel.ai.abstract import Anthropic, Google, MasterAI, OpenAI
-from karatel.ai.constants import AIName
 from karatel.core.hero import HeroFactory
 from karatel.core.map import generate_map, render_map
 from karatel.core.professions import PROFESSIONS, Profession, show_professions
 from karatel.logic.map import find_hero, output_setter
 from karatel.ui.web.constants import BUTTON_WIDTH, TITLE, GameState
 from karatel.ui.web.elements import (
+    ai_master,
     equipment,
     legend,
     load_hero_button,
@@ -163,42 +162,7 @@ def profile() -> None:
 
     with col3:
 
-        if 'ai' in st.session_state and st.session_state.ai:
-            AI_CLASSES = {
-                AIName.OPENAI.value: OpenAI,
-                AIName.GOOGLE.value: Google,
-                AIName.ANTHROPIC.value: Anthropic,
-                AIName.MASTERAI.value: MasterAI,
-            }
-
-            ai_options = list(AI_CLASSES.keys())
-
-            current_name = st.session_state.ai.name
-            default_index = (
-                ai_options.index(current_name) if current_name in ai_options else 0
-            )
-
-            ai_model = st.selectbox(
-                f"Модель ШІ",
-                key="ai_model_radio",
-                index=default_index,
-                options=ai_options,
-            )
-
-            if ai_model != st.session_state.ai.name:
-                # Закриваємо старий loop перед створенням нового
-                if hasattr(st.session_state.ai, 'close'):
-                    try:
-                        st.session_state.ai.close()
-                    except Exception as e:
-                        st.session_state.gsm.output(
-                            f"Помилка при закритті попередньої моделі: {e}", log=DEBUG
-                        )
-
-                AIClass = AI_CLASSES[ai_model]
-                st.session_state.ai = AIClass()
-        else:
-            pass
+        ai_master()
 
     with col4:
         delete_user = st.button(

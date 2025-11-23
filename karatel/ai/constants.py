@@ -8,3 +8,4 @@ class AIName(Enum):
     GOOGLE = "Gemini"
     OPENAI = "ChatGPT"
     MASTERAI = "MasterAI"
+    NONE = "Вимкнути ШІ"
