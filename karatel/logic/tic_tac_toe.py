@@ -93,4 +93,4 @@ def render_board(output: OutputSpace, the_board: list) -> None:
     output.write(text)
 
 
-board = [Emoji.EMPTY.value] * 9
+START_BOARD = [Emoji.EMPTY.value] * 9
