@@ -25,6 +25,7 @@ class Emoji(Enum):
     DUNG = "🗺️"
     RESP = "🔄"
     X = "❌"
+    CIRCLE = "⭕"
     SHIELD = "🛡️"
     WEAPON = "🗡️"
     LOG = "📜"
