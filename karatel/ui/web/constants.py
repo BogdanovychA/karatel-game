@@ -12,3 +12,4 @@ class GameState(Enum):
     MAP = "map"
     LOAD_HERO = "load_hero"
     PROFILE = "profile"
+    TTT = "ttt"

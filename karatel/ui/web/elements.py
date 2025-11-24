@@ -207,6 +207,10 @@ def navigation() -> None:
         elif st.session_state.game_state == GameState.PROFILE.value:
             logout_button()
 
+    if st.button("Тест TTT"):
+        st.session_state.game_state = GameState.TTT.value
+        st.rerun()
+
 
 def respawn() -> None:
     """Блок кнопок відродження"""

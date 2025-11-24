@@ -2,6 +2,7 @@
 
 import streamlit as st
 
+import karatel.logic.tic_tac_toe as ttt
 from karatel.core.game_state_manager import GameStateManager
 from karatel.storage.abstract import SQLiteSaver
 from karatel.ui.abstract import BufferedOutput
@@ -17,6 +18,7 @@ def init_session_state():
         'game_map': None,
         'gsm': None,
         'ai': None,
+        'ttt_board': None,
         'first_start': True,
     }
 
@@ -31,7 +33,7 @@ def init_session_state():
             username=None,
             can_generate_map=False,
         )
-
+        st.session_state.ttt_board = ttt.START_BOARD.copy()
         st.session_state.first_start = False
 
 

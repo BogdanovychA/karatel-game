@@ -108,3 +108,9 @@ def render_board(output: OutputSpace, board: list) -> None:
     for i in range(0, 9, 3):
         text += f"{board[i]} {board[i + 1]} {board[i + 2]}\n"
     output.write(text)
+
+
+def set_cell(board: list, cell: str, position: int) -> list[str]:
+    if position in range(len(board)) and board[position] == Emoji.EMPTY.value:
+        board[position] = cell
+    # return board

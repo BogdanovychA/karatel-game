@@ -1,9 +1,11 @@
 # -*- coding: utf-8 -*-
 
+import copy
 import pickle
 
 import streamlit as st
 
+import karatel.logic.tic_tac_toe as ttt
 from karatel.core.hero import HeroFactory
 from karatel.core.map import generate_map, render_map
 from karatel.core.professions import PROFESSIONS, Profession, show_professions
@@ -12,6 +14,7 @@ from karatel.ui.web.constants import BUTTON_WIDTH, TITLE, GameState
 from karatel.ui.web.elements import (
     ai_master,
     equipment,
+    hero_button,
     legend,
     load_hero_button,
     movement_controls,
@@ -25,7 +28,7 @@ from karatel.ui.web.elements import (
 from karatel.ui.web.logic import check_password, check_username_and_password
 from karatel.utils.constants import Emoji, Sex
 from karatel.utils.crypt import hash_pass, validate_password
-from karatel.utils.settings import DEBUG, HERO_LIVES, LOG, MAX_LEVEL, MIN_LEVEL
+from karatel.utils.settings import HERO_LIVES, LOG, MAX_LEVEL, MIN_LEVEL
 
 
 def check_game_state() -> None:
@@ -45,6 +48,9 @@ def check_game_state() -> None:
                 load_hero()
             case GameState.PROFILE.value:
                 profile()
+            case GameState.TTT.value:
+                ttt_screen()
+
             case _:
                 st.title(f"{Emoji.X.value} Відсутній пункт меню")
                 st.write(f"game_state: {st.session_state.game_state}")
@@ -52,7 +58,62 @@ def check_game_state() -> None:
         authenticate_user()
 
 
-def authenticate_user():
+def ttt_screen() -> None:
+    st.title(TITLE)
+    st.header(f"{Emoji.X.value}рестики-Н{Emoji.CIRCLE.value}лики")
+    if "ttt_board" in st.session_state and st.session_state.ttt_board:
+        st.subheader(f"{Emoji.DUNG.value} Дошка")
+        # ttt.render_board(st.session_state.gsm.output, st.session_state.ttt_board)
+        # st.text(st.session_state.gsm.output.read_buffer())
+
+        cell = Emoji.X.value
+
+        for n in range(0, 9, 3):
+            cols = st.columns([1, 1, 1])
+            for i, col in enumerate(cols):
+                index = i + n
+                with col:
+                    if st.button(
+                        f"{st.session_state.ttt_board[index]}",
+                        key=f"cell{index}",
+                        type="secondary",
+                        disabled=(
+                            True
+                            if st.session_state.ttt_board[index] != Emoji.EMPTY.value
+                            else False
+                        ),
+                    ):
+                        if ttt.check_winner(st.session_state.ttt_board) is None:
+                            ttt.set_cell(st.session_state.ttt_board, cell, index)
+                        if ttt.check_winner(st.session_state.ttt_board) is None:
+                            ai_move = ttt.best_move(
+                                st.session_state.ttt_board,
+                                Emoji.CIRCLE.value,
+                                Emoji.X.value,
+                            )
+                            ttt.set_cell(
+                                st.session_state.ttt_board, Emoji.CIRCLE.value, ai_move
+                            )
+                        st.rerun()
+
+    col1, col2, col3, col4 = st.columns([1, 1, 1, 1])
+    with col1:
+        hero_button()
+    with col2:
+        pass
+    with col3:
+        pass
+    with col4:
+        if st.button(
+            "Ще раз", icon=Emoji.RELOAD.value, type="primary", width=BUTTON_WIDTH
+        ):
+            # st.session_state.ttt_board = None
+            st.session_state.ttt_board = ttt.START_BOARD.copy()
+            # st.session_state.ttt_board = copy.deepcopy(ttt.START_BOARD)
+            st.rerun()
+
+
+def authenticate_user() -> None:
 
     st.image("./karatel/images/logo.png", width=500)
     st.subheader(
