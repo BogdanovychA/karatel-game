@@ -43,7 +43,7 @@ class AIModel(ABC):
 class OpenAI(AIModel):
     """Робота з ChatGPT"""
 
-    def __init__(self, on: bool | None = None):
+    def __init__(self):
         super().__init__()
         self.model = ChatGPT()
         self.name = AIName.OPENAI.value  # Використовується в зовнішній логіці
@@ -55,7 +55,7 @@ class OpenAI(AIModel):
 class Google(AIModel):
     """Робота з Gemini"""
 
-    def __init__(self, on: bool | None = None):
+    def __init__(self):
         super().__init__()
         self.model = Gemini()
         self.name = AIName.GOOGLE.value  # Використовується в зовнішній логіці
@@ -86,7 +86,7 @@ class Google(AIModel):
 class Anthropic(AIModel):
     """Робота з Claude"""
 
-    def __init__(self, on: bool | None = None):
+    def __init__(self):
         super().__init__()
         self.model = Claude()
         self.name = AIName.ANTHROPIC.value  # Використовується в зовнішній логіці
@@ -100,7 +100,7 @@ class Anthropic(AIModel):
 class MasterAI(AIModel):
     """Асинхронна робота з API ШІ"""
 
-    def __init__(self, on: bool | None = None):
+    def __init__(self):
         super().__init__()
         self.model_openai = ChatGPT()
         self.model_anthropic = Claude()
