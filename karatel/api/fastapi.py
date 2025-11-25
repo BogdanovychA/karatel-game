@@ -6,6 +6,9 @@ from karatel.ui.abstract import ConsoleOutput
 
 app = FastAPI(
     title="Karatel Game API",
+    root_path="/api",
+    openapi_url="/openapi.json",
+    docs_url="/docs",
 )
 
 
