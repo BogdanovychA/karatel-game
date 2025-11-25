@@ -58,7 +58,7 @@ def move_hero(
     step_x: int,
     the_map: list,
     log: bool = LOG,
-) -> None:
+) -> CellType | None:
     """Переміщення персонажа по мапі"""
 
     def _step():
@@ -80,20 +80,22 @@ def move_hero(
     pos_y, pos_x = find_hero(the_map)
 
     if pos_y is None or pos_x is None:
-        return
+        return None
     else:
         new_y = clamp_value((pos_y + step_y), 0, MapSize.Y - 1)
         new_x = clamp_value((pos_x + step_x), 0, MapSize.X - 1)
 
         # Перевіряємо клітинку, куди треба перемістити героя
-        match the_map[new_y][new_x].type:
+        new_cell_type = the_map[new_y][new_x].type
+
+        match new_cell_type.value:
 
             # Якщо клітинка пуста
-            case CellType.EMPTY | CellType.GOLD | CellType.BOOK:
+            case CellType.EMPTY.value | CellType.GOLD.value | CellType.BOOK.value:
                 _step()
 
             # Якщо там предмет
-            case CellType.ITEM:
+            case CellType.ITEM.value:
                 if the_map[new_y][new_x].obj is not None:
                     the_map[pos_y][pos_x].obj.equipment.add_item(
                         the_map[new_y][new_x].obj, log=log
@@ -106,12 +108,16 @@ def move_hero(
                 _step()
 
             # Якщо там життя
-            case CellType.HEART:
+            case CellType.HEART.value:
                 add_lives(the_map[pos_y][pos_x].obj, 1)
                 _step()
 
+            # Якщо там гра
+            case CellType.GAME.value:
+                _step()
+
             # Якщо там ворог
-            case CellType.ENEMY:
+            case CellType.ENEMY.value:
                 gsm.output.write(
                     f"Ваш ворог:\n"
                     + f"{the_map[new_y][new_x].obj}\n"
@@ -127,7 +133,7 @@ def move_hero(
                     _step()
 
             # Якщо це вихід
-            case CellType.EXIT:
+            case CellType.EXIT.value:
                 gsm.output.write(
                     f"{the_map[pos_y][pos_x].obj.name} знаходить вихід. "
                     + "Тепер можна створити нове підземелля, з сильнішими ворогами.",
@@ -137,4 +143,4 @@ def move_hero(
                 gsm.can_generate_map = True
                 _step()
 
-        return
+        return new_cell_type

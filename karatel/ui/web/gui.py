@@ -13,7 +13,6 @@ from karatel.ui.web.constants import BUTTON_WIDTH, TITLE, GameState
 from karatel.ui.web.elements import (
     ai_master,
     equipment,
-    hero_button,
     legend,
     load_hero_button,
     movement_controls,

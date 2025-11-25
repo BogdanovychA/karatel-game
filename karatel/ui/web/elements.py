@@ -1,10 +1,12 @@
 # -*- coding: utf-8 -*-
 
+
 import streamlit as st
 
 from karatel.ai.abstract import Anthropic, Google, MasterAI, OpenAI
 from karatel.ai.constants import AIName
 from karatel.core.items import Shield, Weapon
+from karatel.core.map import CellType
 from karatel.logic.map import move_hero
 from karatel.ui.web.constants import BUTTON_WIDTH, GameState
 from karatel.utils.constants import Emoji
@@ -207,9 +209,9 @@ def navigation() -> None:
         elif st.session_state.game_state == GameState.PROFILE.value:
             logout_button()
 
-    if st.button("Тест TTT"):
-        st.session_state.game_state = GameState.TTT.value
-        st.rerun()
+    # if st.button("Тест TTT"):
+    #     st.session_state.game_state = GameState.TTT.value
+    #     st.rerun()
 
 
 def respawn() -> None:
@@ -324,13 +326,17 @@ def movement_controls() -> None:
                 else:
                     text, key, y, x, description = value
                     if st.button(label=text, key=key, help=description):
-                        move_hero(
+                        next_cell = move_hero(
                             st.session_state.gsm,
                             y,
                             x,
                             st.session_state.game_map,
                             log=LOG,
                         )
+
+                        if hasattr(next_cell, "value"):
+                            if next_cell.value == CellType.GAME.value:
+                                st.session_state.game_state = GameState.TTT.value
                         st.rerun()
 
 

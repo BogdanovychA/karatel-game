@@ -25,6 +25,7 @@ class CellType(Enum):
     GOLD = "Гроші"
     BOOK = "Досвід"
     HEART = "Життя"
+    GAME = "Гра"
 
 
 class MapSize(IntEnum):
@@ -73,12 +74,13 @@ class CellMultiplier(IntEnum):
     """Enum-клас для зберігання змінних, що
     відповідають за мультиплікатор типів клітинок"""
 
-    EMPTY = 10
-    ENEMY = 5
-    ITEM = 3
-    GOLD = 1
-    BOOK = 1
-    HEART = 1
+    EMPTY = 20
+    ENEMY = 10
+    ITEM = 6
+    GOLD = 2
+    BOOK = 2
+    HEART = 2
+    GAME = 1
 
 
 TYPES_OF_CELL = (
@@ -88,6 +90,7 @@ TYPES_OF_CELL = (
     + [CellType.GOLD] * CellMultiplier.GOLD
     + [CellType.BOOK] * CellMultiplier.BOOK
     + [CellType.HEART] * CellMultiplier.HEART
+    + [CellType.GAME] * CellMultiplier.GAME
 )
 
 
@@ -125,6 +128,8 @@ class Cell:
                 return Emoji.EMPTY.value
             case CellType.EXIT:
                 return Emoji.EXIT.value
+            case CellType.GAME:
+                return Emoji.CTRL.value
             case CellType.HERO:
                 if self.obj.alive:
                     return Emoji.HERO.value
@@ -179,6 +184,15 @@ def select_obj(
         )
         return gold_cell
 
+    def _generate_game() -> Cell:
+        """Створення клітинки з грою"""
+
+        game_cell = Cell(
+            cell_type=CellType.GAME,
+            obj=None,
+        )
+        return game_cell
+
     def _generate_book() -> Cell:
         """Створення клітинки з досвідом"""
 
@@ -213,6 +227,8 @@ def select_obj(
                 return _generate_book()
             case CellType.HEART:
                 return _generate_heart()
+            case CellType.GAME:
+                return _generate_game()
             case CellType.EMPTY | _:
                 return EMPTY_CELL
 
