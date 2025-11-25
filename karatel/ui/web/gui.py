@@ -4,7 +4,7 @@ import pickle
 
 import streamlit as st
 
-import karatel.logic.tic_tac_toe as ttt
+import karatel.logic.tic_tac_toe_4x4 as ttt
 from karatel.core.hero import HeroFactory
 from karatel.core.map import generate_map, render_map
 from karatel.core.professions import PROFESSIONS, Profession, show_professions
@@ -76,68 +76,88 @@ def ttt_screen() -> None:
         st.session_state.ai_moved = False
 
     st.title(TITLE)
-    st.header(f"{Emoji.X.value}рестики-Н{Emoji.CIRCLE.value}лики")
+    st.subheader(f"{Emoji.X.value}рестики-Н{Emoji.CIRCLE.value}лики")
+
     if "ttt_board" in st.session_state and st.session_state.ttt_board:
-        st.subheader(f"{Emoji.DUNG.value} Дошка")
-        # ttt.render_board(st.session_state.gsm.output, st.session_state.ttt_board)
-        # st.text(st.session_state.gsm.output.read_buffer())
 
-        player_is = st.selectbox(
-            "Обери за кого грати:",
-            key="symbol_radio",
-            on_change=_restart,
-            options=[Emoji.X.value, Emoji.CIRCLE.value],
-        )
+        column1, column2 = st.columns([1, 1])
 
-        if player_is == Emoji.X.value:
-            max_player_symbol = Emoji.X.value
-            min_player_symbol = Emoji.CIRCLE.value
-        else:
-            max_player_symbol = Emoji.CIRCLE.value
-            min_player_symbol = Emoji.X.value
+        with column1:
 
-            if not st.session_state.ai_moved:
-                _ai_move()
-                st.session_state.ai_moved = True
+            player_is = st.selectbox(
+                "Обери за кого грати:",
+                key="symbol_radio",
+                on_change=_restart,
+                options=[Emoji.X.value, Emoji.CIRCLE.value],
+            )
 
-        for n in range(0, 9, 3):
-            cols = st.columns([1, 1, 1])
-            for i, col in enumerate(cols):
-                index = i + n
-                with col:
-                    if st.button(
-                        f"{st.session_state.ttt_board[index]}",
-                        key=f"cell{index}",
-                        type="secondary",
-                        disabled=(
-                            st.session_state.ttt_board[index] != Emoji.EMPTY.value
-                        ),
-                    ):
-                        if ttt.check_winner(st.session_state.ttt_board) is None:
-                            st.session_state.ttt_board[index] = max_player_symbol
+            if player_is == Emoji.X.value:
+                max_player_symbol = Emoji.X.value
+                min_player_symbol = Emoji.CIRCLE.value
+            else:
+                max_player_symbol = Emoji.CIRCLE.value
+                min_player_symbol = Emoji.X.value
 
-                            if player_is == Emoji.X.value:
-                                _ai_move()
-                            else:
-                                st.session_state.ai_moved = False
+                if not st.session_state.ai_moved:
+                    _ai_move()
+                    st.session_state.ai_moved = True
 
-                        st.rerun()
-        if ttt.check_winner(st.session_state.ttt_board):
-            st.text(f"Гравець {ttt.check_winner(st.session_state.ttt_board)} переміг")
+            st.text(f" ")
 
-    col1, col2, col3, col4 = st.columns([1, 1, 1, 1])
-    with col1:
-        hero_button()
-    with col2:
-        pass
-    with col3:
-        pass
-    with col4:
-        if st.button(
-            "Ще раз", icon=Emoji.RELOAD.value, type="primary", width=BUTTON_WIDTH
-        ):
-            _restart()
-            st.rerun()
+            winner = ttt.check_winner(st.session_state.ttt_board)
+            if winner:
+                if winner != ttt.TTT.DRAW.value:
+                    st.text(f"Гравець {winner} переміг")
+                else:
+                    st.text(f"Нічия: {max_player_symbol}/{min_player_symbol}")
+                if st.button(
+                    "Ще раз",
+                    icon=Emoji.RELOAD.value,
+                    type="secondary",
+                    width=BUTTON_WIDTH,
+                ):
+                    _restart()
+                    st.rerun()
+
+        with column2:
+
+            for n in range(0, 16, 4):
+                cols = st.columns([1, 1, 1, 1])
+                for i, col in enumerate(cols):
+                    index = i + n
+                    with col:
+                        if st.button(
+                            f"{st.session_state.ttt_board[index]}",
+                            key=f"cell{index}",
+                            type="secondary",
+                            disabled=(
+                                st.session_state.ttt_board[index] != Emoji.EMPTY.value
+                            ),
+                        ):
+                            if ttt.check_winner(st.session_state.ttt_board) is None:
+                                st.session_state.ttt_board[index] = max_player_symbol
+
+                                if player_is == Emoji.X.value:
+                                    _ai_move()
+                                else:
+                                    st.session_state.ai_moved = False
+                            st.rerun()
+
+    navigation()
+
+    # col1, col2, col3, col4 = st.columns([1, 1, 1, 1])
+    # with col1:
+    #     hero_button()
+    # with col2:
+    #     pass
+    # with col3:
+    #     pass
+    # with col4:
+    #     if st.button(
+    #         "Ще раз", icon=Emoji.RELOAD.value, type="primary", width=BUTTON_WIDTH
+    #     ):
+    #         _restart()
+    #         st.rerun()
 
 
 def authenticate_user() -> None:

@@ -58,7 +58,7 @@ def move_hero(
     step_x: int,
     the_map: list,
     log: bool = LOG,
-) -> list:
+) -> None:
     """Переміщення персонажа по мапі"""
 
     def _step():
@@ -80,7 +80,7 @@ def move_hero(
     pos_y, pos_x = find_hero(the_map)
 
     if pos_y is None or pos_x is None:
-        return the_map
+        return
     else:
         new_y = clamp_value((pos_y + step_y), 0, MapSize.Y - 1)
         new_x = clamp_value((pos_x + step_x), 0, MapSize.X - 1)
@@ -137,4 +137,4 @@ def move_hero(
                 gsm.can_generate_map = True
                 _step()
 
-        return the_map
+        return

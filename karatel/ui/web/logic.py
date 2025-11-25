@@ -2,7 +2,7 @@
 
 import streamlit as st
 
-import karatel.logic.tic_tac_toe as ttt
+import karatel.logic.tic_tac_toe_4x4 as ttt
 from karatel.core.game_state_manager import GameStateManager
 from karatel.storage.abstract import SQLiteSaver
 from karatel.ui.abstract import BufferedOutput
