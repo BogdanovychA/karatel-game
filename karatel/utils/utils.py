@@ -55,7 +55,6 @@ def obj_finder(
 
 
 def generate_random_prefix(length=5):
-    """
-    Генерує випадковий рядок з маленьких латинських літер заданої довжини.
-    """
+    """Генерує випадковий рядок з маленьких латинських літер
+    заданої довжини."""
     return ''.join(random.choice(string.ascii_lowercase) for _ in range(length))
