@@ -361,9 +361,9 @@ def legend() -> None:
     with col2:
         st.text(f"{Emoji.GOLD.value} — гроші")
     with col3:
-        st.text(f"{Emoji.EMPTY.value} — нічого")
+        st.text(f"{Emoji.CTRL.value} — міні-гра")
     with col4:
-        pass
+        st.text(f"{Emoji.EMPTY.value} — нічого")
 
 
 def show_log(expanded: bool = False) -> None:
