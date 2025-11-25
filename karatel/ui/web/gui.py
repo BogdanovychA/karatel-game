@@ -27,6 +27,7 @@ from karatel.ui.web.logic import check_password, check_username_and_password
 from karatel.utils.constants import Emoji, Sex
 from karatel.utils.crypt import hash_pass, validate_password
 from karatel.utils.settings import HERO_LIVES, LOG, MAX_LEVEL, MIN_LEVEL
+from karatel.utils.utils import generate_random_prefix
 
 
 def check_game_state() -> None:
@@ -367,10 +368,10 @@ def hero() -> None:
             )
 
             if display_sex == Sex.F.value:
-                name_text = "КАРАТЄЛЬКА"
+                name_text = f"КАРАТЄЛЬКА_{generate_random_prefix(3)}"
                 sex = Sex.F
             else:
-                name_text = "КАРАТЄЛЬ"
+                name_text = f"КАРАТЄЛЬ_{generate_random_prefix(3)}"
                 sex = Sex.M
 
             name = st.text_input("Ім'я", icon=Emoji.HERO.value, value=name_text)

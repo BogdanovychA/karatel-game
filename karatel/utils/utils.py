@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
-
 from __future__ import annotations
 
+import random
+import string
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
@@ -51,3 +52,10 @@ def obj_finder(
         if getattr(obj, "name", None) == name:
             return obj
     return None
+
+
+def generate_random_prefix(length=5):
+    """
+    Генерує випадковий рядок з маленьких латинських літер заданої довжини.
+    """
+    return ''.join(random.choice(string.ascii_lowercase) for _ in range(length))
