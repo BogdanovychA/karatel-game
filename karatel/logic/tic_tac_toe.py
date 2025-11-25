@@ -110,7 +110,18 @@ def render_board(output: OutputSpace, board: list) -> None:
     output.write(text)
 
 
-def set_cell(board: list, cell: str, position: int) -> list[str]:
-    if position in range(len(board)) and board[position] == Emoji.EMPTY.value:
-        board[position] = cell
-    # return board
+# def set_cell(board: list, cell: str, position: int) -> list[str]:
+#     if position in range(len(board)) and board[position] == Emoji.EMPTY.value:
+#         board[position] = cell
+#     return board
+
+import time
+
+board = START_BOARD.copy()
+
+start = time.time()
+move = best_move(board, "X", "O")
+elapsed = time.time() - start
+
+print(f"Найкращий хід: {move}")
+print(f"Час обчислення: {elapsed:.4f}s")

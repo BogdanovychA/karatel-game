@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 
-import copy
 import pickle
 
 import streamlit as st
@@ -59,6 +58,23 @@ def check_game_state() -> None:
 
 
 def ttt_screen() -> None:
+
+    def _ai_move() -> None:
+        if ttt.check_winner(st.session_state.ttt_board) is None:
+            ai_move = ttt.best_move(
+                board=st.session_state.ttt_board,
+                max_player_symbol=min_player_symbol,
+                min_player_symbol=max_player_symbol,
+            )
+            st.session_state.ttt_board[ai_move] = min_player_symbol
+
+    def _restart() -> None:
+        st.session_state.ttt_board = ttt.START_BOARD.copy()
+        st.session_state.ai_moved = False
+
+    if "ai_moved" not in st.session_state:
+        st.session_state.ai_moved = False
+
     st.title(TITLE)
     st.header(f"{Emoji.X.value}рестики-Н{Emoji.CIRCLE.value}лики")
     if "ttt_board" in st.session_state and st.session_state.ttt_board:
@@ -66,7 +82,23 @@ def ttt_screen() -> None:
         # ttt.render_board(st.session_state.gsm.output, st.session_state.ttt_board)
         # st.text(st.session_state.gsm.output.read_buffer())
 
-        cell = Emoji.X.value
+        player_is = st.selectbox(
+            "Обери за кого грати:",
+            key="symbol_radio",
+            on_change=_restart,
+            options=[Emoji.X.value, Emoji.CIRCLE.value],
+        )
+
+        if player_is == Emoji.X.value:
+            max_player_symbol = Emoji.X.value
+            min_player_symbol = Emoji.CIRCLE.value
+        else:
+            max_player_symbol = Emoji.CIRCLE.value
+            min_player_symbol = Emoji.X.value
+
+            if not st.session_state.ai_moved:
+                _ai_move()
+                st.session_state.ai_moved = True
 
         for n in range(0, 9, 3):
             cols = st.columns([1, 1, 1])
@@ -78,23 +110,20 @@ def ttt_screen() -> None:
                         key=f"cell{index}",
                         type="secondary",
                         disabled=(
-                            True
-                            if st.session_state.ttt_board[index] != Emoji.EMPTY.value
-                            else False
+                            st.session_state.ttt_board[index] != Emoji.EMPTY.value
                         ),
                     ):
                         if ttt.check_winner(st.session_state.ttt_board) is None:
-                            ttt.set_cell(st.session_state.ttt_board, cell, index)
-                        if ttt.check_winner(st.session_state.ttt_board) is None:
-                            ai_move = ttt.best_move(
-                                st.session_state.ttt_board,
-                                Emoji.CIRCLE.value,
-                                Emoji.X.value,
-                            )
-                            ttt.set_cell(
-                                st.session_state.ttt_board, Emoji.CIRCLE.value, ai_move
-                            )
+                            st.session_state.ttt_board[index] = max_player_symbol
+
+                            if player_is == Emoji.X.value:
+                                _ai_move()
+                            else:
+                                st.session_state.ai_moved = False
+
                         st.rerun()
+        if ttt.check_winner(st.session_state.ttt_board):
+            st.text(f"Гравець {ttt.check_winner(st.session_state.ttt_board)} переміг")
 
     col1, col2, col3, col4 = st.columns([1, 1, 1, 1])
     with col1:
@@ -107,9 +136,7 @@ def ttt_screen() -> None:
         if st.button(
             "Ще раз", icon=Emoji.RELOAD.value, type="primary", width=BUTTON_WIDTH
         ):
-            # st.session_state.ttt_board = None
-            st.session_state.ttt_board = ttt.START_BOARD.copy()
-            # st.session_state.ttt_board = copy.deepcopy(ttt.START_BOARD)
+            _restart()
             st.rerun()
 
 
