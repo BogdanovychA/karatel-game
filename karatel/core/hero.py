@@ -9,8 +9,11 @@ if TYPE_CHECKING:
     from karatel.ui.abstract import OutputSpace
 
 from karatel.core.items import (  # ITEMS,; SHIELDS,; WEAPONS,
+    ITEMS,
     JUST_HAND,
+    SHIELDS,
     UNARMED_STRIKE,
+    WEAPONS,
     Item,
     Shield,
     Weapon,
@@ -563,53 +566,61 @@ class HeroFactory:
 
         return hero
 
-    # @staticmethod
-    # def dict_to_hero(output: OutputSpace, the_dict: dict) -> Hero:
-    #     """Створення героя передаючи словник.
-    #     Використовується при завантаженнях зі збереження"""
-    #
-    #     def _create_list(input_list: list, base: tuple) -> list:
-    #         """Допоміжна функція для забезпечення DRY"""
-    #         the_list = []
-    #         for item in input_list:
-    #             the_list.append(obj_finder(item, base))
-    #         return the_list
-    #
-    #     hero = Hero(
-    #         output=output,
-    #         name=the_dict["name"],
-    #         profession=obj_finder(the_dict["profession"], PROFESSIONS),
-    #         experience=int(the_dict["experience"] or "0"),
-    #     )
-    #     hero.lives = int(the_dict["lives"] or "1")
-    #     hero.money = int(the_dict["money"] or "0")
-    #     hero.right_hand = obj_finder(the_dict["right_hand"], WEAPONS)
-    #     hero.left_hand = obj_finder(the_dict["left_hand"], SHIELDS)
-    #     hero.inventory = _create_list(the_dict["inventory"], ITEMS)
-    #     hero.skills = _create_list(the_dict["skills"], SKILLS)
-    #
-    #     return hero
-    #
-    # @staticmethod
-    # def hero_to_dict(hero: Hero) -> dict:
-    #     """Конвертація героя в словник -- для збереження"""
-    #     the_dict: dict = {
-    #         "name": hero.name,
-    #         "profession": hero.profession.name,
-    #         "experience": hero.experience,
-    #         "lives": hero.lives,
-    #         "money": hero.money,
-    #         "left_hand": hero.left_hand.name,
-    #         "right_hand": hero.right_hand.name,
-    #         "skills": [],
-    #         "inventory": [],
-    #     }
-    #     for skill in hero.skills:
-    #         the_dict["skills"].append(skill.name)
-    #     for item in hero.inventory:
-    #         the_dict["inventory"].append(item.name)
-    #
-    #     return the_dict
+    @staticmethod
+    def dict_to_hero(output: OutputSpace, the_dict: dict) -> Hero:
+        """Створення героя передаючи словник.
+        Використовується при завантаженнях зі збереження"""
+
+        def _create_list(input_list: list, base: tuple) -> list:
+            """Допоміжна функція для забезпечення DRY"""
+            the_list = []
+            for item in input_list:
+                the_list.append(obj_finder(item, base))
+            return the_list
+
+        def _get_sex(value: str) -> Sex | None:
+            for sex in Sex:
+                if sex.value == value:
+                    return sex
+            return None
+
+        hero = Hero(
+            output=output,
+            name=the_dict["name"],
+            sex=_get_sex(the_dict["sex"]),
+            profession=obj_finder(the_dict["profession"], PROFESSIONS),
+            experience=int(the_dict["experience"] or "0"),
+        )
+        hero.lives = int(the_dict["lives"] or "1")
+        hero.money = int(the_dict["money"] or "0")
+        hero.right_hand = obj_finder(the_dict["right_hand"], WEAPONS)
+        hero.left_hand = obj_finder(the_dict["left_hand"], SHIELDS)
+        hero.inventory = _create_list(the_dict["inventory"], ITEMS)
+        hero.skills = _create_list(the_dict["skills"], SKILLS)
+
+        return hero
+
+    @staticmethod
+    def hero_to_dict(hero: Hero) -> dict:
+        """Конвертація героя в словник -- для збереження"""
+        the_dict: dict = {
+            "name": hero.name,
+            "sex": hero.sex,
+            "profession": hero.profession.name,
+            "experience": hero.experience,
+            "lives": hero.lives,
+            "money": hero.money,
+            "left_hand": hero.left_hand.name,
+            "right_hand": hero.right_hand.name,
+            "skills": [],
+            "inventory": [],
+        }
+        for skill in hero.skills:
+            the_dict["skills"].append(skill.name)
+        for item in hero.inventory:
+            the_dict["inventory"].append(item.name)
+
+        return the_dict
 
     @staticmethod
     def select_name(sex: Sex | None = None) -> str:
