@@ -4,7 +4,11 @@ from fastapi.responses import FileResponse
 from karatel.core.hero import HeroFactory
 from karatel.ui.abstract import ConsoleOutput
 
-app = FastAPI()
+app = FastAPI(
+    title="Karatel Game API",
+    openapi_url="/api/openapi.json",
+    docs_url="/api/docs",
+)
 
 
 @app.get("/favicon.ico")
