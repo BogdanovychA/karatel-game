@@ -12,6 +12,14 @@ app = FastAPI(
 )
 
 
+@app.get("/")
+def root():
+    routes = [
+        {"path": r.path, "name": r.name, "methods": list(r.methods)} for r in app.routes
+    ]
+    return {"available_routes": routes}
+
+
 @app.get("/favicon.ico")
 def favicon():
     return FileResponse("./karatel/images/favicon.png")
