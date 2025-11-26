@@ -8,12 +8,10 @@ from typing import TYPE_CHECKING, Type
 if TYPE_CHECKING:
     from karatel.ui.abstract import OutputSpace
 
-from karatel.core.items import (  # ITEMS,; SHIELDS,; WEAPONS,
+from karatel.core.items import (
     ITEMS,
     JUST_HAND,
-    SHIELDS,
     UNARMED_STRIKE,
-    WEAPONS,
     Item,
     Shield,
     Weapon,
@@ -593,8 +591,8 @@ class HeroFactory:
         )
         hero.lives = int(the_dict["lives"] or "1")
         hero.money = int(the_dict["money"] or "0")
-        hero.right_hand = obj_finder(the_dict["right_hand"], WEAPONS)
-        hero.left_hand = obj_finder(the_dict["left_hand"], SHIELDS)
+        hero.right_hand = obj_finder(the_dict["right_hand"], ITEMS)
+        hero.left_hand = obj_finder(the_dict["left_hand"], ITEMS)
         hero.inventory = _create_list(the_dict["inventory"], ITEMS)
         hero.skills = _create_list(the_dict["skills"], SKILLS)
 

@@ -6,8 +6,16 @@ from enum import Enum, IntEnum
 from typing import TYPE_CHECKING
 
 from karatel.core.hero import Hero, HeroFactory
-from karatel.core.items import ITEMS_LIST, JUST_HAND, UNARMED_STRIKE, Item, match_level
+from karatel.core.items import (
+    ITEMS,
+    ITEMS_LIST,
+    JUST_HAND,
+    UNARMED_STRIKE,
+    Item,
+    match_level,
+)
 from karatel.utils.constants import Emoji
+from karatel.utils.utils import obj_finder
 
 if TYPE_CHECKING:
     from karatel.ui.abstract import OutputSpace
@@ -265,9 +273,9 @@ def generate_map(hero: Hero) -> list[list[Cell]]:
 
     all_items = _crate_item_list()
 
-    line_y: list[list] = []
+    the_map: list[list] = []
     for coordinate_y in range(MapSize.Y):
-        line_x: list[Cell] = []
+        line_y: list[Cell] = []
         for coordinate_x in range(0, MapSize.X):
 
             # Встановлюємо гравця на стартову позицію
@@ -303,9 +311,9 @@ def generate_map(hero: Hero) -> list[list[Cell]]:
                     output=hero.output, all_items=all_items, enemy_level=hero.level
                 )
 
-            line_x.append(cell)
-        line_y.append(line_x)
-    return line_y
+            line_y.append(cell)
+        the_map.append(line_y)
+    return the_map
 
 
 def render_map(output: OutputSpace, the_map: list) -> None:
@@ -317,3 +325,125 @@ def render_map(output: OutputSpace, the_map: list) -> None:
             text += " " + x.emoji + " "
         text += "\n"
     output.write(text)
+
+
+def map_to_dict(the_map: list) -> list:
+    """Конвертація мапи в словник для збереження в БД"""
+
+    map_dict: list = []
+    for y in the_map:
+        line: list = []
+        for x in y:
+            match x.type.value:
+                case CellType.HERO.value:
+                    line.append(
+                        {
+                            "type": x.type.value,
+                            "obj": HeroFactory.hero_to_dict(x.obj),
+                        }
+                    )
+                case CellType.ENEMY.value:
+                    line.append(
+                        {
+                            "type": x.type.value,
+                            "obj": HeroFactory.hero_to_dict(x.obj),
+                            "gold": x.gold,
+                        }
+                    )
+                case CellType.ITEM.value:
+                    line.append(
+                        {
+                            "type": x.type.value,
+                            "obj": getattr(x.obj, "name", None),
+                        }
+                    )
+                case CellType.GOLD.value:
+                    line.append(
+                        {
+                            "type": x.type.value,
+                            "gold": x.gold,
+                        }
+                    )
+                case CellType.BOOK.value:
+                    line.append(
+                        {
+                            "type": x.type.value,
+                            "experience": x.experience,
+                        }
+                    )
+                case CellType.EXIT.value:
+                    line.append(
+                        {
+                            "type": x.type.value,
+                            "gold": x.gold,
+                        }
+                    )
+                case CellType.HEART.value | CellType.GAME.value | CellType.EMPTY.value:
+                    line.append({"type": x.type.value})
+
+                case _:
+                    line.append({"type": x.type.value})
+
+        map_dict.append(line)
+    return map_dict
+
+
+def dict_to_map(output: OutputSpace, the_list: list) -> list:
+    """Конвертація словника в мапу для відновлення з БД"""
+
+    the_map: list[list] = []
+    for y in the_list:
+        line_y: list[Cell] = []
+        for x in y:
+
+            cell = EMPTY_CELL
+
+            match x["type"]:
+
+                case CellType.HERO.value:
+                    cell = Cell(
+                        cell_type=CellType.HERO,
+                        obj=HeroFactory.dict_to_hero(output, x["obj"]),
+                    )
+
+                case CellType.ENEMY.value:
+                    cell = Cell(
+                        cell_type=CellType.ENEMY,
+                        obj=HeroFactory.dict_to_hero(output, x["obj"]),
+                        gold=x["gold"],
+                    )
+
+                case CellType.ITEM.value:
+                    cell = Cell(
+                        cell_type=CellType.ITEM,
+                        obj=(
+                            obj_finder(x["obj"], ITEMS)
+                            if x["obj"] is not None
+                            else None
+                        ),
+                    )
+
+                case CellType.GOLD.value:
+                    cell = Cell(cell_type=CellType.GOLD, obj=None, gold=x["gold"])
+
+                case CellType.BOOK.value:
+                    cell = Cell(
+                        cell_type=CellType.BOOK, obj=None, experience=x["experience"]
+                    )
+
+                case CellType.EXIT.value:
+                    cell = Cell(cell_type=CellType.EXIT, obj=None, gold=x["gold"])
+
+                case CellType.HEART.value:
+                    cell = Cell(cell_type=CellType.HEART, obj=None)
+
+                case CellType.GAME.value:
+                    cell = Cell(cell_type=CellType.GAME, obj=None)
+
+                case CellType.EMPTY.value | _:
+                    pass  # cell вже встановлено
+
+            line_y.append(cell)
+
+        the_map.append(line_y)
+    return the_map
