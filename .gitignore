@@ -8,3 +8,6 @@ karatel/saves/*
 !karatel/saves/.gitkeep
 karatel/storage/postgresql_config.py
 karatel/ai/config.py
+htmlcov/
+.pytest_cache/
+.coverage

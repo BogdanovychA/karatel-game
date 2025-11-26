@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 
-from fastapi import FastAPI, HTTPException
+from typing import Any
+
+from fastapi import FastAPI, HTTPException, Query
 from fastapi.responses import FileResponse
 
 from karatel.api.schemas import ProfessionSchema, ShieldSchema, WeaponSchema
@@ -26,7 +28,7 @@ app = FastAPI(
 
 
 @app.get("/")
-def root():
+def root() -> dict[str, list[dict[str, Any]]]:
     routes = [
         {"path": r.path, "name": r.name, "methods": list(r.methods)} for r in app.routes
     ]
@@ -34,22 +36,24 @@ def root():
 
 
 @app.get("/favicon.ico")
-def favicon():
+def favicon() -> FileResponse:
     return FileResponse("./karatel/images/favicon.png")
 
 
 @app.get("/generate_hero")
-def generate_hero():
+def generate_hero() -> dict[str, Any]:
     return HeroFactory.hero_to_dict(HeroFactory.generate(ConsoleOutput()))
 
 
 @app.get("/professions", response_model=dict[str, ProfessionSchema])
-def get_professions():
+def get_professions() -> dict[str, ProfessionSchema]:
     return PROFESSIONS
 
 
 @app.get("/weapons", response_model=list[WeaponSchema])
-def get_weapons(t: WeaponType):
+def get_weapons(
+    t: WeaponType = Query(..., description="Weapon type")
+) -> list[WeaponSchema]:
 
     match t:
         case WeaponType.STRENGTH:
@@ -67,5 +71,5 @@ def get_weapons(t: WeaponType):
 
 
 @app.get("/shields", response_model=list[ShieldSchema])
-def get_shields():
+def get_shields() -> list[ShieldSchema]:
     return SHIELDS
