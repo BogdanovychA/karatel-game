@@ -1,3 +1,14 @@
+[project]
+name = "karatel"
+version = "0.1.0"
+description = "Karatel game project"
+readme = "README.md"
+requires-python = ">=3.10"
+
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
 [tool.black]
 line-length = 88
 target-version = ['py310']

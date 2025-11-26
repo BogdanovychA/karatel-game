@@ -11,3 +11,4 @@ karatel/ai/config.py
 htmlcov/
 .pytest_cache/
 .coverage
+*.egg-info/
