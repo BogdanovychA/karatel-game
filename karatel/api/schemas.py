@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 
-from enum import Enum
 
 from pydantic import BaseModel, ConfigDict
 
@@ -20,6 +19,8 @@ class ProfessionSchema(BaseModel):
 
 
 class WeaponSchema(BaseModel):
+    """Схема для класу зброї"""
+
     name: str
     description: str
     damage: str
@@ -29,9 +30,11 @@ class WeaponSchema(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
 
-class WeaponType(str, Enum):
-    STRENGTH = "strength"
-    DEXTERITY = "dexterity"
-    INTELLIGENCE = "intelligence"
-    CHARISMA = "charisma"
-    ALL = "all"
+class ShieldSchema(BaseModel):
+    """Схема для класу щитів"""
+
+    name: str
+    description: str
+    ac_bonus: int
+
+    model_config = ConfigDict(from_attributes=True)

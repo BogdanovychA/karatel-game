@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+from enum import Enum
+
 from karatel.utils.constants import TRANSLATIONS
 from karatel.utils.settings import MAX_LEVEL, MIN_LEVEL
 from karatel.utils.utils import clamp_value
@@ -37,6 +39,16 @@ class Weapon(Item):
             + f"Атака: {self.damage}. {two_handed}. Бонус: "
             + f"{TRANSLATIONS.get(self.stat, self.stat)}."
         )
+
+
+class WeaponType(str, Enum):
+    """Тип зброї, використовується в API"""
+
+    STRENGTH = "strength"
+    DEXTERITY = "dexterity"
+    INTELLIGENCE = "intelligence"
+    CHARISMA = "charisma"
+    ALL = "all"
 
 
 class Shield(Item):

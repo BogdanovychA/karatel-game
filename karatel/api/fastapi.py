@@ -1,10 +1,9 @@
 # -*- coding: utf-8 -*-
-from unittest import case
 
 from fastapi import FastAPI, HTTPException
 from fastapi.responses import FileResponse
 
-from karatel.api.schemas import ProfessionSchema, WeaponSchema, WeaponType
+from karatel.api.schemas import ProfessionSchema, ShieldSchema, WeaponSchema
 from karatel.core.hero import HeroFactory
 from karatel.core.items import (
     CHARISMA_WEAPONS,
@@ -13,6 +12,7 @@ from karatel.core.items import (
     SHIELDS,
     STRENGTH_WEAPONS,
     WEAPONS,
+    WeaponType,
 )
 from karatel.core.professions import PROFESSIONS
 from karatel.ui.abstract import ConsoleOutput
@@ -64,3 +64,8 @@ def get_weapons(t: WeaponType):
             return WEAPONS
         case _:
             raise HTTPException(status_code=400, detail=f"Unknown weapon type: {t}")
+
+
+@app.get("/shields", response_model=list[ShieldSchema])
+def get_shields():
+    return SHIELDS
