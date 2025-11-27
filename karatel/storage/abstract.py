@@ -51,7 +51,7 @@ class SQLSaver(ABC):
         pass
 
     @abstractmethod
-    def select_user(self, *args, **kwargs) -> tuple[int, bytes] | None:
+    def fetch_user(self, *args, **kwargs) -> tuple[int, bytes] | None:
         """Вибірка інформації про користувача через 'відкритий простір'"""
         pass
 
@@ -105,7 +105,7 @@ class SQLiteSaver(SQLSaver):
     def register_user(self, *args, **kwargs) -> bool:
         return insert_user(*args, table_name=self._users_table, **kwargs)
 
-    def select_user(self, *args, **kwargs) -> tuple[int, bytes] | None:
+    def fetch_user(self, *args, **kwargs) -> tuple[int, bytes] | None:
         return select_user(*args, table_name=self._users_table, **kwargs)
 
     def delete_user(self, output: OutputSpace, username: str, row_id: int) -> bool:
