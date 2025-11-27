@@ -24,7 +24,7 @@ class NoneOutput(OutputSpace):
 class ConsoleOutput(OutputSpace):
     """Вивід в консоль"""
 
-    def write(self, *args, log=True, **kwargs) -> None:
+    def write(self, *args, log: bool = True, **kwargs) -> None:
         """Вивід в консоль"""
         if log:
             text = " ".join(str(a) for a in args)
@@ -38,7 +38,7 @@ class BufferedOutput(OutputSpace):
     def __init__(self):
         self._buffer: list[str] = []
 
-    def write(self, *args, log=True, **kwargs) -> None:
+    def write(self, *args, log: bool = True, **kwargs) -> None:
         """Запис в буфер"""
         if log:
             text = " ".join(str(a) for a in args)

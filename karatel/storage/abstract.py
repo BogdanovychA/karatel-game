@@ -26,22 +26,22 @@ class SQLSaver(ABC):
     """'Відкритий простір' для збереження/завантаження користувача та героїв"""
 
     @abstractmethod
-    def list_hero(self, *args, **kwargs) -> list:
+    def list_hero(self, *args, username: str, **kwargs) -> list:
         """Перегляд переліку героїв через 'відкритий простір'"""
         pass
 
     @abstractmethod
-    def save_hero(self, *args, hero: Hero, **kwargs) -> None:
+    def save_hero(self, *args, username: str, **kwargs) -> None:
         """Збереження героя через 'відкритий простір'"""
         pass
 
     @abstractmethod
-    def load_hero(self, *args, **kwargs) -> Hero:
+    def load_hero(self, *args, username: str, **kwargs) -> Hero:
         """Завантаження героя через 'відкритий простір'"""
         pass
 
     @abstractmethod
-    def delete_hero(self, *args, **kwargs) -> bool:
+    def delete_hero(self, *args, username: str, **kwargs) -> bool:
         """Видалення героя через 'відкритий простір'"""
         pass
 
@@ -56,17 +56,26 @@ class SQLSaver(ABC):
         pass
 
     @abstractmethod
-    def delete_user(self, *args, **kwargs) -> bool:
+    def delete_user(self, output: OutputSpace, username: str, row_id: int) -> bool:
         """Видалення користувача через 'відкритий простір'"""
         pass
 
     @abstractmethod
-    def update_password(self, *args, **kwargs) -> bool:
+    def update_password(
+        self, output: OutputSpace, user_id: int, hashed_password: bytes, log: bool
+    ) -> bool:
         """Оновлення пароля користувача через 'відкритий простір'"""
         pass
 
     @abstractmethod
-    def update_username(self, *args, **kwargs) -> bool:
+    def update_username(
+        self,
+        output: OutputSpace,
+        user_id: int,
+        new_username: str,
+        old_username: str,
+        log: bool,
+    ) -> bool:
         """Оновлення імені користувача через 'відкритий простір'"""
         pass
 
