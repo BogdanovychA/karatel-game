@@ -521,8 +521,8 @@ def load_hero() -> None:
                 # Відновлюємо героя та мапу
                 st.session_state.hero, st.session_state.game_map = (
                     st.session_state.gsm.saver.load_hero(
-                        username=st.session_state.gsm.username,
                         output=st.session_state.gsm.output,
+                        username=st.session_state.gsm.username,
                         hero_id=hero_id,
                         log=LOG,
                     )

@@ -158,9 +158,9 @@ def save_button() -> None:
         "Зберегти", icon=Emoji.SAVE.value, type="secondary", width=BUTTON_WIDTH
     ):
         st.session_state.gsm.saver.save_hero(
-            username=st.session_state.gsm.username,
             hero=st.session_state.hero,
             game_map=st.session_state.game_map,
+            username=st.session_state.gsm.username,
             log=LOG,
         )
         st.rerun()

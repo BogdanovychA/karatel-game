@@ -26,32 +26,38 @@ class SQLSaver(ABC):
     """'Відкритий простір' для збереження/завантаження користувача та героїв"""
 
     @abstractmethod
-    def list_hero(self, *args, username: str, **kwargs) -> list:
+    def list_hero(self, output: OutputSpace, username: str) -> list:
         """Перегляд переліку героїв через 'відкритий простір'"""
         pass
 
     @abstractmethod
-    def save_hero(self, *args, username: str, **kwargs) -> None:
+    def save_hero(self, hero: Hero, game_map: list, username: str, log: bool) -> None:
         """Збереження героя через 'відкритий простір'"""
         pass
 
     @abstractmethod
-    def load_hero(self, *args, username: str, **kwargs) -> Hero:
+    def load_hero(
+        self, output: OutputSpace, username: str, hero_id: int, log: bool
+    ) -> Hero:
         """Завантаження героя через 'відкритий простір'"""
         pass
 
     @abstractmethod
-    def delete_hero(self, *args, username: str, **kwargs) -> bool:
+    def delete_hero(self, output: OutputSpace, username: str, row_id: int) -> bool:
         """Видалення героя через 'відкритий простір'"""
         pass
 
     @abstractmethod
-    def register_user(self, *args, **kwargs) -> bool:
+    def register_user(
+        self, output: OutputSpace, username: str, hashed_password: bytes, log: bool
+    ) -> bool:
         """Реєстрація користувача через 'відкритий простір'"""
         pass
 
     @abstractmethod
-    def fetch_user(self, *args, **kwargs) -> tuple[int, bytes] | None:
+    def fetch_user(
+        self, output: OutputSpace, username: str, log: bool
+    ) -> tuple[int, bytes] | None:
         """Вибірка інформації про користувача через 'відкритий простір'"""
         pass
 
@@ -91,31 +97,54 @@ class SQLiteSaver(SQLSaver):
     def _create_table_name(self, username: str) -> str:
         return self._hero_table + "_" + username
 
-    def list_hero(self, *args, username: str, **kwargs) -> list:
+    def list_hero(self, output: OutputSpace, username: str) -> list:
         return select_heroes(
-            *args, table_name=self._create_table_name(username), **kwargs
+            output=output,
+            table_name=self._create_table_name(username),
         )
 
-    def save_hero(self, *args, username: str, **kwargs) -> None:
+    def save_hero(self, hero: Hero, game_map: list, username: str, log: bool) -> None:
         sqlite_hero_and_map_saver(
-            *args, table_name=self._create_table_name(username), **kwargs
+            hero=hero,
+            game_map=game_map,
+            table_name=self._create_table_name(username),
+            log=log,
         )
 
-    def load_hero(self, *args, username: str, **kwargs) -> Hero:
+    def load_hero(
+        self, output: OutputSpace, username: str, hero_id: int, log: bool
+    ) -> Hero:
         return sqlite_hero_and_map_loader(
-            *args, table_name=self._create_table_name(username), **kwargs
+            output=output,
+            table_name=self._create_table_name(username),
+            hero_id=hero_id,
+            log=log,
         )
 
-    def delete_hero(self, *args, username: str, **kwargs) -> bool:
+    def delete_hero(self, output: OutputSpace, username: str, row_id: int) -> bool:
         return delete_row_by_id(
-            *args, table_name=self._create_table_name(username), **kwargs
+            output=output,
+            table_name=self._create_table_name(username),
+            row_id=row_id,
         )
 
-    def register_user(self, *args, **kwargs) -> bool:
-        return insert_user(*args, table_name=self._users_table, **kwargs)
+    def register_user(
+        self, output: OutputSpace, username: str, hashed_password: bytes, log: bool
+    ) -> bool:
+        return insert_user(
+            output=output,
+            username=username,
+            hashed_password=hashed_password,
+            table_name=self._users_table,
+            log=log,
+        )
 
-    def fetch_user(self, *args, **kwargs) -> tuple[int, bytes] | None:
-        return select_user(*args, table_name=self._users_table, **kwargs)
+    def fetch_user(
+        self, output: OutputSpace, username: str, log: bool
+    ) -> tuple[int, bytes] | None:
+        return select_user(
+            output=output, username=username, table_name=self._users_table, log=log
+        )
 
     def delete_user(self, output: OutputSpace, username: str, row_id: int) -> bool:
         delete_table(output=output, table_name=self._create_table_name(username))
