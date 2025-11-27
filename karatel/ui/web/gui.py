@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-import pickle
+import json
 
 import streamlit as st
 
@@ -8,7 +8,7 @@ import karatel.logic.tic_tac_toe_4x4 as ttt
 from karatel.core.hero import HeroFactory
 from karatel.core.map import generate_map, render_map
 from karatel.core.professions import PROFESSIONS, Profession, show_professions
-from karatel.logic.map import find_hero, output_setter
+from karatel.logic.map import find_hero
 from karatel.ui.web.constants import BUTTON_WIDTH, TITLE, GameState
 from karatel.ui.web.elements import (
     ai_master,
@@ -499,14 +499,14 @@ def load_hero() -> None:
         pass
 
     for saved_hero in all_saved_heroes:
-        hero_id, hero_name, pickled_hero, pickled_map = saved_hero
+        hero_id, hero_name, json_hero, json_map = saved_hero
         col1, col2, col3, col4, col5 = st.columns([1, 7, 2, 4, 4])
         with col1:
             st.text(hero_id)
         with col2:
             st.text(hero_name)
         with col3:
-            if pickle.loads(pickled_map) is not None:
+            if json.loads(json_map) is not None:
                 st.text(Emoji.CHECK.value)
             else:
                 st.text(Emoji.X.value)
@@ -528,15 +528,17 @@ def load_hero() -> None:
                     )
                 )
                 # Встановлюємо відновленому герою output поточної сесії
-                st.session_state.hero.output = st.session_state.gsm.output
+                # (актуально лише якщо в БД зберігається як BLOB)
+                # st.session_state.hero.output = st.session_state.gsm.output
                 if st.session_state.game_map:
                     y, x = find_hero(st.session_state.game_map)
                     # Встановлюємо екземпляр новоствореного героя на мапу
                     st.session_state.game_map[y][x].obj = st.session_state.hero
                     # Встановлюємо всім об'єктам на мапі поточний output
-                    output_setter(
-                        st.session_state.game_map, st.session_state.gsm.output
-                    )
+                    # (актуально лише якщо в БД зберігається як BLOB)
+                    # output_setter(
+                    #     st.session_state.game_map, st.session_state.gsm.output
+                    # )
                 st.session_state.game_state = GameState.HERO.value
                 st.rerun()
         with col5:

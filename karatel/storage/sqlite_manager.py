@@ -1,10 +1,12 @@
 # -*- coding: utf-8 -*-
 from __future__ import annotations
 
-import pickle
+import json
 import sqlite3
 from typing import TYPE_CHECKING
 
+from karatel.core.hero import HeroFactory
+from karatel.core.map import dict_to_map, map_to_dict
 from karatel.utils.settings import DEBUG, LOG, SQLITE_PATH
 from karatel.utils.utils import sanitize_word
 
@@ -119,61 +121,6 @@ def select_heroes(
         return []
 
 
-# def insert_hero(hero: Hero, table_name: str) -> None:
-#     """Вставка героя в БД -- новий запис або перезапис"""
-#
-#     table_name = sanitize_word(table_name)
-#     if not table_name:
-#         return
-#
-#     json_data = json.dumps(HeroFactory.hero_to_dict(hero), ensure_ascii=False)
-#     insert = False
-#
-#     try:
-#         with sqlite3.connect(SQLITE_PATH) as connection:
-#
-#             old_data = select_heroes(
-#                 hero.output, table_name, hero_name=hero.name, conn=connection
-#             )
-#             if not old_data:
-#                 insert = True
-#
-#             create_hero_table(hero.output, connection, table_name)
-#
-#             cursor = connection.cursor()
-#             try:
-#                 if insert:
-#                     cursor.execute(
-#                         f"INSERT INTO {table_name} (name, data) VALUES (?, ?)",
-#                         (hero.name, json_data),
-#                     )
-#                     hero_id = cursor.lastrowid
-#                     hero.output.write(
-#                         f"Герой '{hero.name}' збережений з ID: {hero_id}", log=DEBUG
-#                     )
-#                 else:
-#                     cursor.execute(
-#                         f"""UPDATE {table_name}
-#                         SET data = ?
-#                         WHERE id = (
-#                             SELECT MIN(id)
-#                             FROM {table_name}
-#                             WHERE name = ?
-#                         );
-#                         """,
-#                         (json_data, hero.name),
-#                     )
-#                     hero.output.write(
-#                         f"Герой '{hero.name}' оновлений. ID: {old_data[0][0]}",
-#                         log=DEBUG,
-#                     )
-#             finally:
-#                 cursor.close()
-#
-#     except sqlite3.Error as e:
-#         hero.output.write(f"Помилка SQLite: {e}", log=DEBUG)
-
-
 def delete_row_by_id(output: OutputSpace, table_name: str, row_id: int) -> bool:
     """Видалення запису по ID"""
 
@@ -209,6 +156,7 @@ def delete_row_by_id(output: OutputSpace, table_name: str, row_id: int) -> bool:
         return False
 
 
+## Втратило актуальність. Зараз зберігається в JSON
 # def create_hero_and_map_table(
 #     output: OutputSpace, conn: sqlite3.Connection, table_name: str
 # ) -> None:
@@ -231,7 +179,82 @@ def delete_row_by_id(output: OutputSpace, table_name: str, row_id: int) -> bool:
 #         output.write(f"Таблицю '{table_name}' успішно створено", log=DEBUG)
 
 
-def insert_hero_and_map(hero: Hero, game_map: list | None, table_name: str) -> None:
+## Втратило актуальність. Зараз зберігається в JSON
+# def insert_hero_and_map_as_blob(hero: Hero, game_map: list | None, table_name: str) -> None:
+#     """Вставка героя в БД -- новий запис або перезапис"""
+#
+#     def _create_table() -> None:
+#
+#         cur = connection.cursor()
+#         try:
+#             sql = f"""CREATE TABLE IF NOT EXISTS {table_name} (
+#         id INTEGER PRIMARY KEY,
+#         name TEXT NOT NULL,
+#         hero BLOB NOT NULL,
+#         map BLOB NOT NULL
+#             )"""
+#             cur.execute(sql)
+#         finally:
+#             cur.close()
+#
+#     table_name = sanitize_word(table_name)
+#     if not table_name:
+#         return
+#
+#     pickled_hero = pickle.dumps(hero)
+#     pickled_map = pickle.dumps(game_map)
+#
+#     insert = False
+#
+#     try:
+#         with sqlite3.connect(SQLITE_PATH) as connection:
+#
+#             old_data = select_heroes(
+#                 hero.output, table_name, hero_name=hero.name, conn=connection
+#             )
+#             if not old_data:
+#                 insert = True
+#
+#             _create_table()
+#
+#             cursor = connection.cursor()
+#             try:
+#                 if insert:
+#                     cursor.execute(
+#                         f"INSERT INTO {table_name} (name, hero, map) VALUES (?, ?, ?)",
+#                         (hero.name, pickled_hero, pickled_map),
+#                     )
+#                     hero_id = cursor.lastrowid
+#                     hero.output.write(
+#                         f"Герой '{hero.name}' збережений з ID: {hero_id}", log=DEBUG
+#                     )
+#                 else:
+#                     cursor.execute(
+#                         f"""UPDATE {table_name}
+#                         SET hero = ?,
+#                             map = ?
+#                         WHERE id = (
+#                             SELECT MIN(id)
+#                             FROM {table_name}
+#                             WHERE name = ?
+#                         );
+#                         """,
+#                         (pickled_hero, pickled_map, hero.name),
+#                     )
+#                     hero.output.write(
+#                         f"Герой '{hero.name}' оновлений. ID: {old_data[0][0]}",
+#                         log=DEBUG,
+#                     )
+#             finally:
+#                 cursor.close()
+#
+#     except sqlite3.Error as e:
+#         hero.output.write(f"Помилка SQLite: {e}", log=DEBUG)
+
+
+def insert_hero_and_map_as_json(
+    hero: Hero, game_map: list | None, table_name: str
+) -> None:
     """Вставка героя в БД -- новий запис або перезапис"""
 
     def _create_table() -> None:
@@ -241,8 +264,8 @@ def insert_hero_and_map(hero: Hero, game_map: list | None, table_name: str) -> N
             sql = f"""CREATE TABLE IF NOT EXISTS {table_name} (
         id INTEGER PRIMARY KEY,
         name TEXT NOT NULL,
-        hero BLOB NOT NULL,
-        map BLOB NOT NULL
+        hero TEXT NOT NULL,
+        map TEXT NOT NULL
             )"""
             cur.execute(sql)
         finally:
@@ -252,8 +275,10 @@ def insert_hero_and_map(hero: Hero, game_map: list | None, table_name: str) -> N
     if not table_name:
         return
 
-    pickled_hero = pickle.dumps(hero)
-    pickled_map = pickle.dumps(game_map)
+    json_hero = json.dumps(HeroFactory.hero_to_dict(hero), ensure_ascii=False)
+    json_map = json.dumps(
+        map_to_dict(game_map) if game_map is not None else None, ensure_ascii=False
+    )
 
     insert = False
 
@@ -273,7 +298,7 @@ def insert_hero_and_map(hero: Hero, game_map: list | None, table_name: str) -> N
                 if insert:
                     cursor.execute(
                         f"INSERT INTO {table_name} (name, hero, map) VALUES (?, ?, ?)",
-                        (hero.name, pickled_hero, pickled_map),
+                        (hero.name, json_hero, json_map),
                     )
                     hero_id = cursor.lastrowid
                     hero.output.write(
@@ -290,7 +315,7 @@ def insert_hero_and_map(hero: Hero, game_map: list | None, table_name: str) -> N
                             WHERE name = ?
                         );
                         """,
-                        (pickled_hero, pickled_map, hero.name),
+                        (json_hero, json_map, hero.name),
                     )
                     hero.output.write(
                         f"Герой '{hero.name}' оновлений. ID: {old_data[0][0]}",
@@ -303,6 +328,27 @@ def insert_hero_and_map(hero: Hero, game_map: list | None, table_name: str) -> N
         hero.output.write(f"Помилка SQLite: {e}", log=DEBUG)
 
 
+## Втратило актуальність. Зараз зберігається в JSON
+# def sqlite_hero_and_map_loader(
+#     output: OutputSpace,
+#     table_name: str,
+#     hero_id: int,
+#     log: bool = LOG,
+# ):
+#     """Завантаження героя"""
+#
+#     sql_data = select_heroes(output, table_name, hero_id=hero_id)
+#
+#     hero = pickle.loads(sql_data[0][2])
+#     the_map = pickle.loads(sql_data[0][3])
+#
+#     output.write(
+#         f"Героя {hero.name} завантажено.",
+#         log=log,
+#     )
+#     return hero, the_map
+
+
 def sqlite_hero_and_map_loader(
     output: OutputSpace,
     table_name: str,
@@ -313,8 +359,11 @@ def sqlite_hero_and_map_loader(
 
     sql_data = select_heroes(output, table_name, hero_id=hero_id)
 
-    hero = pickle.loads(sql_data[0][2])
-    the_map = pickle.loads(sql_data[0][3])
+    json_hero = json.loads(sql_data[0][2])
+    json_the_map = json.loads(sql_data[0][3])
+
+    hero = HeroFactory.dict_to_hero(output, json_hero)
+    the_map = dict_to_map(output, json_the_map) if json_the_map else None
 
     output.write(
         f"Героя {hero.name} завантажено.",
@@ -328,7 +377,7 @@ def sqlite_hero_and_map_saver(
 ) -> None:
     """Збереження героя"""
 
-    insert_hero_and_map(hero, game_map, table_name)
+    insert_hero_and_map_as_json(hero, game_map, table_name)
     hero.output.write(
         f"Героя {hero.name} збережено.",
         log=log,
