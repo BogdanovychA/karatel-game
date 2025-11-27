@@ -6,6 +6,7 @@ from karatel.core.hero import HeroFactory
 from karatel.core.professions import PROFESSIONS
 from karatel.logic.combat import fight
 from karatel.ui.abstract import NoneOutput
+from karatel.utils.settings import MAX_LEVEL, MIN_LEVEL
 
 output = NoneOutput()
 
@@ -14,7 +15,7 @@ min_ratio = 0.45
 max_ratio = 0.55
 
 
-@pytest.mark.parametrize("level", list(range(1, 21)))
+@pytest.mark.parametrize("level", list(range(MIN_LEVEL, MAX_LEVEL + 1)))
 @pytest.mark.parametrize(
     "prof1, prof2", list(combinations(list(PROFESSIONS.keys()), 2))
 )
