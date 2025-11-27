@@ -1,22 +1,19 @@
 from collections.abc import Iterable
 
 import pytest
-from pandas.core.indexes.base import ensure_has_len
 
-from karatel.core.hero import Hero, HeroFactory
+from karatel.core.hero import HeroFactory
 from karatel.core.map import CellType, generate_map
 from karatel.ui.abstract import NoneOutput
 from karatel.utils.constants import Sex
 
 output = NoneOutput()
 
-
 hero_c = HeroFactory.generate(
     output, name="Іван", sex=Sex.M, level=1, profession="commando"
 )
 map_a = generate_map(hero_c)
 map_b = map_a.copy()
-# map_b = copy.deepcopy(map_a)
 
 
 def deep_eq(item_a, item_b) -> bool:
@@ -86,4 +83,6 @@ def deep_eq(item_a, item_b) -> bool:
         return True
 
 
-print(deep_eq(map_a, map_b))
+def test_map_eq():
+
+    assert deep_eq(map_a, map_b)
