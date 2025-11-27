@@ -1,6 +1,7 @@
 from collections.abc import Iterable
 
 import pytest
+from pandas.core.indexes.base import ensure_has_len
 
 from karatel.core.hero import Hero, HeroFactory
 from karatel.core.map import CellType, generate_map
@@ -18,75 +19,71 @@ map_b = map_a.copy()
 # map_b = copy.deepcopy(map_a)
 
 
-def deep_eq(item_a, item_b):
+def deep_eq(item_a, item_b) -> bool:
+
     if isinstance(item_a, Iterable) and isinstance(item_b, Iterable):
-        # print("Iterable - True")
-        if len(item_a) == len(item_b):
-            # print("len is eq")
-            for sub_a, sub_b in zip(item_a, item_b):
-                deep_eq(sub_a, sub_b)
+
+        if len(item_a) != len(item_b):
+            return False
+
+        for sub_a, sub_b in zip(item_a, item_b):
+            if not deep_eq(sub_a, sub_b):
+                return False
+
+        return True
     else:
-        # print("Iterable - False")
-        print("----------")
-        # print(item_a.__dict__, item_b.__dict__)
-        if item_a.type == item_b.type:
+        if item_a.type != item_b.type:
+            return False
 
-            match item_a.type.value:
+        match item_a.type.value:
 
-                case CellType.HERO.value | CellType.ENEMY.value:
-                    IGNORE_KEYS = [
-                        'leveling',
-                        'equipment',
-                        'display',
-                        'skill_manager',
-                        'output',
-                    ]
+            case CellType.HERO.value | CellType.ENEMY.value:
+                IGNORE_KEYS = [
+                    'leveling',
+                    'equipment',
+                    'display',
+                    'skill_manager',
+                    'output',
+                ]
 
-                    item_a_dict = item_a.obj.__dict__.copy()
-                    item_b_dict = item_b.obj.__dict__.copy()
+                item_a_dict = item_a.obj.__dict__.copy()
+                item_b_dict = item_b.obj.__dict__.copy()
 
-                    for key in IGNORE_KEYS:
-                        item_a_dict.pop(key, None)
-                        item_b_dict.pop(key, None)
+                for key in IGNORE_KEYS:
+                    item_a_dict.pop(key, None)
+                    item_b_dict.pop(key, None)
 
-                    if item_a_dict == item_b_dict:
-                        print(item_a_dict)
-                    else:
-                        print("Not eq")
+                if item_a_dict != item_b_dict:
+                    return False
 
-                    if hasattr(item_a, 'gold') and hasattr(item_a, 'gold'):
-                        print(item_a.gold == item_b.gold)
+                if (
+                    hasattr(item_a, 'gold')
+                    and hasattr(item_a, 'gold')
+                    and item_a.gold != item_b.gold
+                ):
+                    return False
 
-                case CellType.ITEM.value:
+            case CellType.ITEM.value:
 
-                    if item_a.obj == item_b.obj:
-                        print(item_a.obj)
-                    else:
-                        print("Not eq")
+                if item_a.obj != item_b.obj:
+                    return False
 
-                case CellType.GOLD.value | CellType.EXIT.value:
+            case CellType.GOLD.value | CellType.EXIT.value:
 
-                    if item_a.gold == item_b.gold:
-                        print(item_a.gold)
-                    else:
-                        print("Not eq")
+                if item_a.gold != item_b.gold:
+                    return False
 
-                case CellType.BOOK.value:
-                    if item_a.experience == item_b.experience:
-                        print(item_a.experience)
-                    else:
-                        print("Not eq")
+            case CellType.BOOK.value:
+                if item_a.experience != item_b.experience:
+                    return False
 
-                case CellType.HEART.value | CellType.GAME.value | CellType.EMPTY.value:
-                    print(
-                        "CellType.HEART.value | CellType.GAME.value | CellType.EMPTY.value"
-                    )
+            case CellType.HEART.value | CellType.GAME.value | CellType.EMPTY.value:
+                pass
 
-                case _:
-                    print("_")
+            case _:
+                return False
 
-        else:
-            print("Type of Cell not eq")
+        return True
 
 
-deep_eq(map_a, map_b)
+print(deep_eq(map_a, map_b))
