@@ -42,8 +42,8 @@ def deep_eq(item_a, item_b):
                         'output',
                     ]
 
-                    item_a_dict = item_a.obj.__dict__
-                    item_b_dict = item_b.obj.__dict__
+                    item_a_dict = item_a.obj.__dict__.copy()
+                    item_b_dict = item_b.obj.__dict__.copy()
 
                     for key in IGNORE_KEYS:
                         item_a_dict.pop(key, None)
