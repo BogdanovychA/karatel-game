@@ -4,7 +4,7 @@
 venv*/
 **/__pycache__/
 **/*.pyc
-karatel/tests/
+karatel/manual_tests/
 karatel/saves/*
 !karatel/saves/.gitkeep
 karatel/storage/postgresql_config.py
