@@ -1,6 +1,6 @@
-# python -m pytest karatel/manual_tests/test_api.py
+# python -m pytest karatel/tests/test_api.py
 #
-# python -m pytest karatel/manual_tests/test_api.py --cov=karatel.api --cov-report=html
+# python -m pytest karatel/tests/test_api.py --cov=karatel.api --cov-report=html
 
 
 import pytest
