@@ -14,6 +14,13 @@ class OutputSpace(ABC):
         pass
 
 
+class NoneOutput(OutputSpace):
+    """Без виводу"""
+
+    def write(self, *args, **kwargs) -> None:
+        pass
+
+
 class ConsoleOutput(OutputSpace):
     """Вивід в консоль"""
 
