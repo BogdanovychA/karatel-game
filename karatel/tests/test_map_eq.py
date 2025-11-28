@@ -1,36 +1,35 @@
-from collections.abc import Iterable
+from __future__ import annotations
 
-import pytest
+from collections.abc import Iterable
+from typing import TYPE_CHECKING
 
 from karatel.core.hero import HeroFactory
-from karatel.core.map import CellType, generate_map
+from karatel.core.map import CellType, MapSize, generate_map
 from karatel.ui.abstract import NoneOutput
 from karatel.utils.constants import Sex
 
+if TYPE_CHECKING:
+    from karatel.core.map import Cell
+
 output = NoneOutput()
 
-hero_c = HeroFactory.generate(
-    output, name="Іван", sex=Sex.M, level=1, profession="commando"
-)
-map_a = generate_map(hero_c)
-map_b = map_a.copy()
 
-
-def deep_eq(item_a, item_b) -> bool:
+def deep_eq(item_a: list | Cell, item_b: list | Cell, deep: int) -> tuple[bool, int]:
 
     if isinstance(item_a, Iterable) and isinstance(item_b, Iterable):
 
         if len(item_a) != len(item_b):
-            return False
+            return False, deep
 
         for sub_a, sub_b in zip(item_a, item_b):
-            if not deep_eq(sub_a, sub_b):
-                return False
+            is_eq, deep = deep_eq(sub_a, sub_b, deep)
+            if not is_eq:
+                return False, deep
 
-        return True
+        return True, deep
     else:
         if item_a.type != item_b.type:
-            return False
+            return False, deep
 
         match item_a.type.value:
 
@@ -51,38 +50,48 @@ def deep_eq(item_a, item_b) -> bool:
                     item_b_dict.pop(key, None)
 
                 if item_a_dict != item_b_dict:
-                    return False
+                    return False, deep
 
                 if (
                     hasattr(item_a, 'gold')
                     and hasattr(item_a, 'gold')
                     and item_a.gold != item_b.gold
                 ):
-                    return False
+                    return False, deep
 
             case CellType.ITEM.value:
 
                 if item_a.obj != item_b.obj:
-                    return False
+                    return False, deep
 
             case CellType.GOLD.value | CellType.EXIT.value:
 
                 if item_a.gold != item_b.gold:
-                    return False
+                    return False, deep
 
             case CellType.BOOK.value:
                 if item_a.experience != item_b.experience:
-                    return False
+                    return False, deep
 
             case CellType.HEART.value | CellType.GAME.value | CellType.EMPTY.value:
                 pass
 
             case _:
-                return False
+                return False, deep
 
-        return True
+        deep += 1
+        return True, deep
 
 
 def test_map_eq():
 
-    assert deep_eq(map_a, map_b)
+    hero_c = HeroFactory.generate(
+        output, name="Іван", sex=Sex.M, level=1, profession="commando"
+    )
+    map_a = generate_map(hero_c)
+    map_b = map_a.copy()
+
+    is_eq, deep = deep_eq(map_a, map_b, 0)
+
+    assert deep == MapSize.X * MapSize.Y
+    assert is_eq
