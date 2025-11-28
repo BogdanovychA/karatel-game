@@ -354,7 +354,7 @@ def sqlite_hero_and_map_loader(
     table_name: str,
     hero_id: int,
     log: bool = LOG,
-):
+) -> tuple[Hero, list]:
     """Завантаження героя"""
 
     sql_data = select_heroes(output, table_name, hero_id=hero_id)

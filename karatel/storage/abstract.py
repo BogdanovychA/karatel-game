@@ -38,7 +38,7 @@ class SQLSaver(ABC):
     @abstractmethod
     def load_hero(
         self, output: OutputSpace, username: str, hero_id: int, log: bool
-    ) -> Hero:
+    ) -> tuple[Hero, list]:
         """Завантаження героя через 'відкритий простір'"""
         pass
 
@@ -113,7 +113,7 @@ class SQLiteSaver(SQLSaver):
 
     def load_hero(
         self, output: OutputSpace, username: str, hero_id: int, log: bool
-    ) -> Hero:
+    ) -> tuple[Hero, list]:
         return sqlite_hero_and_map_loader(
             output=output,
             table_name=self._create_table_name(username),

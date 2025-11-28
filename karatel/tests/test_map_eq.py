@@ -5,6 +5,7 @@ from typing import TYPE_CHECKING
 
 from karatel.core.hero import HeroFactory
 from karatel.core.map import CellType, MapSize, generate_map
+from karatel.storage.abstract import SQLiteSaver
 from karatel.ui.abstract import NoneOutput
 from karatel.utils.constants import Sex
 
@@ -12,6 +13,7 @@ if TYPE_CHECKING:
     from karatel.core.map import Cell
 
 output = NoneOutput()
+saver = SQLiteSaver()
 
 
 def deep_eq(item_a: list | Cell, item_b: list | Cell, deep: int) -> tuple[bool, int]:
@@ -85,13 +87,19 @@ def deep_eq(item_a: list | Cell, item_b: list | Cell, deep: int) -> tuple[bool, 
 
 def test_map_eq():
 
-    hero_c = HeroFactory.generate(
-        output, name="Іван", sex=Sex.M, level=1, profession="commando"
-    )
-    map_a = generate_map(hero_c)
-    map_b = map_a.copy()
+    USERNAME = "test_user"
+    HERO_ID = 1
+
+    hero_a = HeroFactory.generate(output)
+    map_a = generate_map(hero_a)
+
+    saver.save_hero(hero_a, map_a, USERNAME, True)
+
+    hero_b, map_b = saver.load_hero(output, USERNAME, HERO_ID, True)
+
+    saver.delete_hero(output, USERNAME, HERO_ID)
 
     is_eq, deep = deep_eq(map_a, map_b, 0)
 
-    assert deep == MapSize.X * MapSize.Y
     assert is_eq
+    assert deep == MapSize.X * MapSize.Y
