@@ -101,7 +101,7 @@ def maps_equal(item_a: list | Cell, item_b: list | Cell, deep: int) -> tuple[boo
 
 @pytest.mark.parametrize("level", list(range(MIN_LEVEL, MAX_LEVEL + 1)))
 @pytest.mark.parametrize("profession", list(PROFESSIONS.keys()))
-def test_map_eq(level, profession):
+def test_maps_equal(level, profession):
     """Тест рівності героїв та мап"""
     USERNAME = "test_user"
     HERO_ID = 1
