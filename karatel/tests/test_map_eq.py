@@ -3,20 +3,48 @@ from __future__ import annotations
 from collections.abc import Iterable
 from typing import TYPE_CHECKING
 
+import pytest
+
 from karatel.core.hero import HeroFactory
 from karatel.core.map import CellType, MapSize, generate_map
+from karatel.core.professions import PROFESSIONS
 from karatel.storage.abstract import SQLiteSaver
 from karatel.ui.abstract import NoneOutput
-from karatel.utils.constants import Sex
+from karatel.utils.settings import MAX_LEVEL, MIN_LEVEL
 
 if TYPE_CHECKING:
+    from karatel.core.hero import Hero
     from karatel.core.map import Cell
 
 output = NoneOutput()
 saver = SQLiteSaver()
 
 
-def deep_eq(item_a: list | Cell, item_b: list | Cell, deep: int) -> tuple[bool, int]:
+def heroes_equal(hero_a: Hero, hero_b: Hero) -> bool:
+    """Перевірка рівності героїв"""
+
+    # Видаляємо менеджери, бо вони завжди не збігаються,
+    # але це не проблема
+    IGNORE_KEYS = [
+        'leveling',
+        'equipment',
+        'display',
+        'skill_manager',
+        'output',
+    ]
+
+    hero_a_dict = hero_a.__dict__.copy()
+    hero_b_dict = hero_b.__dict__.copy()
+
+    for key in IGNORE_KEYS:
+        hero_a_dict.pop(key, None)
+        hero_b_dict.pop(key, None)
+
+    return hero_a_dict == hero_b_dict
+
+
+def maps_equal(item_a: list | Cell, item_b: list | Cell, deep: int) -> tuple[bool, int]:
+    """Перевірка рівності мап"""
 
     if isinstance(item_a, Iterable) and isinstance(item_b, Iterable):
 
@@ -24,7 +52,7 @@ def deep_eq(item_a: list | Cell, item_b: list | Cell, deep: int) -> tuple[bool, 
             return False, deep
 
         for sub_a, sub_b in zip(item_a, item_b):
-            is_eq, deep = deep_eq(sub_a, sub_b, deep)
+            is_eq, deep = maps_equal(sub_a, sub_b, deep)
             if not is_eq:
                 return False, deep
 
@@ -35,30 +63,16 @@ def deep_eq(item_a: list | Cell, item_b: list | Cell, deep: int) -> tuple[bool, 
 
         match item_a.type.value:
 
-            case CellType.HERO.value | CellType.ENEMY.value:
-                IGNORE_KEYS = [
-                    'leveling',
-                    'equipment',
-                    'display',
-                    'skill_manager',
-                    'output',
-                ]
-
-                item_a_dict = item_a.obj.__dict__.copy()
-                item_b_dict = item_b.obj.__dict__.copy()
-
-                for key in IGNORE_KEYS:
-                    item_a_dict.pop(key, None)
-                    item_b_dict.pop(key, None)
-
-                if item_a_dict != item_b_dict:
+            case CellType.HERO.value:
+                if not heroes_equal(item_a.obj, item_b.obj):
                     return False, deep
 
-                if (
-                    hasattr(item_a, 'gold')
-                    and hasattr(item_a, 'gold')
-                    and item_a.gold != item_b.gold
-                ):
+            case CellType.ENEMY.value:
+
+                if not heroes_equal(item_a.obj, item_b.obj):
+                    return False, deep
+
+                if item_a.gold != item_b.gold:
                     return False, deep
 
             case CellType.ITEM.value:
@@ -85,21 +99,23 @@ def deep_eq(item_a: list | Cell, item_b: list | Cell, deep: int) -> tuple[bool, 
         return True, deep
 
 
-def test_map_eq():
-
+@pytest.mark.parametrize("level", list(range(MIN_LEVEL, MAX_LEVEL + 1)))
+@pytest.mark.parametrize("profession", list(PROFESSIONS.keys()))
+def test_map_eq(level, profession):
+    """Тест рівності героїв та мап"""
     USERNAME = "test_user"
     HERO_ID = 1
 
-    hero_a = HeroFactory.generate(output)
+    hero_a = HeroFactory.generate(output, level, profession)
     map_a = generate_map(hero_a)
+    saver.save_hero(hero_a, map_a, USERNAME, False)
 
-    saver.save_hero(hero_a, map_a, USERNAME, True)
-
-    hero_b, map_b = saver.load_hero(output, USERNAME, HERO_ID, True)
-
+    hero_b, map_b = saver.load_hero(output, USERNAME, HERO_ID, False)
     saver.delete_hero(output, USERNAME, HERO_ID)
 
-    is_eq, deep = deep_eq(map_a, map_b, 0)
+    heroes_are_equal = heroes_equal(hero_a, hero_b)
+    maps_are_equal, deep = maps_equal(map_a, map_b, 0)
 
-    assert is_eq
+    assert heroes_are_equal
+    assert maps_are_equal
     assert deep == MapSize.X * MapSize.Y
