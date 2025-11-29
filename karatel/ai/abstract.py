@@ -4,6 +4,7 @@ import asyncio
 from abc import ABC, abstractmethod
 
 from karatel.ai.anthropic import Claude
+from karatel.ai.config import PERPLEXITY_TOKEN, PERPLEXITY_URL
 from karatel.ai.constants import AIName
 from karatel.ai.google import Gemini
 from karatel.ai.openai import ChatGPT
@@ -23,6 +24,7 @@ class AIModel(ABC):
             self.BASE_REWRITE_PROMPT
             + "Не згадуй дату свого навчання або обмеження знань."
         )
+        self.rewrite_prompt_perplexity = self.BASE_REWRITE_PROMPT + ""
         self.rewrite_prompt_google = (
             self.BASE_REWRITE_PROMPT
             + "Видай лише один варіант рерайту. "
@@ -50,6 +52,21 @@ class OpenAI(AIModel):
 
     def rewrite(self, text: str) -> str:
         return asyncio.run(self.model.request(self.rewrite_prompt_openai, text))
+
+
+class Perplexity(AIModel):
+    """Робота з Perplexity"""
+
+    def __init__(self):
+        super().__init__()
+        self.model = ChatGPT(api_key=PERPLEXITY_TOKEN, base_url=PERPLEXITY_URL)
+        self.name = AIName.PERPLEXITY.value  # Використовується в зовнішній логіці
+        self.version = "sonar-pro"  # sonar-medium-online, llama-3.1-sonar-large-online
+
+    def rewrite(self, text: str) -> str:
+        return asyncio.run(
+            self.model.request(self.rewrite_prompt_perplexity, text, self.version)
+        )
 
 
 class Google(AIModel):

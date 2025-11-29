@@ -7,19 +7,27 @@ from karatel.ai.config import OPENAI_TOKEN, OPENAI_URL
 
 class ChatGPT:
 
-    def __init__(self) -> None:
+    def __init__(self, api_key: str | None = None, base_url: str | None = None) -> None:
         # self.client = openai.OpenAI(base_url=OPENAI_URL, api_key=OPENAI_TOKEN)
-        self.client = openai.AsyncOpenAI(base_url=OPENAI_URL, api_key=OPENAI_TOKEN)
 
-    async def request(self, prompt: str, message: str) -> str:
+        key = api_key or OPENAI_TOKEN
+        url = base_url or OPENAI_URL
+
+        self.client = openai.AsyncOpenAI(base_url=url, api_key=key)
+
+        # self.client = openai.AsyncOpenAI(base_url=OPENAI_URL, api_key=OPENAI_TOKEN)
+
+    async def request(self, prompt: str, message: str, model: str | None = None) -> str:
         """Відправка промпта та тексту, отримання відповіді (асинхронно)"""
+
+        mod = model or "gpt-4-turbo"  # gpt-4-turbo, gpt-4o, gpt-4-turbo, gpt-3.5-turbo
 
         message_list = [
             {"role": "system", "content": prompt},
             {"role": "user", "content": message},
         ]
         response = await self.client.chat.completions.create(
-            model="gpt-4-turbo",
+            model=mod,
             messages=message_list,
             max_tokens=2000,
             temperature=0.9,
