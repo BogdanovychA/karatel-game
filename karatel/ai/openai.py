@@ -8,14 +8,11 @@ from karatel.ai.config import OPENAI_TOKEN, OPENAI_URL
 class ChatGPT:
 
     def __init__(self, api_key: str | None = None, base_url: str | None = None) -> None:
-        # self.client = openai.OpenAI(base_url=OPENAI_URL, api_key=OPENAI_TOKEN)
 
         key = api_key or OPENAI_TOKEN
         url = base_url or OPENAI_URL
 
         self.client = openai.AsyncOpenAI(base_url=url, api_key=key)
-
-        # self.client = openai.AsyncOpenAI(base_url=OPENAI_URL, api_key=OPENAI_TOKEN)
 
     async def request(self, prompt: str, message: str, model: str | None = None) -> str:
         """Відправка промпта та тексту, отримання відповіді (асинхронно)"""
