@@ -141,7 +141,7 @@ class MasterAI(AIModel):
                 task_openai, task_google, task_claude
             )
 
-            return f"OpenAI:\n{openai}\n\nGoogle:\n{google}\n\nAnthropic:\n{anthropic}"
+            return f"ChatGPT:\n{openai}\n\nGemini:\n{google}\n\nClaude:\n{anthropic}"
 
         return self.loop.run_until_complete(_main())
 
