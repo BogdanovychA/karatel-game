@@ -5,6 +5,14 @@ from __future__ import annotations
 from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING
 
+import requests
+
+from karatel.auth.firebase import (
+    firebase_change_password,
+    firebase_delete_user,
+    firebase_signin,
+    firebase_signup,
+)
 from karatel.storage.sqlite_manager import (
     delete_row_by_id,
     delete_table,
@@ -56,8 +64,14 @@ class SQLSaver(ABC):
     @abstractmethod
     def register_user(
         self, output: OutputSpace, username: str, password: str, log: bool
-    ) -> bool:
+    ) -> tuple[bool, str | int | None, str | None, str | None, str | None]:
         """Реєстрація користувача через 'відкритий простір'"""
+        pass
+
+    @abstractmethod
+    def validate_user(
+        self, output: OutputSpace, username: str, password: str, log: bool
+    ) -> tuple[bool, str | int | None, str | None, str | None, str | None]:
         pass
 
     @abstractmethod
@@ -92,7 +106,14 @@ class SQLSaver(ABC):
         pass
 
     @staticmethod
+    @abstractmethod
+    def check_username(output: OutputSpace, username: str, log: bool) -> bool:
+        """Перевірка валідності імені користувача"""
+        pass
+
+    @staticmethod
     def check_password(output: OutputSpace, password: str, log: bool) -> bool:
+        """Перевірка валідності пароля користувача"""
         pwd = is_password_valid(password)
         if not pwd:
             output.write(
@@ -126,21 +147,71 @@ class FirebaseSaver(SQLSaver):
 
     def register_user(
         self, output: OutputSpace, username: str, password: str, log: bool
-    ) -> bool:
-        pass
+    ) -> tuple[bool, str | None, str | None, str | None, str | None]:
+        try:
+            result = firebase_signup(email=username, password=password)
+            return (
+                True,
+                result["localId"],
+                result["email"],
+                result["idToken"],
+                result["refreshToken"],
+            )
+        except requests.HTTPError as e:
+            error = e.response.json()
+            output.write("Помилка реєстрації:", error["error"]["message"], log=log)
+            return False, None, None, None, None
+
+    def validate_user(
+        self, output: OutputSpace, username: str, password: str, log: bool
+    ) -> tuple[bool, str | None, str | None, str | None, str | None]:
+        try:
+            result = firebase_signin(email=username, password=password)
+            return (
+                True,
+                result["localId"],
+                result["email"],
+                result["idToken"],
+                result["refreshToken"],
+            )
+        except requests.HTTPError as e:
+            error = e.response.json()
+            output.write("Помилка авторизації:", error["error"]["message"], log=log)
+            return False, None, None, None, None
 
     def fetch_user(
         self, output: OutputSpace, username: str, log: bool
     ) -> tuple[int, bytes] | None:
         pass
 
-    def delete_user(self, output: OutputSpace, username: str, row_id: int) -> bool:
-        pass
+    def delete_user(self, output: OutputSpace, id_token: str, log: bool) -> bool:
+        try:
+            firebase_delete_user(id_token=id_token)
+            return True
+        except requests.HTTPError as e:
+            error = e.response.json()
+            output.write(
+                "Помилка видалення користувача:", error["error"]["message"], log=log
+            )
+            return False
 
     def update_password(
-        self, output: OutputSpace, user_id: int, password: str, log: bool
-    ) -> bool:
-        pass
+        self, output: OutputSpace, id_token: str, password: str, log: bool
+    ) -> tuple[bool, str | None, str | None, str | None, str | None]:
+
+        try:
+            result = firebase_change_password(id_token=id_token, new_password=password)
+            return (
+                True,
+                result["localId"],
+                result["email"],
+                result["idToken"],
+                result["refreshToken"],
+            )
+        except requests.HTTPError as e:
+            error = e.response.json()
+            output.write("Помилка зміни пароля:", error["error"]["message"], log=log)
+            return False, None, None, None, None
 
     def update_username(
         self,
@@ -150,6 +221,10 @@ class FirebaseSaver(SQLSaver):
         old_username: str,
         log: bool,
     ) -> bool:
+        pass
+
+    @staticmethod
+    def check_username(output: OutputSpace, username: str, log: bool) -> bool:
         pass
 
 
@@ -251,8 +326,8 @@ class SQLiteSaver(SQLSaver):
             log=log,
         )
 
-    def validate_password(
-        self, output: OutputSpace, username: str, password: str
+    def validate_user(
+        self, output: OutputSpace, username: str, password: str, log: bool
     ) -> tuple[int | None, bool]:
         all_data = select_user(
             output=output, username=username, table_name=self._users_table, log=False

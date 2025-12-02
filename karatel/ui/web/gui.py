@@ -213,7 +213,7 @@ def authenticate_user() -> None:
     # Логіка роботи кнопок
     if submitted_login:
         if check_username_and_password(username, password):
-            user_id, is_user_valid = st.session_state.gsm.saver.validate_password(
+            user_id, is_user_valid = st.session_state.gsm.saver.validate_user(
                 output=st.session_state.gsm.output,
                 username=username,
                 password=password,
@@ -285,7 +285,7 @@ def profile() -> None:
     if change_login:
         if password:
             if check_username_and_password(username, password):
-                user_id, is_user_valid = st.session_state.gsm.saver.validate_password(
+                user_id, is_user_valid = st.session_state.gsm.saver.validate_user(
                     output=st.session_state.gsm.output,
                     username=st.session_state.gsm.username,
                     password=password,
@@ -332,7 +332,7 @@ def profile() -> None:
 
     elif delete_user:
         if password:
-            user_id, is_user_valid = st.session_state.gsm.saver.validate_password(
+            user_id, is_user_valid = st.session_state.gsm.saver.validate_user(
                 output=st.session_state.gsm.output,
                 username=st.session_state.gsm.username,
                 password=password,

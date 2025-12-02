@@ -14,3 +14,6 @@ class GameStateManager:
     saver: SQLSaver
     can_generate_map: bool
     username: str | None
+    user_id: str | None = None
+    idToken: str | None = None
+    refreshToken: str | None = None
