@@ -25,7 +25,6 @@ from karatel.ui.web.elements import (
 )
 from karatel.ui.web.logic import check_password, check_username_and_password
 from karatel.utils.constants import Emoji, Sex
-from karatel.utils.crypt import hash_pass, validate_password
 from karatel.utils.settings import HERO_LIVES, LOG, MAX_LEVEL, MIN_LEVEL
 from karatel.utils.utils import generate_random_prefix
 
@@ -214,22 +213,22 @@ def authenticate_user() -> None:
     # Логіка роботи кнопок
     if submitted_login:
         if check_username_and_password(username, password):
-            all_data = st.session_state.gsm.saver.fetch_user(
-                output=st.session_state.gsm.output, username=username, log=LOG
+            user_id, is_user_valid = st.session_state.gsm.saver.validate_password(
+                output=st.session_state.gsm.output,
+                username=username,
+                password=password,
             )
-            if all_data:
-                user_id, hashed_password = all_data
-                if validate_password(password, hashed_password):
-                    _start_logic()
-                else:
-                    st.session_state.gsm.output.write("Пароль не коректний")
+            if is_user_valid:
+                _start_logic()
+            else:
+                st.session_state.gsm.output.write("Пароль не коректний")
         st.rerun()
     elif submitted_registration:
         if check_username_and_password(username, password):
             if st.session_state.gsm.saver.register_user(
                 output=st.session_state.gsm.output,
                 username=username,
-                hashed_password=hash_pass(password),
+                password=password,
                 log=LOG,
             ):
                 _start_logic()
@@ -286,24 +285,23 @@ def profile() -> None:
     if change_login:
         if password:
             if check_username_and_password(username, password):
-                all_data = st.session_state.gsm.saver.fetch_user(
+                user_id, is_user_valid = st.session_state.gsm.saver.validate_password(
                     output=st.session_state.gsm.output,
                     username=st.session_state.gsm.username,
-                    log=LOG,
+                    password=password,
                 )
-                if all_data:
-                    user_id, hashed_password = all_data
-                    if validate_password(password, hashed_password):
-                        if st.session_state.gsm.saver.update_username(
-                            output=st.session_state.gsm.output,
-                            user_id=user_id,
-                            old_username=st.session_state.gsm.username,
-                            new_username=username,
-                            log=LOG,
-                        ):
-                            st.session_state.gsm.username = username
-                    else:
-                        st.session_state.gsm.output.write("Пароль не коректний")
+                if is_user_valid:
+                    if st.session_state.gsm.saver.update_username(
+                        output=st.session_state.gsm.output,
+                        user_id=user_id,
+                        old_username=st.session_state.gsm.username,
+                        new_username=username,
+                        log=LOG,
+                    ):
+                        st.session_state.gsm.username = username
+
+                else:
+                    st.session_state.gsm.output.write("Пароль не коректний")
 
         else:
             st.session_state.gsm.output.write(
@@ -323,28 +321,28 @@ def profile() -> None:
                 st.session_state.gsm.saver.update_password(
                     output=st.session_state.gsm.output,
                     user_id=user_id,
-                    hashed_password=hash_pass(password),
+                    password=password,
                     log=LOG,
                 )
         st.rerun()
 
     elif delete_user:
         if password:
-            all_data = st.session_state.gsm.saver.fetch_user(
-                output=st.session_state.gsm.output, username=username, log=LOG
+            user_id, is_user_valid = st.session_state.gsm.saver.validate_password(
+                output=st.session_state.gsm.output,
+                username=st.session_state.gsm.username,
+                password=password,
             )
-            if all_data:
-                user_id, hashed_password = all_data
-                if validate_password(password, hashed_password):
-                    if st.session_state.gsm.saver.delete_user(
-                        output=st.session_state.gsm.output,
-                        username=st.session_state.gsm.username,
-                        row_id=user_id,
-                    ):
-                        st.session_state.gsm.username = None
-                        st.session_state.game_state = None
-                else:
-                    st.session_state.gsm.output.write("Пароль не коректний")
+            if is_user_valid:
+                if st.session_state.gsm.saver.delete_user(
+                    output=st.session_state.gsm.output,
+                    username=st.session_state.gsm.username,
+                    row_id=user_id,
+                ):
+                    st.session_state.gsm.username = None
+                    st.session_state.game_state = None
+            else:
+                st.session_state.gsm.output.write("Пароль не коректний")
         else:
             st.session_state.gsm.output.write(
                 "Для видалення користувача введіть діючий пароль", log=LOG

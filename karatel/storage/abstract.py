@@ -15,6 +15,7 @@ from karatel.storage.sqlite_manager import (
     sqlite_hero_and_map_saver,
     update_user_data,
 )
+from karatel.utils.crypt import hash_pass, validate_password
 from karatel.utils.settings import HERO_SQL_TABLE, USERS_SQL_TABLE
 
 if TYPE_CHECKING:
@@ -49,7 +50,7 @@ class SQLSaver(ABC):
 
     @abstractmethod
     def register_user(
-        self, output: OutputSpace, username: str, hashed_password: bytes, log: bool
+        self, output: OutputSpace, username: str, password: str, log: bool
     ) -> bool:
         """Реєстрація користувача через 'відкритий простір'"""
         pass
@@ -68,7 +69,7 @@ class SQLSaver(ABC):
 
     @abstractmethod
     def update_password(
-        self, output: OutputSpace, user_id: int, hashed_password: bytes, log: bool
+        self, output: OutputSpace, user_id: int, password: str, log: bool
     ) -> bool:
         """Оновлення пароля користувача через 'відкритий простір'"""
         pass
@@ -83,6 +84,55 @@ class SQLSaver(ABC):
         log: bool,
     ) -> bool:
         """Оновлення імені користувача через 'відкритий простір'"""
+        pass
+
+
+class FirebaseSaver(SQLSaver):
+    """Робота з Firebase"""
+
+    def __init__(self):
+        pass
+
+    def list_hero(self, output: OutputSpace, username: str) -> list:
+        pass
+
+    def save_hero(self, hero: Hero, game_map: list, username: str, log: bool) -> None:
+        pass
+
+    def load_hero(
+        self, output: OutputSpace, username: str, hero_id: int, log: bool
+    ) -> tuple[Hero, list]:
+        pass
+
+    def delete_hero(self, output: OutputSpace, username: str, row_id: int) -> bool:
+        pass
+
+    def register_user(
+        self, output: OutputSpace, username: str, password: str, log: bool
+    ) -> bool:
+        pass
+
+    def fetch_user(
+        self, output: OutputSpace, username: str, log: bool
+    ) -> tuple[int, bytes] | None:
+        pass
+
+    def delete_user(self, output: OutputSpace, username: str, row_id: int) -> bool:
+        pass
+
+    def update_password(
+        self, output: OutputSpace, user_id: int, password: str, log: bool
+    ) -> bool:
+        pass
+
+    def update_username(
+        self,
+        output: OutputSpace,
+        user_id: int,
+        new_username: str,
+        old_username: str,
+        log: bool,
+    ) -> bool:
         pass
 
 
@@ -129,8 +179,9 @@ class SQLiteSaver(SQLSaver):
         )
 
     def register_user(
-        self, output: OutputSpace, username: str, hashed_password: bytes, log: bool
+        self, output: OutputSpace, username: str, password: str, log: bool
     ) -> bool:
+        hashed_password = hash_pass(password)
         return insert_user(
             output=output,
             username=username,
@@ -154,8 +205,9 @@ class SQLiteSaver(SQLSaver):
         return is_row_deleted
 
     def update_password(
-        self, output: OutputSpace, user_id: int, hashed_password: bytes, log: bool
+        self, output: OutputSpace, user_id: int, password: str, log: bool
     ) -> bool:
+        hashed_password = hash_pass(password)
         return update_user_data(
             output=output,
             user_id=user_id,
@@ -181,6 +233,17 @@ class SQLiteSaver(SQLSaver):
             table_name=self._users_table,
             log=log,
         )
+
+    def validate_password(
+        self, output: OutputSpace, username: str, password: str
+    ) -> tuple[int | None, bool]:
+        all_data = select_user(
+            output=output, username=username, table_name=self._users_table, log=False
+        )
+        if all_data is None:
+            return None, False
+        user_id, hashed_password = all_data
+        return user_id, validate_password(password, hashed_password)
 
 
 #
