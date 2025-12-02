@@ -15,7 +15,12 @@ from karatel.storage.sqlite_manager import (
     sqlite_hero_and_map_saver,
     update_user_data,
 )
-from karatel.utils.crypt import hash_pass, validate_password
+from karatel.utils.crypt import (
+    hash_pass,
+    is_password_valid,
+    is_username_valid,
+    validate_password,
+)
 from karatel.utils.settings import HERO_SQL_TABLE, USERS_SQL_TABLE
 
 if TYPE_CHECKING:
@@ -85,6 +90,18 @@ class SQLSaver(ABC):
     ) -> bool:
         """Оновлення імені користувача через 'відкритий простір'"""
         pass
+
+    @staticmethod
+    def check_password(output: OutputSpace, password: str, log: bool) -> bool:
+        pwd = is_password_valid(password)
+        if not pwd:
+            output.write(
+                "Пароль має складатися з мінімум 8 символів латинського алфавіту, "
+                + "має містити мінімум одну велику та одну малу літеру і "
+                + "обов'язково має мати мінімум одну цифру і один спеціальний символ.",
+                log=log,
+            )
+        return pwd
 
 
 class FirebaseSaver(SQLSaver):
@@ -244,6 +261,18 @@ class SQLiteSaver(SQLSaver):
             return None, False
         user_id, hashed_password = all_data
         return user_id, validate_password(password, hashed_password)
+
+    @staticmethod
+    def check_username(output: OutputSpace, username: str, log: bool) -> bool:
+        uname = is_username_valid(username)
+        if not uname:
+            output.write(
+                "Ім'я користувача має містити мінімум 2 символи, "
+                + "може мати лише літери латинського алфавіту, "
+                + "цифри та знак підкреслення.",
+                log=log,
+            )
+        return uname
 
 
 #

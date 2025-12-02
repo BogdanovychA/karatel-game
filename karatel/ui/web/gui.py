@@ -23,7 +23,7 @@ from karatel.ui.web.elements import (
     show_log,
     username_input,
 )
-from karatel.ui.web.logic import check_password, check_username_and_password
+from karatel.ui.web.logic import check_username_and_password
 from karatel.utils.constants import Emoji, Sex
 from karatel.utils.settings import HERO_LIVES, LOG, MAX_LEVEL, MIN_LEVEL
 from karatel.utils.utils import generate_random_prefix
@@ -310,7 +310,11 @@ def profile() -> None:
         st.rerun()
 
     elif change_password:
-        if check_password(password):
+        if st.session_state.gsm.saver.check_password(
+            output=st.session_state.gsm.output,
+            password=password,
+            log=LOG,
+        ):
             all_data = st.session_state.gsm.saver.fetch_user(
                 output=st.session_state.gsm.output,
                 username=st.session_state.gsm.username,

@@ -6,7 +6,7 @@ import karatel.logic.tic_tac_toe_4x4 as ttt
 from karatel.core.game_state_manager import GameStateManager
 from karatel.storage.abstract import SQLiteSaver
 from karatel.ui.abstract import BufferedOutput
-from karatel.utils.crypt import is_password_valid, is_username_valid
+from karatel.utils.settings import LOG
 
 
 def init_session_state():
@@ -38,30 +38,16 @@ def init_session_state():
 
 
 def check_username_and_password(username: str, password: str) -> bool:
-    uname = check_username(username)
-    pwd = check_password(password)
+    uname = st.session_state.gsm.saver.check_username(
+        output=st.session_state.gsm.output,
+        username=username,
+        log=LOG,
+    )
+    pwd = st.session_state.gsm.saver.check_password(
+        output=st.session_state.gsm.output,
+        password=password,
+        log=LOG,
+    )
     if not uname or not pwd:
         st.rerun()
     return uname and pwd
-
-
-def check_username(username: str) -> bool:
-    uname = is_username_valid(username)
-    if not uname:
-        st.session_state.gsm.output.write(
-            "Ім'я користувача має містити мінімум 2 символи, "
-            + "може мати лише літери латинського алфавіту, "
-            + "цифри та знак підкреслення."
-        )
-    return uname
-
-
-def check_password(password: str) -> bool:
-    pwd = is_password_valid(password)
-    if not pwd:
-        st.session_state.gsm.output.write(
-            "Пароль має складатися з мінімум 8 символів латинського алфавіту, "
-            + "має містити мінімум одну велику та одну малу літеру і "
-            + "обов'язково має мати мінімум одну цифру і один спеціальний символ."
-        )
-    return pwd
