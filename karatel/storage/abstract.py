@@ -13,6 +13,7 @@ from karatel.auth.firebase import (
     firebase_signin,
     firebase_signup,
 )
+from karatel.storage import firebase_manager
 from karatel.storage.sqlite_manager import (
     delete_row_by_id,
     delete_table,
@@ -135,15 +136,18 @@ class FirebaseSaver(SQLSaver):
         pass
 
     def save_hero(self, hero: Hero, game_map: list, username: str, log: bool) -> None:
-        pass
+        firebase_manager.save_hero(hero=hero, game_map=game_map, uid=username)
 
     def load_hero(
-        self, output: OutputSpace, username: str, hero_id: int, log: bool
+        self, output: OutputSpace, username: str, hero_name: str, log: bool
     ) -> tuple[Hero, list]:
-        pass
+        hero, game_map = firebase_manager.load_hero(
+            output=output, uid=username, hero_name=hero_name
+        )
+        return hero, game_map
 
-    def delete_hero(self, output: OutputSpace, username: str, row_id: int) -> bool:
-        pass
+    def delete_hero(self, output: OutputSpace, username: str, hero_name: str) -> bool:
+        return firebase_manager.delete_hero(uid=username, hero_name=hero_name)
 
     def register_user(
         self, output: OutputSpace, username: str, password: str, log: bool
@@ -213,14 +217,8 @@ class FirebaseSaver(SQLSaver):
             output.write("Помилка зміни пароля:", error["error"]["message"], log=log)
             return False, None, None, None, None
 
-    def update_username(
-        self,
-        output: OutputSpace,
-        user_id: int,
-        new_username: str,
-        old_username: str,
-        log: bool,
-    ) -> bool:
+    def update_username(self, **kwargs):
+        """Неможливо змінити ім'я користувача у Firebase Auth"""
         pass
 
     @staticmethod
