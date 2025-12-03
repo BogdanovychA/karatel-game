@@ -111,6 +111,30 @@ def fetch_heroes(
     return the_list
 
 
+def delete_all_heroes(uid: str, limit: int | None = LIMIT) -> None:
+    """Видалення всіх героїв користувача та самого користувача
+    з Firebase Firestore
+    Обережно! Рекурсія! :)"""
+
+    counter = 0
+    docs = (
+        DB.document(uid)
+        .collection(SAVES_COLLECTION)
+        .order_by("__name__")
+        .limit(limit)
+        .get()
+    )
+    for doc in docs:
+        doc.reference.delete()
+        counter += 1
+
+    if counter == limit:
+        delete_all_heroes(uid, limit)
+    if counter < limit:
+        doc_ref = DB.document(uid)
+        doc_ref.delete()
+
+
 def delete_hero(uid: str, hero_name: str) -> bool:
     """Видалення героя з Firebase Firestore"""
     doc_ref = DB.document(uid).collection(SAVES_COLLECTION).document(hero_name)
