@@ -217,6 +217,7 @@ def authenticate_user() -> None:
                 output=st.session_state.gsm.output,
                 username=username,
                 password=password,
+                log=LOG,
             )
             if is_user_valid:
                 _start_logic()
