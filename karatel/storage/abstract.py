@@ -26,6 +26,7 @@ from karatel.storage.sqlite_manager import (
 )
 from karatel.utils.crypt import (
     hash_pass,
+    is_email_valid,
     is_password_valid,
     is_username_valid,
     validate_password,
@@ -223,7 +224,14 @@ class FirebaseSaver(StorageManager):
 
     @staticmethod
     def check_username(output: OutputSpace, username: str, log: bool) -> bool:
-        pass
+        uname = is_email_valid(username)
+        if not uname:
+            output.write(
+                "Введіть коректну email-адресу у форматі: "
+                + "ім’я@домен.зона (наприклад: user@example.com)",
+                log=log,
+            )
+        return uname
 
 
 class SQLiteSaver(StorageManager):
