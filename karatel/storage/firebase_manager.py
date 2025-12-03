@@ -83,14 +83,11 @@ def load_hero(
 
 
 def fetch_heroes(
-    uid: str, limit: int = LIMIT, the_list: list | None = None, last_doc=None
-) -> list[tuple[str, str, str | None]]:
+    uid: str, limit: int = LIMIT, last_doc=None
+) -> list[tuple[str, str | None, str | None]]:
     """Отримання списку героїв та мап для користувача з Firebase Firestore"""
 
-    counter = 0
-
-    if the_list is None:
-        the_list = []
+    the_list = []
 
     query = (
         DB.document(uid).collection(SAVES_COLLECTION).order_by("__name__").limit(limit)
@@ -105,12 +102,10 @@ def fetch_heroes(
 
     for doc in docs:
         data = doc.to_dict()
-        line = (doc.id, data.get("hero"), data.get("map"))
-        the_list.append(line)
-        counter += 1
+        the_list.append((doc.id, data.get("hero"), data.get("map")))
 
-    if counter == limit:
-        the_list = fetch_heroes(uid, limit, the_list, docs[-1])
+    if len(docs) == limit:
+        the_list += fetch_heroes(uid, limit, docs[-1])
 
     return the_list
 
