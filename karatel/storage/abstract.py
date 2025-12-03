@@ -37,7 +37,7 @@ if TYPE_CHECKING:
     from karatel.ui.abstract import OutputSpace
 
 
-class SQLSaver(ABC):
+class StorageManager(ABC):
     """'Відкритий простір' для збереження/завантаження користувача та героїв"""
 
     @abstractmethod
@@ -126,7 +126,7 @@ class SQLSaver(ABC):
         return pwd
 
 
-class FirebaseSaver(SQLSaver):
+class FirebaseSaver(StorageManager):
     """Робота з Firebase"""
 
     def __init__(self):
@@ -226,7 +226,7 @@ class FirebaseSaver(SQLSaver):
         pass
 
 
-class SQLiteSaver(SQLSaver):
+class SQLiteSaver(StorageManager):
     """Робота з SQLite"""
 
     def __init__(self):
