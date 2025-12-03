@@ -85,7 +85,8 @@ def load_hero(
 def fetch_heroes(
     uid: str, limit: int = LIMIT, last_doc=None
 ) -> list[tuple[str, str | None, str | None]]:
-    """Отримання списку героїв та мап для користувача з Firebase Firestore"""
+    """Отримання списку героїв та мап для користувача з Firebase Firestore
+    Обережно! Рекурсія! :)"""
 
     the_list = []
 
