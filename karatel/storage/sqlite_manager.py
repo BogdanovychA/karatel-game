@@ -373,7 +373,7 @@ def sqlite_hero_and_map_loader(
 
 
 def sqlite_hero_and_map_saver(
-    hero: Hero, game_map: list, table_name, log: bool = LOG
+    hero: Hero, game_map: list | None, table_name, log: bool = LOG
 ) -> None:
     """Збереження героя"""
 

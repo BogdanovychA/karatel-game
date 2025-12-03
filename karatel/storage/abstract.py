@@ -47,7 +47,9 @@ class StorageManager(ABC):
         pass
 
     @abstractmethod
-    def save_hero(self, hero: Hero, game_map: list, username: str, log: bool) -> None:
+    def save_hero(
+        self, hero: Hero, game_map: list | None, username: str, log: bool
+    ) -> None:
         """Збереження героя через 'відкритий простір'"""
         pass
 
@@ -136,7 +138,9 @@ class FirebaseSaver(StorageManager):
     def list_hero(self, output: OutputSpace, username: str) -> list:
         pass
 
-    def save_hero(self, hero: Hero, game_map: list, username: str, log: bool) -> None:
+    def save_hero(
+        self, hero: Hero, game_map: list | None, username: str, log: bool
+    ) -> None:
         firebase_manager.save_hero(hero=hero, game_map=game_map, uid=username)
 
     def load_hero(
@@ -251,7 +255,9 @@ class SQLiteSaver(StorageManager):
             table_name=self._create_table_name(username),
         )
 
-    def save_hero(self, hero: Hero, game_map: list, username: str, log: bool) -> None:
+    def save_hero(
+        self, hero: Hero, game_map: list | None, username: str, log: bool
+    ) -> None:
         sqlite_hero_and_map_saver(
             hero=hero,
             game_map=game_map,

@@ -20,6 +20,8 @@ output = NoneOutput()
 # saver = SQLiteSaver()
 saver = FirebaseSaver()
 
+USERNAME = "test_user"
+
 
 def heroes_equal(hero_a: Hero, hero_b: Hero) -> bool:
     """Перевірка рівності героїв"""
@@ -105,8 +107,6 @@ def maps_equal(item_a: list | Cell, item_b: list | Cell, deep: int) -> tuple[boo
 def test_maps_equal(level, profession):
     """Тест рівності героїв та мап"""
 
-    USERNAME = "test_user"
-
     hero_a = HeroFactory.generate(output, level, profession)
     map_a = generate_map(hero_a)
     saver.save_hero(hero_a, map_a, USERNAME, False)
@@ -120,6 +120,25 @@ def test_maps_equal(level, profession):
     assert heroes_are_equal
     assert maps_are_equal
     assert deep == MapSize.X * MapSize.Y
+
+
+@pytest.mark.parametrize("level", list(range(MIN_LEVEL, MAX_LEVEL + 1)))
+@pytest.mark.parametrize("profession", list(PROFESSIONS.keys()))
+def test_heroes_equal_without_map(level, profession):
+    """Тест рівності героїв, коли мапи немає"""
+
+    hero_a = HeroFactory.generate(output, level, profession)
+    map_a = None
+    saver.save_hero(hero_a, map_a, USERNAME, False)
+
+    hero_b, map_b = saver.load_hero(output, USERNAME, hero_a.name, False)
+    saver.delete_hero(output, USERNAME, hero_a.name)
+
+    heroes_are_equal = heroes_equal(hero_a, hero_b)
+    maps_are_equal = map_a == map_b
+
+    assert heroes_are_equal
+    assert maps_are_equal
 
 
 # @pytest.mark.parametrize("level", list(range(MIN_LEVEL, MAX_LEVEL + 1)))
