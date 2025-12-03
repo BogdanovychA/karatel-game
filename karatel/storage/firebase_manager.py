@@ -27,14 +27,13 @@ DB = db.collection(MAIN_COLLECTION)
 
 def save_hero(hero: Hero, game_map: list | None, uid: str) -> None:
 
-    hero_dict = HeroFactory.hero_to_dict(hero)
-
+    json_hero = json.dumps(HeroFactory.hero_to_dict(hero))
     json_map = json.dumps(
         map_to_dict(game_map) if game_map is not None else None, ensure_ascii=False
     )
 
     data = {
-        "hero": hero_dict,
+        "hero": json_hero,
         "map": json_map,
     }
 
@@ -51,12 +50,10 @@ def load_hero(
     if doc.exists:
         data = doc.to_dict()
 
-        hero_dict = data["hero"]
+        hero_dict = json.loads(data["hero"])
         hero = HeroFactory.dict_to_hero(output, hero_dict)
 
-        json_map = data["map"]
-        map_dict = json.loads(json_map)
-
+        map_dict = json.loads(data["map"])
         game_map = (
             dict_to_map(output=output, the_list=map_dict)
             if map_dict is not None

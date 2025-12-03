@@ -483,7 +483,7 @@ def game_map() -> None:
 
 def load_hero() -> None:
     st.title(TITLE)
-    st.header(f"{Emoji.LOG.value} Список збережених {Emoji.HERO.value} Героїв")
+    st.header(f"{Emoji.LOG.value} Список збережених {Emoji.HERO.value} героїв")
     all_saved_heroes = st.session_state.gsm.saver.list_hero(
         output=st.session_state.gsm.output, username=st.session_state.gsm.username
     )
