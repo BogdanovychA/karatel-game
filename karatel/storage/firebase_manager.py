@@ -131,8 +131,7 @@ def delete_all_heroes(uid: str, limit: int | None = LIMIT) -> None:
     if counter == limit:
         delete_all_heroes(uid, limit)
     if counter < limit:
-        doc_ref = DB.document(uid)
-        doc_ref.delete()
+        DB.document(uid).delete()
 
 
 def delete_hero(uid: str, hero_name: str) -> bool:
