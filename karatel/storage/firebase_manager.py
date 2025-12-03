@@ -28,7 +28,7 @@ DB = db.collection(MAIN_COLLECTION)
 def save_hero(hero: Hero, game_map: list | None, uid: str) -> None:
     """Збереження героя та мапи у Firebase Firestore"""
 
-    json_hero = json.dumps(HeroFactory.hero_to_dict(hero))
+    json_hero = json.dumps(HeroFactory.hero_to_dict(hero), ensure_ascii=False)
     json_map = json.dumps(
         map_to_dict(game_map) if game_map is not None else None, ensure_ascii=False
     )
