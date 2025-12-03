@@ -136,7 +136,7 @@ class FirebaseSaver(StorageManager):
         pass
 
     def list_hero(self, output: OutputSpace, username: str) -> list:
-        pass
+        return firebase_manager.fetch_heroes(username)
 
     def save_hero(
         self, hero: Hero, game_map: list | None, username: str, log: bool

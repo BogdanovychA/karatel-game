@@ -21,6 +21,7 @@ db = firestore.client()
 
 MAIN_COLLECTION = "karatel_database"
 SAVES_COLLECTION = "saves"
+LIMIT = 100
 
 DB = db.collection(MAIN_COLLECTION)
 
@@ -79,6 +80,39 @@ def load_hero(
     )
 
     return hero, game_map
+
+
+def fetch_heroes(
+    uid: str, limit: int = LIMIT, the_list: list | None = None, last_doc=None
+) -> list[tuple[str, str, str | None]]:
+    """Отримання списку героїв та мап для користувача з Firebase Firestore"""
+
+    counter = 0
+
+    if the_list is None:
+        the_list = []
+
+    query = (
+        DB.document(uid).collection(SAVES_COLLECTION).order_by("__name__").limit(limit)
+    )
+
+    if last_doc is not None:
+        query = query.start_after(last_doc)
+
+    docs = list(
+        query.get()
+    )  # .get() повертає не звичайний список, тому конвертуємо його
+
+    for doc in docs:
+        data = doc.to_dict()
+        line = (doc.id, data.get("hero"), data.get("map"))
+        the_list.append(line)
+        counter += 1
+
+    if counter == limit:
+        the_list = fetch_heroes(uid, limit, the_list, docs[-1])
+
+    return the_list
 
 
 def delete_hero(uid: str, hero_name: str) -> bool:
