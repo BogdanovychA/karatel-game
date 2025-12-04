@@ -15,9 +15,17 @@ if TYPE_CHECKING:
     from karatel.core.hero import Hero
     from karatel.ui.abstract import OutputSpace
 
-cred = credentials.Certificate("./karatel/storage/karatel-game-firebase-adminsdk.json")
-firebase_admin.initialize_app(cred)
-db = firestore.client()
+
+try:
+    app = firebase_admin.get_app()  # якщо вже ініціалізовано — отримуємо
+except ValueError:
+    cred = credentials.Certificate(
+        "./karatel/storage/karatel-game-firebase-adminsdk.json"
+    )
+    app = firebase_admin.initialize_app(cred)  # ініціалізуємо лише один раз
+
+db = firestore.client(app)  # після цього можна створювати клієнти сервісів
+
 
 MAIN_COLLECTION = "karatel_database"
 SAVES_COLLECTION = "saves"

@@ -4,7 +4,7 @@ import streamlit as st
 
 import karatel.logic.tic_tac_toe_4x4 as ttt
 from karatel.core.game_state_manager import GameStateManager
-from karatel.storage.abstract import SQLiteSaver
+from karatel.storage.abstract import FirebaseSaver  # SQLiteSaver
 from karatel.ui.abstract import BufferedOutput
 from karatel.utils.settings import LOG
 
@@ -28,10 +28,7 @@ def init_session_state():
 
     if st.session_state.first_start:
         st.session_state.gsm = GameStateManager(
-            output=BufferedOutput(),
-            saver=SQLiteSaver(),
-            username=None,
-            can_generate_map=False,
+            output=BufferedOutput(), saver=FirebaseSaver(), can_generate_map=False
         )
         st.session_state.ttt_board = ttt.START_BOARD.copy()
         st.session_state.first_start = False
@@ -51,3 +48,12 @@ def check_username_and_password(username: str, password: str) -> bool:
     if not uname or not pwd:
         st.rerun()
     return uname and pwd
+
+
+def user_params_update(
+    local_id: str, email: str, id_token: str, refresh_token: str
+) -> None:
+    st.session_state.gsm.local_id = local_id
+    st.session_state.gsm.email = email
+    st.session_state.gsm.id_token = id_token
+    st.session_state.gsm.refresh_token = refresh_token

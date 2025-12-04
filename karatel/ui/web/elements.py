@@ -61,15 +61,16 @@ def ai_master() -> None:
                 st.session_state.ai = None
 
 
-def username_input():
-    if st.session_state.gsm.username is not None:
-        value = st.session_state.gsm.username
+def username_input(disabled: bool = False) -> str:
+    if st.session_state.gsm.email is not None:
+        value = st.session_state.gsm.email
     else:
         value = ""
     return st.text_input(
-        "Ім'я користувача",
+        "Email",
         icon=Emoji.MAN.value,
         value=value,
+        disabled=disabled,
     )
 
 
@@ -84,7 +85,7 @@ def logout_button() -> None:
         "Вийти з гри", icon=Emoji.LOGOUT.value, type="primary", width=BUTTON_WIDTH
     ):
         st.session_state.game_state = None
-        st.session_state.gsm.username = None
+        st.session_state.gsm.email = None
         st.rerun()
 
 
@@ -160,7 +161,7 @@ def save_button() -> None:
         st.session_state.gsm.saver.save_hero(
             hero=st.session_state.hero,
             game_map=st.session_state.game_map,
-            username=st.session_state.gsm.username,
+            username=st.session_state.gsm.local_id,
             log=LOG,
         )
         st.rerun()
@@ -202,7 +203,7 @@ def navigation() -> None:
         pass
     with col4:
         if (
-            st.session_state.gsm.username is not None
+            st.session_state.gsm.email is not None
             and st.session_state.game_state != GameState.PROFILE.value
         ):
             profile_button()

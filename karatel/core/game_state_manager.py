@@ -13,7 +13,7 @@ class GameStateManager:
     output: OutputSpace
     saver: StorageManager
     can_generate_map: bool
-    username: str | None
-    user_id: str | None = None
-    idToken: str | None = None
-    refreshToken: str | None = None
+    email: str | None = None
+    local_id: str | None = None
+    id_token: str | None = None
+    refresh_token: str | None = None

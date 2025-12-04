@@ -23,7 +23,7 @@ from karatel.ui.web.elements import (
     show_log,
     username_input,
 )
-from karatel.ui.web.logic import check_username_and_password
+from karatel.ui.web.logic import check_username_and_password, user_params_update
 from karatel.utils.constants import Emoji, Sex
 from karatel.utils.settings import HERO_LIVES, LOG, MAX_LEVEL, MIN_LEVEL
 from karatel.utils.utils import generate_random_prefix
@@ -34,7 +34,7 @@ def check_game_state() -> None:
     (викликає відповідну функцію)"""
 
     if (
-        st.session_state.gsm.username is not None
+        st.session_state.gsm.email is not None
         and st.session_state.game_state is not None
     ):
         match st.session_state.game_state:
@@ -207,17 +207,19 @@ def authenticate_user() -> None:
             st.text(st.session_state.gsm.output.read_buffer())
 
     def _start_logic() -> None:
-        st.session_state.gsm.username = username
+        user_params_update(local_id, email, id_token, refresh_token)
         st.session_state.game_state = GameState.HERO.value
 
     # Логіка роботи кнопок
     if submitted_login:
         if check_username_and_password(username, password):
-            user_id, is_user_valid = st.session_state.gsm.saver.validate_user(
-                output=st.session_state.gsm.output,
-                username=username,
-                password=password,
-                log=LOG,
+            is_user_valid, local_id, email, id_token, refresh_token = (
+                st.session_state.gsm.saver.validate_user(
+                    output=st.session_state.gsm.output,
+                    username=username,
+                    password=password,
+                    log=LOG,
+                )
             )
             if is_user_valid:
                 _start_logic()
@@ -226,12 +228,15 @@ def authenticate_user() -> None:
         st.rerun()
     elif submitted_registration:
         if check_username_and_password(username, password):
-            if st.session_state.gsm.saver.register_user(
-                output=st.session_state.gsm.output,
-                username=username,
-                password=password,
-                log=LOG,
-            ):
+            is_user_valid, local_id, email, id_token, refresh_token = (
+                st.session_state.gsm.saver.register_user(
+                    output=st.session_state.gsm.output,
+                    username=username,
+                    password=password,
+                    log=LOG,
+                )
+            )
+            if is_user_valid:
                 _start_logic()
             st.rerun()
 
@@ -240,12 +245,12 @@ def profile() -> None:
     """ "Екран з гравцем (героєм)"""
     st.title(TITLE)
     st.header(
-        f"{Emoji.PROFILE.value} Профіль користувача '{st.session_state.gsm.username}'"
+        f"{Emoji.PROFILE.value} Профіль користувача '{st.session_state.gsm.email}'"
     )
 
     col1, col2 = st.columns(2)
     with col1:
-        username = username_input()
+        username = username_input(disabled=True)
         password = pass_input()
     with col2:
         st.text(st.session_state.gsm.output.read_buffer())
@@ -254,10 +259,11 @@ def profile() -> None:
 
     with col1:
         change_login = st.button(
-            "Змінити логін",
+            "Змінити email",
             icon=Emoji.LOGIN.value,
             type="secondary",
             width=BUTTON_WIDTH,
+            disabled=True,  # Firebase не дозволяє змінювати email через Admin SDK
         )
 
     with col2:
@@ -286,21 +292,23 @@ def profile() -> None:
     if change_login:
         if password:
             if check_username_and_password(username, password):
-                user_id, is_user_valid = st.session_state.gsm.saver.validate_user(
-                    output=st.session_state.gsm.output,
-                    username=st.session_state.gsm.username,
-                    password=password,
+                is_user_valid, local_id, email, id_token, refresh_token = (
+                    st.session_state.gsm.saver.validate_user(
+                        output=st.session_state.gsm.output,
+                        username=st.session_state.gsm.email,
+                        password=password,
+                    )
                 )
                 if is_user_valid:
-                    if st.session_state.gsm.saver.update_username(
-                        output=st.session_state.gsm.output,
-                        user_id=user_id,
-                        old_username=st.session_state.gsm.username,
-                        new_username=username,
-                        log=LOG,
-                    ):
-                        st.session_state.gsm.username = username
-
+                    # if st.session_state.gsm.saver.update_username(
+                    #     output=st.session_state.gsm.output,
+                    #     user_id=local_id,
+                    #     old_username=st.session_state.gsm.email,
+                    #     new_username=email,
+                    #     log=LOG,
+                    # ):
+                    #     st.session_state.gsm.email = email
+                    pass  # Firebase не дозволяє змінювати email через Admin SDK
                 else:
                     st.session_state.gsm.output.write("Пароль не коректний")
 
@@ -316,33 +324,36 @@ def profile() -> None:
             password=password,
             log=LOG,
         ):
-            all_data = st.session_state.gsm.saver.fetch_user(
-                output=st.session_state.gsm.output,
-                username=st.session_state.gsm.username,
-                log=LOG,
-            )
-            if all_data:
-                user_id, hashed_password = all_data
+            is_user_valid, local_id, email, id_token, refresh_token = (
                 st.session_state.gsm.saver.update_password(
                     output=st.session_state.gsm.output,
-                    user_id=user_id,
+                    id_token=st.session_state.gsm.id_token,
                     password=password,
                     log=LOG,
                 )
+            )
+            if is_user_valid:
+                user_params_update(local_id, email, id_token, refresh_token)
+
         st.rerun()
 
     elif delete_user:
         if password:
-            user_id, is_user_valid = st.session_state.gsm.saver.validate_user(
-                output=st.session_state.gsm.output,
-                username=st.session_state.gsm.username,
-                password=password,
+            is_user_valid, local_id, email, id_token, refresh_token = (
+                st.session_state.gsm.saver.validate_user(
+                    output=st.session_state.gsm.output,
+                    username=st.session_state.gsm.email,
+                    password=password,
+                    log=LOG,
+                )
             )
             if is_user_valid:
+                user_params_update(local_id, email, id_token, refresh_token)
                 if st.session_state.gsm.saver.delete_user(
                     output=st.session_state.gsm.output,
-                    username=st.session_state.gsm.username,
-                    row_id=user_id,
+                    username=st.session_state.gsm.local_id,
+                    id_token=st.session_state.gsm.id_token,
+                    log=LOG,
                 ):
                     st.session_state.gsm.username = None
                     st.session_state.game_state = None
@@ -486,7 +497,7 @@ def load_hero() -> None:
     st.title(TITLE)
     st.header(f"{Emoji.LOG.value} Список збережених {Emoji.HERO.value} героїв")
     all_saved_heroes = st.session_state.gsm.saver.list_hero(
-        output=st.session_state.gsm.output, username=st.session_state.gsm.username
+        output=st.session_state.gsm.output, username=st.session_state.gsm.local_id
     )
 
     col1, col2, col3, col4, col5 = st.columns([1, 7, 2, 4, 4])
@@ -501,11 +512,11 @@ def load_hero() -> None:
     with col5:
         pass
 
-    for saved_hero in all_saved_heroes:
-        hero_id, hero_name, json_hero, json_map = saved_hero
+    for number, saved_hero in enumerate(all_saved_heroes):
+        hero_name, json_hero, json_map = saved_hero
         col1, col2, col3, col4, col5 = st.columns([1, 7, 2, 4, 4])
         with col1:
-            st.text(hero_id)
+            st.text(number + 1)
         with col2:
             st.text(hero_name)
         with col3:
@@ -519,14 +530,14 @@ def load_hero() -> None:
                 icon=Emoji.LOAD.value,
                 type="secondary",
                 width=BUTTON_WIDTH,
-                key=f"respawn{hero_id}",
+                key=f"respawn{number}",
             ):
                 # Відновлюємо героя та мапу
                 st.session_state.hero, st.session_state.game_map = (
                     st.session_state.gsm.saver.load_hero(
                         output=st.session_state.gsm.output,
-                        username=st.session_state.gsm.username,
-                        hero_id=hero_id,
+                        username=st.session_state.gsm.local_id,
+                        hero_name=hero_name,
                         log=LOG,
                     )
                 )
@@ -550,12 +561,12 @@ def load_hero() -> None:
                 icon=Emoji.TRASH.value,
                 type="primary",
                 width=BUTTON_WIDTH,
-                key=f"del{hero_id}",
+                key=f"del{number}",
             ):
                 st.session_state.gsm.saver.delete_hero(
                     output=st.session_state.gsm.output,
-                    username=st.session_state.gsm.username,
-                    row_id=hero_id,
+                    username=st.session_state.gsm.local_id,
+                    hero_name=hero_name,
                 )
                 st.rerun()
 
