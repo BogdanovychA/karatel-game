@@ -500,31 +500,39 @@ def load_hero() -> None:
         output=st.session_state.gsm.output, username=st.session_state.gsm.local_id
     )
 
-    col1, col2, col3, col4, col5 = st.columns([1, 7, 2, 4, 4])
+    columns = [1, 6, 3, 2, 4, 4]
+
+    col1, col2, col3, col4, col5, col6 = st.columns(columns)
     with col1:
-        st.html("<b>ID</b>")
+        st.html("<b>№</b>")
     with col2:
         st.html("<b>Ім'я</b>")
     with col3:
-        st.html("<b>Мапа</b>")
+        st.html("<b>Стать</b>")
     with col4:
-        pass
+        st.html("<b>Мапа</b>")
     with col5:
+        pass
+    with col6:
         pass
 
     for number, saved_hero in enumerate(all_saved_heroes):
         hero_name, json_hero, json_map = saved_hero
-        col1, col2, col3, col4, col5 = st.columns([1, 7, 2, 4, 4])
+        col1, col2, col3, col4, col5, col6 = st.columns(columns)
         with col1:
             st.text(number + 1)
         with col2:
             st.text(hero_name)
         with col3:
+            hero_data = json.loads(json_hero)
+            sex = hero_data.get("sex")
+            st.text(sex)
+        with col4:
             if json.loads(json_map) is not None:
                 st.text(Emoji.CHECK.value)
             else:
                 st.text(Emoji.X.value)
-        with col4:
+        with col5:
             if st.button(
                 "Відновити",
                 icon=Emoji.LOAD.value,
@@ -555,7 +563,7 @@ def load_hero() -> None:
                     # )
                 st.session_state.game_state = GameState.HERO.value
                 st.rerun()
-        with col5:
+        with col6:
             if st.button(
                 "Видалити",
                 icon=Emoji.TRASH.value,
