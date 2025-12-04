@@ -166,7 +166,7 @@ class FirebaseSaver(StorageManager):
             )
         except requests.HTTPError as e:
             error = e.response.json()
-            output.write(f"Помилка авторизації: {{error['error']['message']}}", log=log)
+            output.write(f"Помилка авторизації: {error['error']['message']}", log=log)
             return False, None, None, None, None
 
     def delete_user(
