@@ -33,6 +33,16 @@ db = firestore.client(app)  # після цього можна створюва�
 DB = db.collection(FIREBASE_MAIN_COLLECTION)
 
 
+def save_email(uid: str, email: str) -> None:
+    """Збереження email користувача у Firebase Firestore"""
+
+    data = {
+        "email": email,
+    }
+
+    DB.document(uid).set(data)
+
+
 def save_hero(hero: Hero, game_map: list | None, uid: str) -> None:
     """Збереження героя та мапи у Firebase Firestore"""
 

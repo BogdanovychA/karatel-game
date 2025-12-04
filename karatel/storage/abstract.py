@@ -154,6 +154,7 @@ class FirebaseSaver(StorageManager):
     ) -> tuple[bool, str | None, str | None, str | None, str | None]:
         try:
             result = firebase_signup(email=username, password=password)
+            firebase_manager.save_email(result["localId"], result["email"])
             return (
                 True,
                 result["localId"],
