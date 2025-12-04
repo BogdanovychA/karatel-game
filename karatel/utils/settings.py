@@ -1,8 +1,13 @@
 # -*- coding: utf-8 -*-
 
-SQLITE_PATH = "./karatel/saves/karatel.db"
-USERS_SQL_TABLE = "users"
-HERO_SQL_TABLE = "saves"
+FIREBASE_CERTIFICATE_PATH = "./karatel/storage/karatel-game-firebase-admin_sdk.json"
+FIREBASE_MAIN_COLLECTION = "karatel_database"
+FIREBASE_SAVES_COLLECTION = "saves"
+FIREBASE_LIMIT = 100
+
+# SQLITE_PATH = "./karatel/saves/karatel.db"
+# USERS_SQL_TABLE = "users"
+# HERO_SQL_TABLE = "saves"
 
 # XML_SAVES_PATH = "./karatel/saves/hero.xml"
 # JSON_SAVES_PATH = "./karatel/saves/hero.json"

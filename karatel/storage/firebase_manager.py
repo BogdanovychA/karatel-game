@@ -10,6 +10,12 @@ from firebase_admin import credentials, firestore
 
 from karatel.core.hero import HeroFactory
 from karatel.core.map import dict_to_map, map_to_dict
+from karatel.utils.settings import (
+    FIREBASE_CERTIFICATE_PATH,
+    FIREBASE_LIMIT,
+    FIREBASE_MAIN_COLLECTION,
+    FIREBASE_SAVES_COLLECTION,
+)
 
 if TYPE_CHECKING:
     from karatel.core.hero import Hero
@@ -19,19 +25,12 @@ if TYPE_CHECKING:
 try:
     app = firebase_admin.get_app()  # якщо вже ініціалізовано — отримуємо
 except ValueError:
-    cred = credentials.Certificate(
-        "./karatel/storage/karatel-game-firebase-adminsdk.json"
-    )
+    cred = credentials.Certificate(FIREBASE_CERTIFICATE_PATH)
     app = firebase_admin.initialize_app(cred)  # ініціалізуємо лише один раз
 
 db = firestore.client(app)  # після цього можна створювати клієнти сервісів
 
-
-MAIN_COLLECTION = "karatel_database"
-SAVES_COLLECTION = "saves"
-LIMIT = 100
-
-DB = db.collection(MAIN_COLLECTION)
+DB = db.collection(FIREBASE_MAIN_COLLECTION)
 
 
 def save_hero(hero: Hero, game_map: list | None, uid: str) -> None:
@@ -47,14 +46,14 @@ def save_hero(hero: Hero, game_map: list | None, uid: str) -> None:
         "map": json_map,
     }
 
-    DB.document(uid).collection(SAVES_COLLECTION).document(hero.name).set(data)
+    DB.document(uid).collection(FIREBASE_SAVES_COLLECTION).document(hero.name).set(data)
 
 
 def select_hero(uid: str, hero_name: str) -> tuple[str | None, str | None]:
     """Вибірка героя та мапи з Firebase Firestore
     повернення в форматі JSON рядків"""
 
-    doc_ref = DB.document(uid).collection(SAVES_COLLECTION).document(hero_name)
+    doc_ref = DB.document(uid).collection(FIREBASE_SAVES_COLLECTION).document(hero_name)
     doc = doc_ref.get()
 
     if doc.exists:
@@ -91,7 +90,7 @@ def load_hero(
 
 
 def fetch_heroes(
-    uid: str, limit: int = LIMIT, last_doc=None
+    uid: str, limit: int = FIREBASE_LIMIT, last_doc=None
 ) -> list[tuple[str, str | None, str | None]]:
     """Отримання списку героїв та мап для користувача з Firebase Firestore
     Обережно! Рекурсія! :)"""
@@ -99,7 +98,10 @@ def fetch_heroes(
     the_list = []
 
     query = (
-        DB.document(uid).collection(SAVES_COLLECTION).order_by("__name__").limit(limit)
+        DB.document(uid)
+        .collection(FIREBASE_SAVES_COLLECTION)
+        .order_by("__name__")
+        .limit(limit)
     )
 
     if last_doc is not None:
@@ -119,7 +121,7 @@ def fetch_heroes(
     return the_list
 
 
-def delete_all_heroes(uid: str, limit: int | None = LIMIT) -> None:
+def delete_all_heroes(uid: str, limit: int | None = FIREBASE_LIMIT) -> None:
     """Видалення всіх героїв користувача та самого користувача
     з Firebase Firestore
     Обережно! Рекурсія! :)"""
@@ -127,7 +129,7 @@ def delete_all_heroes(uid: str, limit: int | None = LIMIT) -> None:
     counter = 0
     docs = (
         DB.document(uid)
-        .collection(SAVES_COLLECTION)
+        .collection(FIREBASE_SAVES_COLLECTION)
         .order_by("__name__")
         .limit(limit)
         .get()
@@ -144,6 +146,6 @@ def delete_all_heroes(uid: str, limit: int | None = LIMIT) -> None:
 
 def delete_hero(uid: str, hero_name: str) -> bool:
     """Видалення героя з Firebase Firestore"""
-    doc_ref = DB.document(uid).collection(SAVES_COLLECTION).document(hero_name)
+    doc_ref = DB.document(uid).collection(FIREBASE_SAVES_COLLECTION).document(hero_name)
     doc_ref.delete()
     return True
