@@ -184,7 +184,7 @@ class FirebaseSaver(StorageManager):
         except requests.HTTPError as e:
             error = e.response.json()
             output.write(
-                "Помилка видалення користувача:", error["error"]["message"], log=log
+                f"Помилка видалення користувача: {error["error"]["message"]}", log=log
             )
             return False
 
@@ -204,7 +204,7 @@ class FirebaseSaver(StorageManager):
             )
         except requests.HTTPError as e:
             error = e.response.json()
-            output.write("Помилка зміни пароля:", error["error"]["message"], log=log)
+            output.write(f"Помилка зміни пароля: {error["error"]["message"]}", log=log)
             return False, None, None, None, None
 
     @staticmethod
