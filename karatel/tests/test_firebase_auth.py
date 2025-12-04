@@ -37,7 +37,7 @@ def registered_user_data():
 
     # Видалення користувача після тесту, якщо test_delete_user() завершився з помилкою
     if user_data.get("id_token"):
-        saver.delete_user(output, user_data["id_token"], False)
+        saver.delete_user(output, user_data["uid"], user_data["id_token"], False)
 
 
 def test_user_login(registered_user_data):
@@ -90,53 +90,8 @@ def test_change_password(registered_user_data):
 def test_delete_user(registered_user_data):
     """Тест видалення користувача."""
 
-    is_deleted = saver.delete_user(output, registered_user_data["id_token"], False)
+    is_deleted = saver.delete_user(
+        output, registered_user_data["uid"], registered_user_data["id_token"], False
+    )
     assert is_deleted
     registered_user_data["id_token"] = None
-
-
-# # Ланцюговий тест реєстрації, логіну, зміни пароля та видалення користувача
-# # Втратив актуальність через фікстуру вище, але залишив для прикладу
-# EMAIL = f"test-{generate_random_prefix()}@karatel.ua"
-# PASS = "TestPassword123!"
-# NEW_PASS = "NewTestPassword123!"
-#
-#
-# def test_user_authentication():
-#     # Тест реєстрації користувача
-#     is_registered, uid, email, id_token, refresh_token = saver.register_user(
-#         output, EMAIL, PASS, False
-#     )
-#     assert is_registered
-#     assert email == EMAIL
-#     assert uid is not None
-#     assert id_token is not None
-#     assert refresh_token is not None
-#
-#     # Тест логіну користувача
-#     is_logged_in, uid_login, email_login, id_token_login, refresh_token_login = (
-#         saver.validate_user(output, EMAIL, PASS, False)
-#     )
-#     assert is_logged_in
-#     assert uid_login == uid
-#     assert email_login == email
-#     assert id_token_login is not None
-#     assert refresh_token_login is not None
-#
-#     # Тест зміни пароля користувача
-#     (
-#         is_pass_changed,
-#         uid_changed,
-#         email_changed,
-#         id_token_changed,
-#         refresh_token_changed,
-#     ) = saver.update_password(output, id_token_login, NEW_PASS, False)
-#     assert is_pass_changed
-#     assert uid_changed == uid_login
-#     assert email_changed == email_login
-#     assert id_token_changed is not None
-#     assert refresh_token_changed is not None
-#
-#     # Тест видалення користувача
-#     is_deleted = saver.delete_user(output, id_token_changed, False)
-#     assert is_deleted

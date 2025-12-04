@@ -8,7 +8,7 @@ import pytest
 from karatel.core.hero import HeroFactory
 from karatel.core.map import CellType, MapSize, generate_map
 from karatel.core.professions import PROFESSIONS
-from karatel.storage.abstract import FirebaseSaver, SQLiteSaver
+from karatel.storage.abstract import FirebaseSaver
 from karatel.ui.abstract import NoneOutput
 from karatel.utils.settings import MAX_LEVEL, MIN_LEVEL
 
@@ -17,7 +17,6 @@ if TYPE_CHECKING:
     from karatel.core.map import Cell
 
 output = NoneOutput()
-# saver = SQLiteSaver()
 saver = FirebaseSaver()
 
 USERNAME = "test_user"
@@ -139,26 +138,3 @@ def test_heroes_equal_without_map(level, profession):
 
     assert heroes_are_equal
     assert maps_are_equal
-
-
-# @pytest.mark.parametrize("level", list(range(MIN_LEVEL, MAX_LEVEL + 1)))
-# @pytest.mark.parametrize("profession", list(PROFESSIONS.keys()))
-# def test_maps_equal(level, profession):
-#     """Тест рівності героїв та мап"""
-#
-#     USERNAME = "test_user"
-#     HERO_ID = 1
-#
-#     hero_a = HeroFactory.generate(output, level, profession)
-#     map_a = generate_map(hero_a)
-#     saver.save_hero(hero_a, map_a, USERNAME, False)
-#
-#     hero_b, map_b = saver.load_hero(output, USERNAME, HERO_ID, False)
-#     saver.delete_hero(output, USERNAME, HERO_ID)
-#
-#     heroes_are_equal = heroes_equal(hero_a, hero_b)
-#     maps_are_equal, deep = maps_equal(map_a, map_b, 0)
-#
-#     assert heroes_are_equal
-#     assert maps_are_equal
-#     assert deep == MapSize.X * MapSize.Y
