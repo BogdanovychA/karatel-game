@@ -149,7 +149,7 @@ class FirebaseSaver(StorageManager):
             )
         except requests.HTTPError as e:
             error = e.response.json()
-            output.write("Помилка реєстрації:", error["error"]["message"], log=log)
+            output.write(f"Помилка реєстрації: {error['error']['message']}", log=log)
             return False, None, None, None, None
 
     def validate_user(
@@ -166,7 +166,7 @@ class FirebaseSaver(StorageManager):
             )
         except requests.HTTPError as e:
             error = e.response.json()
-            output.write("Помилка авторизації:", error["error"]["message"], log=log)
+            output.write(f"Помилка авторизації: {{error['error']['message']}}", log=log)
             return False, None, None, None, None
 
     def delete_user(
@@ -184,7 +184,7 @@ class FirebaseSaver(StorageManager):
         except requests.HTTPError as e:
             error = e.response.json()
             output.write(
-                f"Помилка видалення користувача: {error["error"]["message"]}", log=log
+                f"Помилка видалення користувача: {error['error']['message']}", log=log
             )
             return False
 
@@ -204,7 +204,7 @@ class FirebaseSaver(StorageManager):
             )
         except requests.HTTPError as e:
             error = e.response.json()
-            output.write(f"Помилка зміни пароля: {error["error"]["message"]}", log=log)
+            output.write(f"Помилка зміни пароля: {error['error']['message']}", log=log)
             return False, None, None, None, None
 
     @staticmethod
