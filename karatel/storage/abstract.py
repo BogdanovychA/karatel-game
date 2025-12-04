@@ -91,18 +91,6 @@ class StorageManager(ABC):
         """Оновлення пароля користувача через 'відкритий простір'"""
         pass
 
-    @abstractmethod
-    def update_username(
-        self,
-        output: OutputSpace,
-        user_id: int,
-        new_username: str,
-        old_username: str,
-        log: bool,
-    ) -> bool:
-        """Оновлення імені користувача через 'відкритий простір'"""
-        pass
-
     @staticmethod
     @abstractmethod
     def check_username(output: OutputSpace, username: str, log: bool) -> bool:
@@ -125,9 +113,6 @@ class StorageManager(ABC):
 
 class FirebaseSaver(StorageManager):
     """Робота з Firebase"""
-
-    def __init__(self):
-        pass
 
     def list_hero(self, output: OutputSpace, username: str) -> list:
         return firebase_manager.fetch_heroes(username)
@@ -190,7 +175,7 @@ class FirebaseSaver(StorageManager):
         try:
             firebase_manager.delete_all_heroes(uid=username)
         except Exception as e:
-            output.write("Помилка видалення даних користувача:", str(e), log=log)
+            output.write(f"Помилка видалення даних користувача: {e}", log=log)
             return False
 
         try:
@@ -221,10 +206,6 @@ class FirebaseSaver(StorageManager):
             error = e.response.json()
             output.write("Помилка зміни пароля:", error["error"]["message"], log=log)
             return False, None, None, None, None
-
-    def update_username(self, **kwargs):
-        """Неможливо змінити ім'я користувача у Firebase Auth"""
-        pass
 
     @staticmethod
     def check_username(output: OutputSpace, username: str, log: bool) -> bool:
