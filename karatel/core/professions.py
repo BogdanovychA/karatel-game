@@ -12,7 +12,7 @@ if TYPE_CHECKING:
     from karatel.ui.abstract import OutputSpace
 
 
-@dataclass
+@dataclass(frozen=True)
 class Profession:
     """Клас професій"""
 
