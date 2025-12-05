@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
 
-from datetime import datetime
 from typing import Any
 
-from fastapi import FastAPI, HTTPException, Query, Request
-from fastapi.responses import FileResponse, JSONResponse
+from fastapi import FastAPI, HTTPException, Query
+from fastapi.responses import FileResponse
 
+from karatel.api.handlers import add_handlers
 from karatel.api.schemas import ProfessionSchema, ShieldSchema, WeaponSchema
 from karatel.core.hero import HeroFactory
 from karatel.core.items import (
@@ -27,17 +27,7 @@ app = FastAPI(
     docs_url="/docs",
 )
 
-
-@app.exception_handler(404)
-async def handler(request: Request, exception: HTTPException):
-    return JSONResponse(
-        status_code=exception.status_code,
-        content={
-            "detail": exception.detail,
-            "timestamp": datetime.now().isoformat(),
-            "status": "failure",
-        },
-    )
+add_handlers(app)  # Додаємо обробники помилок
 
 
 @app.get("/")
