@@ -11,7 +11,7 @@ app = FastAPI(
     root_path="/api",
     openapi_url="/openapi.json",
     docs_url="/docs",
-    swagger_ui_parameters={"favicon": "/favicon.ico"},
+    swagger_ui_parameters={"favicon": "/api/favicon.ico"},
 )
 
 # Підключаємо маршрути
