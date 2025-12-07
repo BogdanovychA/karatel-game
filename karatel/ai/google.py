@@ -3,13 +3,16 @@
 from google import genai
 from google.genai import types
 
-from karatel.ai.config import GOOGLE_TOKEN
+from karatel.ai.config import GOOGLE_API_VERSION, GOOGLE_TOKEN, GOOGLE_URL
 
 
 class Gemini:
 
     def __init__(self) -> None:
-        self.client = genai.Client(api_key=GOOGLE_TOKEN)
+        self.options = types.HttpOptions(
+            base_url=GOOGLE_URL, api_version=GOOGLE_API_VERSION
+        )
+        self.client = genai.Client(api_key=GOOGLE_TOKEN, http_options=self.options)
 
     async def request(self, prompt: str, message: str) -> str | None:
         """Відправка промпта та тексту, отримання відповіді (асинхронно)"""
