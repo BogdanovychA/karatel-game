@@ -1,9 +1,13 @@
 # -*- coding: utf-8 -*-
 from __future__ import annotations
 
+import os
 import random
 import string
+from io import BytesIO
 from typing import TYPE_CHECKING
+
+from PIL import Image
 
 if TYPE_CHECKING:
     from karatel.core.items import Item
@@ -58,3 +62,23 @@ def generate_random_prefix(length=5):
     """Генерує випадковий рядок з маленьких латинських літер
     заданої довжини."""
     return ''.join(random.choice(string.ascii_lowercase) for _ in range(length))
+
+
+def save_image(image_bytes: bytes, path_dir: str) -> str:
+    """Збереження зображення з байтів у файл"""
+
+    if not image_bytes:
+        raise ValueError("Порожні байти зображення")
+
+    try:
+        image = Image.open(BytesIO(image_bytes))
+        image = image.convert("RGB")
+        os.makedirs(path_dir, exist_ok=True)
+        image_name = f"image_{generate_random_prefix(5)}.jpg"
+        full_path = os.path.join(path_dir, image_name)
+        image.save(full_path, format="JPEG", quality=95)
+
+        return full_path
+
+    except Exception as e:
+        raise ValueError(f"Не вдалося зберегти зображення: {e}")
