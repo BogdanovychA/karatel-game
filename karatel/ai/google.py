@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 
+import time
+
 from google import genai
 from google.genai import types
 
@@ -59,7 +61,7 @@ class Gemini:
     def create_image(self, prompt: str) -> bytes:
         config = types.GenerateContentConfig(safety_settings=safety_settings)
         response = self.client.models.generate_content(
-            model=IMAGE_MODEL, contents=[prompt], config=config
+            model=IMAGE_MODEL, contents=prompt, config=config
         )
 
         if not response.candidates:
@@ -78,6 +80,36 @@ class Gemini:
                 return part.inline_data.data
 
         raise RuntimeError("Відповідь від ШІ не містить зображення.")
+
+    def create_video(self, prompt: str):
+        config = types.GenerateVideosConfig(aspect_ratio="16:9", number_of_videos=1)
+        operation = self.client.models.generate_videos(
+            model=VIDEO_MODEL, prompt=prompt, config=config
+        )
+
+        timeout = 300  # 5 хвилин
+        start_time = time.time()
+
+        # Чекаємо завершення генерації
+        while not operation.done:
+            if time.time() - start_time > timeout:
+                raise TimeoutError(
+                    f"Очікування генерації відео перевищило {timeout} секунд."
+                )
+            time.sleep(5)
+            operation = self.client.operations.get(operation)
+
+        if not getattr(operation, "response", None):
+            raise RuntimeError("Відео не згенеровано: порожня відповідь від моделі.")
+
+        if not getattr(operation.response, "generated_videos", None):
+            raise RuntimeError("Відео не згенеровано: список порожній.")
+
+        video = operation.response.generated_videos[0]
+
+        # Проміжний результат. Треба допрацювати логіку збереження відео
+
+        return video
 
 
 ## Синхронний варіант втратив актуальність
