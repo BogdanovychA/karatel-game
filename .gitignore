@@ -7,6 +7,8 @@ venv*/
 karatel/manual_tests/
 karatel/saves/*
 !karatel/saves/.gitkeep
+karatel/temp/*
+!karatel/temp/.temp
 karatel/storage/postgresql_config.py
 karatel/storage/karatel-game-firebase-admin_sdk.json
 karatel/auth/config.py
