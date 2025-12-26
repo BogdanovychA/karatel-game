@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 
+import random
+
 from karatel.utils.constants import PRIMES
 
 
@@ -8,6 +10,8 @@ def arithmetic_sequence(start: int, step: int, length: int) -> tuple[int, ...]:
     """Арифметична послідовність"""
     if length <= 0:
         raise ValueError("length має бути > 0")
+    if step == 0:
+        raise ValueError("step не може = 0")
     return tuple(start + i * step for i in range(length))
 
 
@@ -42,10 +46,10 @@ def power_sequence(base: int, power: int, length: int) -> tuple[int, ...]:
     """Послідовність степенів числа"""
     if length <= 0:
         raise ValueError("length має бути > 0")
-    if power <= 0:
-        raise ValueError("power має бути > 0")
     if base <= 1:
         raise ValueError("base має бути > 1")
+    if power <= 0:
+        raise ValueError("power має бути > 0")
     return tuple(base ** (power * i) for i in range(1, length + 1))
 
 
@@ -96,25 +100,75 @@ def fibonacci_sequence(start_index: int, length: int) -> tuple[int, ...]:
 
 if __name__ == "__main__":
     _LENGTH = 10
-    print(f"{arithmetic_sequence.__doc__}:", arithmetic_sequence(2, 3, _LENGTH))
-    print(f"{arithmetic_sequence.__doc__}:", arithmetic_sequence(2, -3, 10))
     print(
-        f"{arithmetic_plus_sequence.__doc__}:",
-        arithmetic_plus_sequence(2, 3, 1, _LENGTH),
+        f"{arithmetic_sequence.__doc__}:",
+        arithmetic_sequence(random.randint(-100, 100), random.randint(1, 10), _LENGTH),
+    )
+    print(
+        f"{arithmetic_sequence.__doc__} (від'ємний крок):",
+        arithmetic_sequence(
+            random.randint(-100, 100), random.randint(-10, -1), _LENGTH
+        ),
     )
     print(
         f"{arithmetic_plus_sequence.__doc__}:",
-        arithmetic_plus_sequence(2, 3, -1, _LENGTH),
+        arithmetic_plus_sequence(
+            random.randint(1, 100), random.randint(1, 10), random.randint(1, 5), _LENGTH
+        ),
     )
     print(
-        f"{arithmetic_plus_sequence.__doc__}:",
-        arithmetic_plus_sequence(2, -3, 1, _LENGTH),
+        f"{arithmetic_plus_sequence.__doc__} (зменшення кроку):",
+        arithmetic_plus_sequence(
+            random.randint(1, 100),
+            random.randint(1, 10),
+            random.randint(-5, -1),
+            _LENGTH,
+        ),
     )
     print(
-        f"{arithmetic_plus_sequence.__doc__}:",
-        arithmetic_plus_sequence(2, -3, -1, _LENGTH),
+        f"{arithmetic_plus_sequence.__doc__} (від'ємний крок):",
+        arithmetic_plus_sequence(
+            random.randint(1, 100),
+            random.randint(-10, -1),
+            random.randint(1, 5),
+            _LENGTH,
+        ),
     )
-    print(f"{geometric_sequence.__doc__}:", geometric_sequence(1, 3, _LENGTH))
-    print(f"{power_sequence.__doc__}:", power_sequence(2, 3, _LENGTH))
-    print(f"{fibonacci_sequence.__doc__}:", fibonacci_sequence(0, _LENGTH))
-    print(f"{primes_sequence.__doc__}:", primes_sequence(90, _LENGTH))
+    print(
+        f"{arithmetic_plus_sequence.__doc__} (від'ємний крок, зменшення кроку):",
+        arithmetic_plus_sequence(
+            random.randint(1, 100),
+            random.randint(-10, -1),
+            random.randint(-5, -1),
+            _LENGTH,
+        ),
+    )
+    print(
+        f"{geometric_sequence.__doc__}:",
+        geometric_sequence(random.randint(1, 9), random.randint(2, 9), _LENGTH),
+    )
+    print(
+        f"{geometric_sequence.__doc__} (інверсія):",
+        geometric_sequence(random.randint(1, 9), random.randint(2, 9), _LENGTH)[::-1],
+    )
+    print(
+        f"{geometric_sequence.__doc__} (зміна знаку):",
+        geometric_sequence(random.randint(1, 9), random.randint(-9, -2), _LENGTH),
+    )
+    print(
+        f"{geometric_sequence.__doc__} (зміна знаку, інверсія):",
+        geometric_sequence(random.randint(1, 9), random.randint(-9, -2), _LENGTH)[::-1],
+    )
+    print(
+        f"{power_sequence.__doc__}:",
+        power_sequence(random.randint(2, 3), random.randint(1, 3), _LENGTH),
+    )
+
+    print(
+        f"{fibonacci_sequence.__doc__}:",
+        fibonacci_sequence(random.randint(0, 10), _LENGTH),
+    )
+    print(
+        f"{primes_sequence.__doc__}:",
+        primes_sequence(random.randint(0, len(PRIMES) - _LENGTH), _LENGTH),
+    )
