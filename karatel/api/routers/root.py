@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 
 from typing import Any
-from fastapi.responses import FileResponse
-from fastapi import APIRouter, Request
 
+from fastapi import APIRouter, Request
+from fastapi.responses import FileResponse
 
 router = APIRouter()
 
