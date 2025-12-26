@@ -169,6 +169,14 @@ if __name__ == "__main__":
         fibonacci_sequence(random.randint(0, 10), _LENGTH),
     )
     print(
+        f"{fibonacci_sequence.__doc__} (інверсія):",
+        fibonacci_sequence(random.randint(0, 10), _LENGTH)[::-1],
+    )
+    print(
         f"{primes_sequence.__doc__}:",
         primes_sequence(random.randint(0, len(PRIMES) - _LENGTH), _LENGTH),
+    )
+    print(
+        f"{primes_sequence.__doc__} (інверсія):",
+        primes_sequence(random.randint(0, len(PRIMES) - _LENGTH), _LENGTH)[::-1],
     )
