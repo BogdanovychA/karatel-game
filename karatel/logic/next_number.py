@@ -2,7 +2,7 @@
 
 import random
 
-from karatel.utils.constants import PRIMES
+from karatel.utils.constants import PRIMES, Difficulty
 
 
 # Easy
@@ -98,115 +98,90 @@ def fibonacci_sequence(start_index: int, length: int) -> tuple[int, ...]:
     return tuple(sequence)
 
 
-LENGTH = 10
-
-
-def get_easy_game(random_game: bool = True) -> tuple:
-    """Генерує кортеж для виклику гри:
-    функція, яка генерує послідовність,
+def get_game(
+    length: int,
+    difficulty: Difficulty = Difficulty.RANDOM,
+    random_game: bool = True,
+) -> tuple | tuple[tuple, ...]:
+    """Фабрика функцій.
+    Створює кортеж для виклику гри (враховуючи рівень складності):
+    функція, яка створює послідовність,
     аргументи для цієї функції,
-    крок для зрізу (прямий (1) чи інверсія(-1))
-    опис послідовності
+    крок для зрізу (прямий (1) чи зворотній (-1))
+    опис послідовності.
+    Якщо random_game = False, створює кортеж кортежів.
     """
 
-    games = (
+    easy: tuple = (
         (
             arithmetic_sequence,
-            (random.randint(-100, 100), random.randint(1, 10), LENGTH),
+            (random.randint(-100, 100), random.randint(1, 10), length),
             1,
             "Арифметична послідовність",
         ),
         (
             arithmetic_sequence,
-            (random.randint(-100, 100), random.randint(-10, -1), LENGTH),
+            (random.randint(-100, 100), random.randint(-10, -1), length),
             1,
             "Арифметична послідовність (від'ємний крок)",
         ),
         (
             power_sequence,
-            (random.randint(2, 3), random.randint(1, 3), LENGTH),
+            (random.randint(2, 3), random.randint(1, 3), length),
             1,
             "Послідовність степенів",
         ),
         (
             geometric_sequence,
-            (random.randint(1, 9), random.randint(2, 9), LENGTH),
+            (random.randint(1, 9), random.randint(2, 9), length),
             1,
             "Геометрична послідовність",
         ),
         (
             primes_sequence,
-            (random.randint(0, len(PRIMES) - LENGTH), LENGTH),
+            (random.randint(0, len(PRIMES) - length), length),
             1,
             "Послідовність простих чисел",
         ),
     )
 
-    if random_game:
-        return random.choice(games)
-    else:
-        return games
-
-
-def get_medium_game(random_game: bool = True) -> tuple:
-    """Генерує кортеж для виклику гри:
-    функція, яка генерує послідовність,
-    аргументи для цієї функції,
-    крок для зрізу (прямий (1) чи інверсія(-1))
-    опис послідовності
-    """
-
-    games = (
+    medium: tuple = (
         (
             geometric_sequence,
-            (random.randint(1, 9), random.randint(2, 9), LENGTH),
+            (random.randint(1, 9), random.randint(2, 9), length),
             -1,
             "Геометрична послідовність (інверсія)",
         ),
         (
             geometric_sequence,
-            (random.randint(1, 9), random.randint(-9, -2), LENGTH),
+            (random.randint(1, 9), random.randint(-9, -2), length),
             1,
             "Геометрична послідовність (зміна знаку)",
         ),
         (
             primes_sequence,
-            (random.randint(0, len(PRIMES) - LENGTH), LENGTH),
+            (random.randint(0, len(PRIMES) - length), length),
             -1,
             "Послідовність простих чисел (інверсія)",
         ),
         (
             fibonacci_sequence,
-            (random.randint(0, 10), LENGTH),
+            (random.randint(0, 10), length),
             1,
             "Послідовність Фібоначчі",
         ),
     )
 
-    if random_game:
-        return random.choice(games)
-    else:
-        return games
-
-
-def get_hard_game(random_game: bool = True) -> tuple:
-    """Генерує кортеж для виклику гри:
-    функція, яка генерує послідовність,
-    аргументи для цієї функції,
-    крок для зрізу (прямий (1) чи інверсія(-1))
-    опис послідовності
-    """
-
-    games = (
+    hard: tuple = (
         (
             geometric_sequence,
-            (random.randint(1, 9), random.randint(-9, -2), LENGTH),
+            (random.randint(1, 9), random.randint(-9, -2), length),
             -1,
             "Геометрична послідовність (зміна знаку, інверсія)",
         ),
         (
             fibonacci_sequence,
-            (random.randint(0, 10), LENGTH),
+            (random.randint(0, 10), length),
             -1,
             "Послідовність Фібоначчі (інверсія)",
         ),
@@ -216,7 +191,7 @@ def get_hard_game(random_game: bool = True) -> tuple:
                 random.randint(1, 100),
                 random.randint(1, 10),
                 random.randint(1, 5),
-                LENGTH,
+                length,
             ),
             1,
             "Арифметична послідовність зі збільшенням кроку",
@@ -227,7 +202,7 @@ def get_hard_game(random_game: bool = True) -> tuple:
                 random.randint(1, 100),
                 random.randint(1, 10),
                 random.randint(-5, -1),
-                LENGTH,
+                length,
             ),
             1,
             "Арифметична послідовність зі зменшенням кроку",
@@ -238,7 +213,7 @@ def get_hard_game(random_game: bool = True) -> tuple:
                 random.randint(1, 100),
                 random.randint(-10, -1),
                 random.randint(1, 5),
-                LENGTH,
+                length,
             ),
             1,
             "Арифметична послідовність зі збільшенням кроку (від'ємний крок)",
@@ -249,32 +224,76 @@ def get_hard_game(random_game: bool = True) -> tuple:
                 random.randint(1, 100),
                 random.randint(-10, -1),
                 random.randint(-5, -1),
-                LENGTH,
+                length,
             ),
             1,
             "Арифметична послідовність зі зменшенням кроку (від'ємний крок)",
         ),
     )
 
+    the_tuple = None
+
+    match difficulty:
+        case Difficulty.EASY:
+            the_tuple = easy
+        case Difficulty.MEDIUM:
+            the_tuple = medium
+        case Difficulty.HARD:
+            the_tuple = hard
+        case Difficulty.ALL:
+            the_tuple = easy + medium + hard
+        case Difficulty.RANDOM | _:
+            the_tuple = random.choice((easy, medium, hard))
+
     if random_game:
-        return (random.choice(games),)
+        return random.choice(the_tuple)
     else:
-        return games
+        return the_tuple
+
+
+def get_sequence(
+    length: int, difficulty: Difficulty = Difficulty.RANDOM, random_game: bool = True
+) -> tuple | tuple[tuple, ...]:
+    """Використовує фабрику функцій, створює послідовність та повертає
+    кортеж з неї та опису.
+    Якщо random_game = False, повертає кортеж кортежів"""
+
+    game_config = get_game(length, difficulty, random_game)
+
+    if random_game:
+        func, args, step, text = game_config
+        sequence = func(*args)[::step]
+        return sequence, text
+    else:
+        list_sequence = [
+            (func(*args)[::step], text) for func, args, step, text in game_config
+        ]
+        return tuple(list_sequence)
 
 
 if __name__ == "__main__":
 
+    _LENGTH = 6
+
     print("EASY")
-    for func, args, step, text in get_easy_game(False):
-        print(text, func(*args)[::step])
+    print(get_sequence(_LENGTH, Difficulty.EASY, False))
     print("-" * 20)
 
     print("MEDIUM")
-    for func, args, step, text in get_medium_game(False):
-        print(text, func(*args)[::step])
+    print(get_sequence(_LENGTH, Difficulty.MEDIUM, False))
     print("-" * 20)
 
     print("HARD")
-    for func, args, step, text in get_hard_game(False):
-        print(text, func(*args)[::step])
+    print(get_sequence(_LENGTH, Difficulty.HARD, False))
+    print("-" * 20)
+
+    print("ALL")
+    print(get_sequence(_LENGTH, Difficulty.ALL, False))
+    print("-" * 20)
+
+    print("RANDOM")
+    print("EASY: ", get_sequence(_LENGTH, Difficulty.EASY))
+    print("MEDIUM: ", get_sequence(_LENGTH, Difficulty.MEDIUM))
+    print("HARD: ", get_sequence(_LENGTH, Difficulty.HARD))
+    print("RANDOM: ", get_sequence(_LENGTH, Difficulty.RANDOM))
     print("-" * 20)

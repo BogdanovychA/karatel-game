@@ -2,6 +2,14 @@
 from enum import Enum
 
 
+class Difficulty(Enum):
+    EASY = "легко"
+    MEDIUM = "середньо"
+    HARD = "складно"
+    RANDOM = "random"
+    ALL = "all"
+
+
 class Sex(Enum):
     """Enum-клас для зберігання статі"""
 
