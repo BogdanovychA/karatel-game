@@ -98,85 +98,165 @@ def fibonacci_sequence(start_index: int, length: int) -> tuple[int, ...]:
     return tuple(sequence)
 
 
-if __name__ == "__main__":
-    _LENGTH = 10
-    print(
-        f"{arithmetic_sequence.__doc__}:",
-        arithmetic_sequence(random.randint(-100, 100), random.randint(1, 10), _LENGTH),
-    )
-    print(
-        f"{arithmetic_sequence.__doc__} (від'ємний крок):",
-        arithmetic_sequence(
-            random.randint(-100, 100), random.randint(-10, -1), _LENGTH
+LENGTH = 10
+
+
+def get_easy_game(random_game: bool = True) -> tuple:
+
+    games = (
+        (
+            arithmetic_sequence,
+            (random.randint(-100, 100), random.randint(1, 10), LENGTH),
+            1,
+            "Арифметична послідовність",
         ),
-    )
-    print(
-        f"{arithmetic_plus_sequence.__doc__}:",
-        arithmetic_plus_sequence(
-            random.randint(1, 100), random.randint(1, 10), random.randint(1, 5), _LENGTH
+        (
+            arithmetic_sequence,
+            (random.randint(-100, 100), random.randint(-10, -1), LENGTH),
+            1,
+            "Арифметична послідовність (від'ємний крок)",
         ),
-    )
-    print(
-        f"{arithmetic_plus_sequence.__doc__} (зменшення кроку):",
-        arithmetic_plus_sequence(
-            random.randint(1, 100),
-            random.randint(1, 10),
-            random.randint(-5, -1),
-            _LENGTH,
+        (
+            power_sequence,
+            (random.randint(2, 3), random.randint(1, 3), LENGTH),
+            1,
+            "Послідовність степенів",
         ),
-    )
-    print(
-        f"{arithmetic_plus_sequence.__doc__} (від'ємний крок):",
-        arithmetic_plus_sequence(
-            random.randint(1, 100),
-            random.randint(-10, -1),
-            random.randint(1, 5),
-            _LENGTH,
+        (
+            geometric_sequence,
+            (random.randint(1, 9), random.randint(2, 9), LENGTH),
+            1,
+            "Геометрична послідовність",
         ),
-    )
-    print(
-        f"{arithmetic_plus_sequence.__doc__} (від'ємний крок, зменшення кроку):",
-        arithmetic_plus_sequence(
-            random.randint(1, 100),
-            random.randint(-10, -1),
-            random.randint(-5, -1),
-            _LENGTH,
+        (
+            primes_sequence,
+            (random.randint(0, len(PRIMES) - LENGTH), LENGTH),
+            1,
+            "Послідовність простих чисел",
         ),
-    )
-    print(
-        f"{geometric_sequence.__doc__}:",
-        geometric_sequence(random.randint(1, 9), random.randint(2, 9), _LENGTH),
-    )
-    print(
-        f"{geometric_sequence.__doc__} (інверсія):",
-        geometric_sequence(random.randint(1, 9), random.randint(2, 9), _LENGTH)[::-1],
-    )
-    print(
-        f"{geometric_sequence.__doc__} (зміна знаку):",
-        geometric_sequence(random.randint(1, 9), random.randint(-9, -2), _LENGTH),
-    )
-    print(
-        f"{geometric_sequence.__doc__} (зміна знаку, інверсія):",
-        geometric_sequence(random.randint(1, 9), random.randint(-9, -2), _LENGTH)[::-1],
-    )
-    print(
-        f"{power_sequence.__doc__}:",
-        power_sequence(random.randint(2, 3), random.randint(1, 3), _LENGTH),
     )
 
-    print(
-        f"{fibonacci_sequence.__doc__}:",
-        fibonacci_sequence(random.randint(0, 10), _LENGTH),
+    if random_game:
+        return random.choice(games)
+    else:
+        return games
+
+
+def get_medium_game(random_game: bool = True) -> tuple:
+
+    games = (
+        (
+            geometric_sequence,
+            (random.randint(1, 9), random.randint(2, 9), LENGTH),
+            -1,
+            "Геометрична послідовність (інверсія)",
+        ),
+        (
+            geometric_sequence,
+            (random.randint(1, 9), random.randint(-9, -2), LENGTH),
+            1,
+            "Геометрична послідовність (зміна знаку)",
+        ),
+        (
+            primes_sequence,
+            (random.randint(0, len(PRIMES) - LENGTH), LENGTH),
+            -1,
+            "Послідовність простих чисел (інверсія)",
+        ),
+        (
+            fibonacci_sequence,
+            (random.randint(0, 10), LENGTH),
+            1,
+            "Послідовність Фібоначчі",
+        ),
     )
-    print(
-        f"{fibonacci_sequence.__doc__} (інверсія):",
-        fibonacci_sequence(random.randint(0, 10), _LENGTH)[::-1],
+
+    if random_game:
+        return random.choice(games)
+    else:
+        return games
+
+
+def get_hard_game(random_game: bool = True) -> tuple:
+
+    games = (
+        (
+            geometric_sequence,
+            (random.randint(1, 9), random.randint(-9, -2), LENGTH),
+            -1,
+            "Геометрична послідовність (зміна знаку, інверсія)",
+        ),
+        (
+            fibonacci_sequence,
+            (random.randint(0, 10), LENGTH),
+            -1,
+            "Послідовність Фібоначчі (інверсія)",
+        ),
+        (
+            arithmetic_plus_sequence,
+            (
+                random.randint(1, 100),
+                random.randint(1, 10),
+                random.randint(1, 5),
+                LENGTH,
+            ),
+            1,
+            "Арифметична послідовність зі збільшенням кроку",
+        ),
+        (
+            arithmetic_plus_sequence,
+            (
+                random.randint(1, 100),
+                random.randint(1, 10),
+                random.randint(-5, -1),
+                LENGTH,
+            ),
+            1,
+            "Арифметична послідовність зі зменшенням кроку",
+        ),
+        (
+            arithmetic_plus_sequence,
+            (
+                random.randint(1, 100),
+                random.randint(-10, -1),
+                random.randint(1, 5),
+                LENGTH,
+            ),
+            1,
+            "Арифметична послідовність зі збільшенням кроку (від'ємний крок)",
+        ),
+        (
+            arithmetic_plus_sequence,
+            (
+                random.randint(1, 100),
+                random.randint(-10, -1),
+                random.randint(-5, -1),
+                LENGTH,
+            ),
+            1,
+            "Арифметична послідовність зі зменшенням кроку (від'ємний крок)",
+        ),
     )
-    print(
-        f"{primes_sequence.__doc__}:",
-        primes_sequence(random.randint(0, len(PRIMES) - _LENGTH), _LENGTH),
-    )
-    print(
-        f"{primes_sequence.__doc__} (інверсія):",
-        primes_sequence(random.randint(0, len(PRIMES) - _LENGTH), _LENGTH)[::-1],
-    )
+
+    if random_game:
+        return (random.choice(games),)
+    else:
+        return games
+
+
+if __name__ == "__main__":
+
+    print("EASY")
+    for func, args, step, text in get_easy_game(False):
+        print(text, func(*args)[::step])
+    print("-" * 20)
+
+    print("MEDIUM")
+    for func, args, step, text in get_medium_game(False):
+        print(text, func(*args)[::step])
+    print("-" * 20)
+
+    print("HARD")
+    for func, args, step, text in get_hard_game(False):
+        print(text, func(*args)[::step])
+    print("-" * 20)
