@@ -5,7 +5,6 @@ import random
 from karatel.utils.constants import PRIMES, Difficulty
 
 
-# Easy
 def arithmetic_sequence(start: int, step: int, length: int) -> tuple[int, ...]:
     """Арифметична послідовність"""
     if length <= 0:
@@ -26,7 +25,6 @@ def geometric_sequence(start: int, ratio: int, length: int) -> tuple[int, ...]:
     return tuple(start * (ratio**i) for i in range(length))
 
 
-# Medium
 def arithmetic_plus_sequence(
     start: int, step: int, multiplier: int, length: int
 ) -> tuple[int, ...]:
@@ -41,7 +39,6 @@ def arithmetic_plus_sequence(
     return tuple(sequence)
 
 
-# Hard
 def power_sequence(base: int, power: int, length: int) -> tuple[int, ...]:
     """Послідовність степенів числа"""
     if length <= 0:
@@ -144,6 +141,12 @@ def get_game(
             1,  # пряма послідовність
             "Послідовність простих чисел",
         ),
+        (
+            primes_sequence,
+            (random.randint(0, len(PRIMES) - length), length),
+            -1,  # зворотня послідовність
+            "Послідовність простих чисел (інверсія)",
+        ),
     )
 
     medium: tuple = (
@@ -160,12 +163,6 @@ def get_game(
             "Геометрична послідовність (зміна знаку)",
         ),
         (
-            primes_sequence,
-            (random.randint(0, len(PRIMES) - length), length),
-            -1,  # зворотня послідовність
-            "Послідовність простих чисел (інверсія)",
-        ),
-        (
             fibonacci_sequence,
             (random.randint(0, 10), length),
             1,  # пряма послідовність
@@ -179,12 +176,6 @@ def get_game(
             (random.randint(1, 9), random.randint(-9, -2), length),
             -1,  # зворотня послідовність
             "Геометрична послідовність (зміна знаку, інверсія)",
-        ),
-        (
-            fibonacci_sequence,
-            (random.randint(0, 10), length),
-            -1,  # зворотня послідовність
-            "Послідовність Фібоначчі (інверсія)",
         ),
         (
             arithmetic_plus_sequence,
@@ -232,6 +223,15 @@ def get_game(
         ),
     )
 
+    expert: tuple = (
+        (
+            fibonacci_sequence,
+            (random.randint(0, 10), length),
+            -1,  # зворотня послідовність
+            "Послідовність Фібоначчі (інверсія)",
+        ),
+    )
+
     the_tuple = None
 
     match difficulty:
@@ -241,10 +241,12 @@ def get_game(
             the_tuple = medium
         case Difficulty.HARD:
             the_tuple = hard
+        case Difficulty.EXPERT:
+            the_tuple = expert
         case Difficulty.ALL:
-            the_tuple = easy + medium + hard
+            the_tuple = easy + medium + hard + expert
         case Difficulty.RANDOM | _:
-            the_tuple = random.choice((easy, medium, hard))
+            the_tuple = random.choice((easy, medium, hard, expert))
 
     if random_game:
         return random.choice(the_tuple)
@@ -286,6 +288,10 @@ if __name__ == "__main__":
 
     print("HARD")
     print(get_sequence(_LENGTH, Difficulty.HARD, False))
+    print("-" * 20)
+
+    print("EXPERT")
+    print(get_sequence(_LENGTH, Difficulty.EXPERT, False))
     print("-" * 20)
 
     print("ALL")

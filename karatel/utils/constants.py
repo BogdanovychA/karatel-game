@@ -6,6 +6,7 @@ class Difficulty(Enum):
     EASY = "легко"
     MEDIUM = "середньо"
     HARD = "складно"
+    EXPERT = "дуже складно"
     RANDOM = "random"
     ALL = "all"
 
