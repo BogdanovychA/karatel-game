@@ -116,31 +116,31 @@ def get_game(
         (
             arithmetic_sequence,
             (random.randint(-100, 100), random.randint(1, 10), length),
-            1,
+            1,  # пряма послідовність
             "Арифметична послідовність",
         ),
         (
             arithmetic_sequence,
             (random.randint(-100, 100), random.randint(-10, -1), length),
-            1,
+            1,  # пряма послідовність
             "Арифметична послідовність (від'ємний крок)",
         ),
         (
             power_sequence,
             (random.randint(2, 3), random.randint(1, 3), length),
-            1,
+            1,  # пряма послідовність
             "Послідовність степенів",
         ),
         (
             geometric_sequence,
             (random.randint(1, 9), random.randint(2, 9), length),
-            1,
-            "Геометрична послідовність",
+            1,  # пряма послідовність
+            "Геометрична послідовність (пряма)",
         ),
         (
             primes_sequence,
             (random.randint(0, len(PRIMES) - length), length),
-            1,
+            1,  # пряма послідовність
             "Послідовність простих чисел",
         ),
     )
@@ -149,25 +149,25 @@ def get_game(
         (
             geometric_sequence,
             (random.randint(1, 9), random.randint(2, 9), length),
-            -1,
+            -1,  # зворотня послідовність
             "Геометрична послідовність (інверсія)",
         ),
         (
             geometric_sequence,
             (random.randint(1, 9), random.randint(-9, -2), length),
-            1,
+            1,  # пряма послідовність
             "Геометрична послідовність (зміна знаку)",
         ),
         (
             primes_sequence,
             (random.randint(0, len(PRIMES) - length), length),
-            -1,
+            -1,  # зворотня послідовність
             "Послідовність простих чисел (інверсія)",
         ),
         (
             fibonacci_sequence,
             (random.randint(0, 10), length),
-            1,
+            1,  # пряма послідовність
             "Послідовність Фібоначчі",
         ),
     )
@@ -176,13 +176,13 @@ def get_game(
         (
             geometric_sequence,
             (random.randint(1, 9), random.randint(-9, -2), length),
-            -1,
+            -1,  # зворотня послідовність
             "Геометрична послідовність (зміна знаку, інверсія)",
         ),
         (
             fibonacci_sequence,
             (random.randint(0, 10), length),
-            -1,
+            -1,  # зворотня послідовність
             "Послідовність Фібоначчі (інверсія)",
         ),
         (
@@ -193,7 +193,7 @@ def get_game(
                 random.randint(1, 5),
                 length,
             ),
-            1,
+            1,  # пряма послідовність
             "Арифметична послідовність зі збільшенням кроку",
         ),
         (
@@ -204,7 +204,7 @@ def get_game(
                 random.randint(-5, -1),
                 length,
             ),
-            1,
+            1,  # пряма послідовність
             "Арифметична послідовність зі зменшенням кроку",
         ),
         (
@@ -215,7 +215,7 @@ def get_game(
                 random.randint(1, 5),
                 length,
             ),
-            1,
+            1,  # пряма послідовність
             "Арифметична послідовність зі збільшенням кроку (від'ємний крок)",
         ),
         (
@@ -226,7 +226,7 @@ def get_game(
                 random.randint(-5, -1),
                 length,
             ),
-            1,
+            1,  # пряма послідовність
             "Арифметична послідовність зі зменшенням кроку (від'ємний крок)",
         ),
     )
@@ -253,7 +253,7 @@ def get_game(
 
 def get_sequence(
     length: int, difficulty: Difficulty = Difficulty.RANDOM, random_game: bool = True
-) -> tuple | tuple[tuple, ...]:
+) -> tuple[tuple[int, ...], str] | tuple[tuple[tuple[int, ...], str], ...]:
     """Використовує фабрику функцій, створює послідовність та повертає
     кортеж з неї та опису.
     Якщо random_game = False, повертає кортеж кортежів"""
