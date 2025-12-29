@@ -19,7 +19,7 @@ def geometric_sequence(start: int, ratio: int, length: int) -> tuple[int, ...]:
     """Геометрична послідовність"""
     if length <= 0:
         raise ValueError("length має бути > 0")
-    if ratio == 0 or ratio == 1 or ratio == -1:
+    if ratio in (0, 1, -1):
         raise ValueError(f"ratio не може = {ratio}")
     if start == 0:
         raise ValueError("start не може = 0")
