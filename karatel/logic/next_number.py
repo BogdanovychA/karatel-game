@@ -80,6 +80,7 @@ def primes_sequence(start_index: int, length: int) -> tuple[int, ...]:
 
 def fibonacci_sequence(start_index: int, length: int) -> tuple[int, ...]:
     """Послідовність Фібоначчі"""
+
     if start_index < 0:
         raise ValueError("start_index має бути більше чи дорівнювати 0")
 
@@ -295,5 +296,5 @@ if __name__ == "__main__":
     print("EASY: ", get_sequence(_LENGTH, Difficulty.EASY))
     print("MEDIUM: ", get_sequence(_LENGTH, Difficulty.MEDIUM))
     print("HARD: ", get_sequence(_LENGTH, Difficulty.HARD))
-    print("RANDOM: ", get_sequence(_LENGTH, Difficulty.RANDOM))
+    print("RANDOM: ", get_sequence(_LENGTH))
     print("-" * 20)
