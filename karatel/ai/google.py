@@ -5,7 +5,7 @@ import time
 from google import genai
 from google.genai import types
 
-from karatel.ai.config import GOOGLE_API_VERSION, GOOGLE_TOKEN, GOOGLE_URL
+from karatel.ai.config import GOOGLE_TOKEN  # , GOOGLE_URL, GOOGLE_API_VERSION,
 
 IMAGE_MODEL = "gemini-2.5-flash-image"
 VIDEO_MODEL = "veo-3.0-fast-generate-001"
@@ -37,10 +37,11 @@ safety_settings = [
 class Gemini:
 
     def __init__(self) -> None:
-        self.options = types.HttpOptions(
-            base_url=GOOGLE_URL, api_version=GOOGLE_API_VERSION
-        )
-        self.client = genai.Client(api_key=GOOGLE_TOKEN, http_options=self.options)
+        self.client = genai.Client(api_key=GOOGLE_TOKEN)
+        # self.options = types.HttpOptions(
+        #     base_url=GOOGLE_URL, api_version=GOOGLE_API_VERSION
+        # )
+        # self.client = genai.Client(api_key=GOOGLE_TOKEN, http_options=self.options)
         self.PATH = "./karatel/temp/"
 
     async def request(self, prompt: str, message: str) -> str | None:
