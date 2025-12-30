@@ -3,10 +3,10 @@ from enum import Enum
 
 
 class Difficulty(Enum):
-    EASY = "легко"
-    MEDIUM = "середньо"
-    HARD = "складно"
-    EXPERT = "дуже складно"
+    EASY = "easy"
+    MEDIUM = "medium"
+    HARD = "hard"
+    EXPERT = "expert"
     RANDOM = "random"
     ALL = "all"
 

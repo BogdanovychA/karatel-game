@@ -4,7 +4,7 @@
 from fastapi import FastAPI
 
 from karatel.api.handlers import add_handlers
-from karatel.api.routers import hero, items, root
+from karatel.api.routers import hero, items, next_number, root
 
 app = FastAPI(
     title="Karatel Game API",
@@ -17,6 +17,7 @@ app = FastAPI(
 app.include_router(root.router)
 app.include_router(items.router, prefix="/items")
 app.include_router(hero.router, prefix="/hero")
+app.include_router(next_number.router, prefix="/next_number")
 
 
 # Додаємо обробники помилок
