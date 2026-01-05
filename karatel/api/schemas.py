@@ -3,7 +3,7 @@
 from enum import Enum
 from typing import Literal
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 
 class ProfessionSchema(BaseModel):
@@ -61,3 +61,24 @@ class TTTGameResult(BaseModel):
     """Для повернення результату гри в хрестики-нолики"""
 
     result: TTTResultEnum
+
+
+TTTPlayerSymbol = Literal["X", "0"]
+
+
+class TTTMoveRequest(BaseModel):
+    board: TTTGameBoard
+    max_player_symbol: TTTPlayerSymbol
+    min_player_symbol: TTTPlayerSymbol
+
+    @model_validator(mode='after')
+    def check_symbols_are_different(self):
+        if self.max_player_symbol == self.min_player_symbol:
+            raise ValueError(
+                "max_player_symbol and min_player_symbol must be different"
+            )
+        return self
+
+
+class TTTMoveResponse(BaseModel):
+    move: int
