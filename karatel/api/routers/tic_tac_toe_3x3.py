@@ -10,13 +10,13 @@ import karatel.logic.tic_tac_toe_3x3 as ttt
 from karatel.utils.constants import Emoji
 
 
-class TTTGameBoard(BaseModel):
+class GameBoard(BaseModel):
     """Схема дошки для хрестиків-ноликів"""
 
     cells: list[Literal[" ", "X", "0"]] = Field(..., min_length=9, max_length=9)
 
 
-class TTTResultEnum(str, Enum):
+class ResultEnum(str, Enum):
     """Символи для повернення результату гри в хрестики-нолики"""
 
     WIN_X = "X"
@@ -25,19 +25,19 @@ class TTTResultEnum(str, Enum):
     NONE = "none"
 
 
-class TTTGameResult(BaseModel):
+class GameResult(BaseModel):
     """Для повернення результату гри в хрестики-нолики"""
 
-    result: TTTResultEnum
+    result: ResultEnum
 
 
-TTTPlayerSymbol = Literal["X", "0"]
+PlayerSymbol = Literal["X", "0"]
 
 
-class TTTMoveRequest(BaseModel):
-    board: TTTGameBoard
-    max_player_symbol: TTTPlayerSymbol
-    min_player_symbol: TTTPlayerSymbol
+class MoveRequest(BaseModel):
+    board: GameBoard
+    max_player_symbol: PlayerSymbol
+    min_player_symbol: PlayerSymbol
 
     @model_validator(mode='after')
     def check_symbols_are_different(self):
@@ -48,7 +48,7 @@ class TTTMoveRequest(BaseModel):
         return self
 
 
-class TTTMoveResponse(BaseModel):
+class MoveResponse(BaseModel):
     move: int
 
 
@@ -59,8 +59,8 @@ def normalise_board(board_list: list[str]) -> list[str]:
     return [Emoji.EMPTY.value if cell == " " else cell for cell in board_list]
 
 
-@router.post("/check", response_model=TTTGameResult)
-def check_winner(board: TTTGameBoard):
+@router.post("/check", response_model=GameResult)
+def check_winner(board: GameBoard):
 
     board_list = board.cells
     board_list = normalise_board(board_list)
@@ -68,13 +68,13 @@ def check_winner(board: TTTGameBoard):
     result = ttt.check_winner(board_list)
 
     if result is None:
-        return TTTGameResult(result=TTTResultEnum.NONE)
+        return GameResult(result=ResultEnum.NONE)
 
-    return TTTGameResult(result=TTTResultEnum(result))
+    return GameResult(result=ResultEnum(result))
 
 
 @router.post("/move")
-def best_move(request_data: TTTMoveRequest):
+def best_move(request_data: MoveRequest):
 
     board_list = request_data.board.cells
     board_list = normalise_board(board_list)
@@ -83,4 +83,4 @@ def best_move(request_data: TTTMoveRequest):
         board_list, request_data.max_player_symbol, request_data.min_player_symbol
     )
 
-    return TTTMoveResponse(move=result)
+    return MoveResponse(move=result)
