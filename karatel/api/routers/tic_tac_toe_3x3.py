@@ -10,7 +10,8 @@ import karatel.logic.tic_tac_toe_3x3 as ttt
 from karatel.utils.constants import Emoji
 
 Board = Annotated[
-    list[Literal["none", "X", "O"]], Field(..., min_length=9, max_length=9)
+    list[Literal["none", "X", "O"]],
+    Field(..., min_length=9, max_length=9, description="Дошка з 9 елементів"),
 ]
 
 Move = Annotated[int, Field(ge=0, le=8, description="Індекс ходу (0-8)")]
@@ -32,6 +33,9 @@ class GameResult(BaseModel):
 
 
 class MoveRequest(BaseModel):
+    """Дошка та символ гравця, який максимізує.
+    Мінімізатор визначається автоматично"""
+
     board: Board
     max_player_symbol: Literal["X", "O"]
 
@@ -40,6 +44,7 @@ router = APIRouter()
 
 
 def normalise_board(board_list: list[str]) -> list[str]:
+    """Приведення дошки у формат, прийнятний для функції в іншому модулі"""
     return [
         Emoji.EMPTY.value if cell == GameSymbol.NONE.value else cell
         for cell in board_list
@@ -47,7 +52,8 @@ def normalise_board(board_list: list[str]) -> list[str]:
 
 
 @router.post("/check", response_model=GameResult)
-def check_winner(board: Board):
+def check_winner(board: Board) -> GameResult:
+    """Перевірка чи є переможець"""
 
     board_list = normalise_board(board)
 
@@ -61,9 +67,9 @@ def check_winner(board: Board):
 
 @router.post("/move", response_model=Move)
 def best_move(request_data: MoveRequest) -> int:
+    """Визначення найкращого ходу для гравця"""
 
-    board_list = request_data.board
-    board_list = normalise_board(board_list)
+    board_list = normalise_board(request_data.board)
 
     min_player_symbol = (
         GameSymbol.O.value
