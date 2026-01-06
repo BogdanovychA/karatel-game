@@ -3,11 +3,26 @@
 from typing import Any
 
 from fastapi import APIRouter
+from pydantic import BaseModel, ConfigDict
 
-from karatel.api.schemas import ProfessionSchema
 from karatel.core.hero import HeroFactory
 from karatel.core.professions import PROFESSIONS
 from karatel.ui.abstract import ConsoleOutput
+
+
+class ProfessionSchema(BaseModel):
+    """Схема для класу професій"""
+
+    name: str  # Назва (чол. рід)
+    name_fem: str  # Назва (жін. рід)
+    description: str  # Опис (чол. рід)
+    description_fem: str  # Опис (жін. рід)
+    main_bonuses: tuple[str, ...]
+    secondary_bonuses: tuple[str, ...]
+    penalties: tuple[str, ...]
+
+    model_config = ConfigDict(from_attributes=True)
+
 
 router = APIRouter()
 

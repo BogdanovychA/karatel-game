@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 
 from fastapi import APIRouter, HTTPException, Query
+from pydantic import BaseModel, ConfigDict
 
-from karatel.api.schemas import ShieldSchema, WeaponSchema
 from karatel.core.items import (
     CHARISMA_WEAPONS,
     DEXTERITY_WEAPONS,
@@ -12,6 +12,29 @@ from karatel.core.items import (
     WEAPONS,
     WeaponType,
 )
+
+
+class WeaponSchema(BaseModel):
+    """Схема для класу зброї"""
+
+    name: str
+    description: str
+    damage: str
+    stat: str
+    two_handed: bool
+
+    model_config = ConfigDict(from_attributes=True)
+
+
+class ShieldSchema(BaseModel):
+    """Схема для класу щитів"""
+
+    name: str
+    description: str
+    ac_bonus: int
+
+    model_config = ConfigDict(from_attributes=True)
+
 
 router = APIRouter()
 

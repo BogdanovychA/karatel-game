@@ -1,16 +1,56 @@
 # -*- coding: utf-8 -*-
 
+from enum import Enum
+from typing import Literal
+
 from fastapi import APIRouter
+from pydantic import BaseModel, Field, model_validator
 
 import karatel.logic.tic_tac_toe_3x3 as ttt
-from karatel.api.schemas import (
-    TTTGameBoard,
-    TTTGameResult,
-    TTTMoveRequest,
-    TTTMoveResponse,
-    TTTResultEnum,
-)
 from karatel.utils.constants import Emoji
+
+
+class TTTGameBoard(BaseModel):
+    """Схема дошки для хрестиків-ноликів"""
+
+    cells: list[Literal[" ", "X", "0"]] = Field(..., min_length=9, max_length=9)
+
+
+class TTTResultEnum(str, Enum):
+    """Символи для повернення результату гри в хрестики-нолики"""
+
+    WIN_X = "X"
+    WIN_0 = "0"
+    DRAW = "draw"
+    NONE = "none"
+
+
+class TTTGameResult(BaseModel):
+    """Для повернення результату гри в хрестики-нолики"""
+
+    result: TTTResultEnum
+
+
+TTTPlayerSymbol = Literal["X", "0"]
+
+
+class TTTMoveRequest(BaseModel):
+    board: TTTGameBoard
+    max_player_symbol: TTTPlayerSymbol
+    min_player_symbol: TTTPlayerSymbol
+
+    @model_validator(mode='after')
+    def check_symbols_are_different(self):
+        if self.max_player_symbol == self.min_player_symbol:
+            raise ValueError(
+                "max_player_symbol and min_player_symbol must be different"
+            )
+        return self
+
+
+class TTTMoveResponse(BaseModel):
+    move: int
+
 
 router = APIRouter()
 
