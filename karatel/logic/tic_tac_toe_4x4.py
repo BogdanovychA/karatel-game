@@ -141,9 +141,7 @@ def minimax(
         return best_score
 
 
-def best_move(
-    board: list, max_player_symbol: str, min_player_symbol: str
-) -> int | None:
+def best_move(board: list, max_player_symbol: str, min_player_symbol: str) -> int:
     """Вибір кращого ходу"""
     best_score = -math.inf
     move = None

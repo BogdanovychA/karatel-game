@@ -1,26 +1,26 @@
 # -*- coding: utf-8 -*-
 
 from enum import Enum
-from typing import Literal
+from typing import Annotated, Literal
 
 from fastapi import APIRouter
-from pydantic import BaseModel, Field, model_validator
+from pydantic import BaseModel, Field
 
 import karatel.logic.tic_tac_toe_3x3 as ttt
 from karatel.utils.constants import Emoji
 
+Board = Annotated[
+    list[Literal["none", "X", "O"]], Field(..., min_length=9, max_length=9)
+]
 
-class GameBoard(BaseModel):
-    """Схема дошки для хрестиків-ноликів"""
-
-    cells: list[Literal[" ", "X", "0"]] = Field(..., min_length=9, max_length=9)
+Move = Annotated[int, Field(ge=0, le=8, description="Індекс ходу (0-8)")]
 
 
-class ResultEnum(str, Enum):
-    """Символи для повернення результату гри в хрестики-нолики"""
+class GameSymbol(str, Enum):
+    """Варіанти повернення результату гри в хрестики-нолики"""
 
-    WIN_X = "X"
-    WIN_0 = "0"
+    X = "X"
+    O = "O"
     DRAW = "draw"
     NONE = "none"
 
@@ -28,59 +28,49 @@ class ResultEnum(str, Enum):
 class GameResult(BaseModel):
     """Для повернення результату гри в хрестики-нолики"""
 
-    result: ResultEnum
-
-
-PlayerSymbol = Literal["X", "0"]
+    result: GameSymbol
 
 
 class MoveRequest(BaseModel):
-    board: GameBoard
-    max_player_symbol: PlayerSymbol
-    min_player_symbol: PlayerSymbol
-
-    @model_validator(mode='after')
-    def check_symbols_are_different(self):
-        if self.max_player_symbol == self.min_player_symbol:
-            raise ValueError(
-                "max_player_symbol and min_player_symbol must be different"
-            )
-        return self
-
-
-class MoveResponse(BaseModel):
-    move: int
+    board: Board
+    max_player_symbol: Literal["X", "O"]
 
 
 router = APIRouter()
 
 
 def normalise_board(board_list: list[str]) -> list[str]:
-    return [Emoji.EMPTY.value if cell == " " else cell for cell in board_list]
+    return [
+        Emoji.EMPTY.value if cell == GameSymbol.NONE.value else cell
+        for cell in board_list
+    ]
 
 
 @router.post("/check", response_model=GameResult)
-def check_winner(board: GameBoard):
+def check_winner(board: Board):
 
-    board_list = board.cells
-    board_list = normalise_board(board_list)
+    board_list = normalise_board(board)
 
     result = ttt.check_winner(board_list)
 
     if result is None:
-        return GameResult(result=ResultEnum.NONE)
+        return GameResult(result=GameSymbol.NONE)
 
-    return GameResult(result=ResultEnum(result))
+    return GameResult(result=GameSymbol(result))
 
 
-@router.post("/move")
-def best_move(request_data: MoveRequest):
+@router.post("/move", response_model=Move)
+def best_move(request_data: MoveRequest) -> int:
 
-    board_list = request_data.board.cells
+    board_list = request_data.board
     board_list = normalise_board(board_list)
 
-    result = ttt.best_move(
-        board_list, request_data.max_player_symbol, request_data.min_player_symbol
+    min_player_symbol = (
+        GameSymbol.O.value
+        if request_data.max_player_symbol == GameSymbol.X.value
+        else GameSymbol.X.value
     )
 
-    return MoveResponse(move=result)
+    move = ttt.best_move(board_list, request_data.max_player_symbol, min_player_symbol)
+
+    return move
