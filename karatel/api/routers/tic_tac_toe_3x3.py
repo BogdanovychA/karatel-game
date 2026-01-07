@@ -61,8 +61,10 @@ def check_winner(board: Board) -> GameResult:
 
     if result is None:
         return GameResult(result=GameSymbol.NONE)
-
-    return GameResult(result=GameSymbol(result))
+    elif result == ttt.TTT.DRAW.value:
+        return GameResult(result=GameSymbol.DRAW)
+    else:
+        return GameResult(result=GameSymbol(result))
 
 
 @router.post("/move", response_model=Move)
