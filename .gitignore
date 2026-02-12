@@ -1,9 +1,22 @@
+# IDEs
 .idea/
 .vscode/
+# Virtual environments
 .venv*/
 venv*/
+# Python-generated files
 **/__pycache__/
 **/*.pyc
+*.py[oc]
+dist/
+wheels/
+*.egg-info
+build*/
+# Tests
+htmlcov/
+.pytest_cache/
+.coverage
+# Project
 karatel/manual_tests/
 karatel/saves/*
 !karatel/saves/.gitkeep
@@ -13,7 +26,3 @@ karatel/storage/postgresql_config.py
 karatel/storage/karatel-game-firebase-admin_sdk.json
 karatel/auth/config.py
 karatel/ai/config.py
-htmlcov/
-.pytest_cache/
-.coverage
-*.egg-info/
