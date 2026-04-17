@@ -16,16 +16,7 @@ build*/
 htmlcov/
 .pytest_cache/
 .coverage
-#
-**/*.tmp
-# Clouds
-**/.stfolder/
-**/.stversions/
-**/.stignore
-**/.syncthing.*.tmp
-**/~syncthing~*.tmp
-**/*sync-conflict*
-**/*conflicted*
+
 # Project
 karatel/manual_tests/
 karatel/saves/*
@@ -36,3 +27,14 @@ karatel/storage/postgresql_config.py
 karatel/storage/karatel-game-firebase-admin_sdk.json
 karatel/auth/config.py
 karatel/ai/config.py
+
+#
+**/*.tmp
+# Clouds
+**/.stfolder/
+**/.stversions/
+**/.stignore
+**/.syncthing.*.tmp
+**/~syncthing~*.tmp
+**/*sync-conflict*
+**/*conflicted*
