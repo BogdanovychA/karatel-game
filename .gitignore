@@ -16,6 +16,16 @@ build*/
 htmlcov/
 .pytest_cache/
 .coverage
+#
+**/*.tmp
+# Clouds
+**/.stfolder/
+**/.stversions/
+**/.stignore
+**/.syncthing.*.tmp
+**/~syncthing~*.tmp
+**/*sync-conflict*
+**/*conflicted*
 # Project
 karatel/manual_tests/
 karatel/saves/*
