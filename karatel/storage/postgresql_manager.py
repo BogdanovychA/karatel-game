@@ -50,8 +50,8 @@ def table_exists(
         with connection.cursor() as cursor:
             sql_query = """
             SELECT EXISTS (
-                SELECT 1 
-                FROM pg_tables 
+                SELECT 1
+                FROM pg_tables
                 WHERE schemaname = %s AND tablename = %s
             );
             """
@@ -123,14 +123,12 @@ def create_hero_table(connection: psycopg.Connection, table_name: str) -> None:
     else:
         try:
             with connection.cursor() as cursor:
-                sql_template = SQL(
-                    """CREATE TABLE {} (
+                sql_template = SQL("""CREATE TABLE {} (
                     id SERIAL PRIMARY KEY,
                     name TEXT NOT NULL,
                     hero BYTEA NOT NULL,
                     map BYTEA NOT NULL
-                    )"""
-                )
+                    )""")
                 sql_query = sql_template.format(Identifier(table_name))
 
                 cursor.execute(sql_query)
@@ -256,17 +254,15 @@ def insert_hero_and_map(hero: Hero, game_map: list | None, table_name: str) -> N
                     if DEBUG:
                         print(f"Герой '{hero.name}' збережений з ID: {hero_id}")
                 else:
-                    sql_template = SQL(
-                        """UPDATE {}
+                    sql_template = SQL("""UPDATE {}
                         SET hero = %s,
-                            map = %s 
+                            map = %s
                         WHERE id = (
-                            SELECT MIN(id) 
-                            FROM {} 
+                            SELECT MIN(id)
+                            FROM {}
                             WHERE name = %s
                         );
-                        """
-                    )
+                        """)
                     sql_query = sql_template.format(
                         Identifier(table_name), Identifier(table_name)
                     )

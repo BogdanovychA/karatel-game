@@ -56,9 +56,7 @@ def is_password_valid(password: str) -> bool:
                 (?=.*[{0}])           # 4. Lookahead: має бути хоча б один спец. символ
                 [a-zA-Z0-9{0}]{{8,}}  # Дозволені символи (всі попередні + спец.) і мінімум 8 разів
                 $                     # Кінець рядка
-            """.format(
-        re.escape(special_chars)
-    )
+            """.format(re.escape(special_chars))
     return bool(
         re.fullmatch(pattern, password, re.VERBOSE)
     )  # re.VERBOSE ігнорує пробіли та коментарі в патерні

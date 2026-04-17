@@ -308,10 +308,10 @@ def insert_hero_and_map_as_json(
                     cursor.execute(
                         f"""UPDATE {table_name}
                         SET hero = ?,
-                            map = ? 
+                            map = ?
                         WHERE id = (
-                            SELECT MIN(id) 
-                            FROM {table_name} 
+                            SELECT MIN(id)
+                            FROM {table_name}
                             WHERE name = ?
                         );
                         """,
