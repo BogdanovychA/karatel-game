@@ -1,35 +1,60 @@
-# IDEs
-.idea/
-.vscode/
-# Virtual environments
-.venv*/
-venv*/
-# Python-generated files
+### Agents
+/.agents/
+
+### IDEs
+**/.idea/
+**/.vscode/
+
+### Virtual environments
+**/.venv*/
+
+### Environmental variables
+**/.env
+**/.env.*
+!**/.env.example
+
+# OS
+**/*.tmp
+**/*.swp
+**/*.swo
+**/.cache
+**/.DS_Store
+**/Thumbs.db
+**/.thumbnails
+
+### Logs
+**/*.log
+**/logs/
+
+### Python-generated files
+**/__pypackages__/
 **/__pycache__/
 **/*.pyc
-*.py[oc]
-dist/
-wheels/
-*.egg-info
-build*/
-# Tests
-htmlcov/
-.pytest_cache/
-.coverage
+**/*.py[oc]
+**/dist/
+**/wheels/
+**/*.egg-info
+**/build*/
+**/.flet/
+
+### Tests
+**/htmlcov/
+**/.pytest_cache/
+**/.coverage
+**/.tox/
+**/.nox/
 
 # Project
-karatel/manual_tests/
-karatel/saves/*
-!karatel/saves/.gitkeep
-karatel/temp/*
-!karatel/temp/.temp
-karatel/storage/postgresql_config.py
-karatel/storage/karatel-game-firebase-admin_sdk.json
-karatel/auth/config.py
-karatel/ai/config.py
+/karatel/manual_tests/
+/karatel/saves/*
+!/karatel/saves/.gitkeep
+/karatel/temp/*
+!/karatel/temp/.temp
+/karatel/storage/postgresql_config.py
+/karatel/storage/karatel-game-firebase-admin_sdk.json
+/karatel/auth/config.py
+/karatel/ai/config.py
 
-#
-**/*.tmp
 # Clouds
 **/.stfolder/
 **/.stversions/
